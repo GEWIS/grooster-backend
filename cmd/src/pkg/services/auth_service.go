@@ -1,13 +1,17 @@
 package services
 
 import (
+	"GEWIS-Rooster/cmd/src/pkg/models"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
+	"gorm.io/gorm"
 	"io"
+	"strconv"
 	"strings"
 )
 
@@ -18,10 +22,12 @@ type AuthServiceInterface interface {
 }
 
 type AuthService struct {
+	u  *UserService
+	db *gorm.DB
 }
 
-func NewAuthService() *AuthService {
-	return &AuthService{}
+func NewAuthService(u *UserService, db *gorm.DB) *AuthService {
+	return &AuthService{u, db}
 }
 
 func (s *AuthService) SetCallBackCookie(c *gin.Context, value string) {
@@ -65,12 +71,71 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 		return
 	}
 
-	// Extract the claim
-	gewisId, ok := claims["preferred_username"].(string)
-	if !ok {
-		log.Error().Msg("Error getting gewisId")
-		return
+	// Extract the id
+	idStr := strings.Split(claims["preferred_username"].(string), "m")[1]
+	idInt, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Error().Msg(err.Error())
+	}
+	username := claims["given_name"].(string)
+
+	user, err := s.u.GetUser(uint(idInt))
+	if user == nil || err != nil {
+		id := uint(idInt)
+		params := models.UserCreateOrUpdate{
+			Name:    &username,
+			GEWISID: &id,
+		}
+		user, err = s.u.Create(&params)
+		if err != nil {
+			log.Error().Msg(err.Error())
+		}
 	}
 
-	log.Print(gewisId)
+	organs, err := getOrgans(claims, s.db)
+	if err != nil {
+		log.Error().Msg("Failed to get organs" + err.Error())
+	}
+
+	if err := s.db.Model(user).Association("Organs").Replace(organs); err != nil {
+		log.Error().Msg("Failed to update user organs" + err.Error())
+	}
+
+	log.Print(idInt, username, user, organs)
+}
+
+func getOrgans(claims map[string]interface{}, db *gorm.DB) ([]*models.Organ, error) {
+	resourceAccess, ok := claims["resource_access"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("resource_access not found or wrong type")
+	}
+
+	OICDName, ok := resourceAccess["grooster-test"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("grooster-test not found or wrong type")
+	}
+
+	roles, ok := OICDName["roles"].([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("roles not found or wrong type")
+	}
+
+	var organs []*models.Organ
+
+	for _, role := range roles {
+		if roleStr, ok := role.(string); ok {
+			if strings.HasPrefix(roleStr, "PRIV") {
+				var organString = strings.TrimPrefix(roleStr, "PRIV - ")
+
+				organ := models.Organ{
+					Name: organString,
+				}
+				db.FirstOrCreate(&organ, models.Organ{Name: organString})
+
+				organs = append(organs, &organ)
+			}
+		}
+	}
+
+	return organs, nil
 }

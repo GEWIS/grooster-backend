@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/auth/callback": {
             "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
                 "description": "Validates state, exchanges code for token, and returns user info",
                 "tags": [
                     "Auth"
@@ -71,6 +76,11 @@ const docTemplate = `{
         },
         "/auth/redirect": {
             "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
                 "description": "Generates state, sets a cookie, and redirects to Google OIDC",
                 "tags": [
                     "Auth"
@@ -97,6 +107,11 @@ const docTemplate = `{
         },
         "/roster/": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -141,6 +156,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -450,6 +470,11 @@ const docTemplate = `{
         },
         "/roster/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -850,12 +875,6 @@ const docTemplate = `{
                 "updatedAt": {
                     "type": "string"
                 },
-                "users": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/User"
-                    }
-                },
                 "values": {
                     "type": "array",
                     "items": {
@@ -932,12 +951,9 @@ const docTemplate = `{
                     "description": "Name the name of the new roster",
                     "type": "string"
                 },
-                "values": {
-                    "description": "Values the values this roster can have",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "organId": {
+                    "description": "Organ that the roster belongs to",
+                    "type": "integer"
                 }
             }
         },
@@ -977,15 +993,7 @@ const docTemplate = `{
             }
         },
         "RosterUpdateRequest": {
-            "type": "object",
-            "properties": {
-                "userIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
+            "type": "object"
         },
         "SavedShift": {
             "description": "A saved roster",
@@ -1041,6 +1049,9 @@ const docTemplate = `{
                 "deletedAt": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
+                "gewis_id": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1073,10 +1084,26 @@ const docTemplate = `{
         "models.UserCreateOrUpdate": {
             "type": "object",
             "properties": {
+                "gewisid": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
+                },
+                "organs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Organ"
+                    }
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

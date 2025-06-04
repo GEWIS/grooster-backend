@@ -1,49 +1,32 @@
 package handlers
 
 import (
+	"GEWIS-Rooster/cmd/src/pkg/middleware"
 	"GEWIS-Rooster/cmd/src/pkg/services"
-	"context"
 	"encoding/json"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"net/http"
-	"os"
 )
 
 type AuthHandler struct {
-	config   *oauth2.Config
-	provider *oidc.Provider
-	service  services.AuthServiceInterface
+	config     *oauth2.Config
+	provider   *oidc.Provider
+	service    services.AuthServiceInterface
+	authMiddle *middleware.AuthMiddleware
 }
 
-func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface) *AuthHandler {
-	ctx := context.Background()
-
-	provider, err := oidc.NewProvider(ctx, "https://auth.gewis.nl/realms/GEWISWG")
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to create OIDC provider")
-		return nil
-	}
-
-	config := &oauth2.Config{
-		ClientID:     os.Getenv("CLIENT_ID"),
-		ClientSecret: os.Getenv("CLIENT_SECRET"),
-		RedirectURL:  os.Getenv("URI_CALLBACK"),
-		Endpoint:     provider.Endpoint(),
-		// TODO Add correct GEWIS scopes
-		Scopes: []string{oidc.ScopeOpenID},
-	}
+func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface, authMiddle *middleware.AuthMiddleware) *AuthHandler {
+	provider, config := authMiddle.SetupOIDC()
 
 	h := &AuthHandler{config: config, provider: provider, service: auth}
 
-	g := rg.Group("/auth")
+	log.Printf("Path %s", rg.BasePath())
 
-	log.Printf("Path %s", g.BasePath())
-
-	g.GET("/redirect", h.AuthRedirect)
-	g.GET("/callback", h.AuthCallback)
+	rg.GET("/redirect", h.AuthRedirect)
+	rg.GET("/callback", h.AuthCallback)
 
 	return h
 }
@@ -52,6 +35,9 @@ func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface) *Au
 //
 //	@Summary		Redirect to OIDC provider
 //	@Description	Generates state, sets a cookie, and redirects to Google OIDC
+//
+// @Security BasicAuth
+//
 //	@Tags			Auth
 //	@Success		302	{string}	string				"redirect"
 //	@Failure		500	{object}	map[string]string	"pkg server error"
@@ -73,6 +59,9 @@ func (h *AuthHandler) AuthRedirect(c *gin.Context) {
 //
 //	@Summary		Handle OAuth2 Callback
 //	@Description	Validates state, exchanges code for token, and returns user info
+//
+// @Security BasicAuth
+//
 //	@Tags			Auth
 //	@Param			state	query		string				true	"State returned from provider"
 //	@Param			code	query		string				true	"Authorization code from provider"

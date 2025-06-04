@@ -4,6 +4,7 @@ import (
 	"GEWIS-Rooster/cmd/src/docs"
 	"GEWIS-Rooster/cmd/src/pkg"
 	handlers2 "GEWIS-Rooster/cmd/src/pkg/handlers"
+	"GEWIS-Rooster/cmd/src/pkg/middleware"
 	services2 "GEWIS-Rooster/cmd/src/pkg/services"
 	"database/sql"
 	"github.com/gin-contrib/cors"
@@ -17,6 +18,9 @@ import (
 // @title			GRooster
 // @version		0.1
 // @description	A GEWIS Rooster maker
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	log.Print("Starting server")
 
@@ -51,14 +55,22 @@ func main() {
 	}))
 
 	api := r.Group("/api/v1")
+	authMiddle := middleware.NewAuthMiddleware()
 
 	userService := services2.NewUserService(db)
 	rosterService := services2.NewRosterService(db)
-	authService := services2.NewAuthService()
+	authService := services2.NewAuthService(userService, db)
 
-	handlers2.NewUserHandler(api, userService)
-	handlers2.NewRosterHandler(rosterService, api)
-	handlers2.NewAuthHandler(api, authService)
+	// Auth routes (no authentication required)
+	authGroup := api.Group("/auth")
+	handlers2.NewAuthHandler(authGroup, authService, authMiddle)
+
+	protectedGroup := api.Group("")
+	protectedGroup.Use(authMiddle.AuthMiddlewareCheck())
+	{
+		handlers2.NewUserHandler(protectedGroup, userService)
+		handlers2.NewRosterHandler(rosterService, protectedGroup)
+	}
 
 	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
