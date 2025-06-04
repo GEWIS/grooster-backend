@@ -26,3 +26,5 @@ go.work.sum
 
 # IDE settings
 .idea
+
+test.db
