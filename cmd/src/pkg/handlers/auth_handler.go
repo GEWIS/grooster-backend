@@ -35,9 +35,7 @@ func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface, aut
 //
 //	@Summary		Redirect to OIDC provider
 //	@Description	Generates state, sets a cookie, and redirects to Google OIDC
-//
-// @Security BasicAuth
-//
+//	@Security		BasicAuth
 //	@Tags			Auth
 //	@Success		302	{string}	string				"redirect"
 //	@Failure		500	{object}	map[string]string	"pkg server error"
@@ -59,9 +57,7 @@ func (h *AuthHandler) AuthRedirect(c *gin.Context) {
 //
 //	@Summary		Handle OAuth2 Callback
 //	@Description	Validates state, exchanges code for token, and returns user info
-//
-// @Security BasicAuth
-//
+//	@Security		BasicAuth
 //	@Tags			Auth
 //	@Param			state	query		string				true	"State returned from provider"
 //	@Param			code	query		string				true	"Authorization code from provider"

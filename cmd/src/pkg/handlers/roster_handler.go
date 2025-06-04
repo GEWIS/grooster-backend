@@ -40,18 +40,14 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 // CreateRoster
 //
 //	@Summary	CreateRoster a new roster
-//
-// @Security BearerAuth
-//
+//	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
 //	@Param		createParams	body		models.RosterCreateRequest	true	"Roster input"
 //	@Success	200				{object}	models.Roster
 //	@Failure	400				{string}	string
-//
 //	@ID			createRoster
-//
 //	@Router		/roster/ [post]
 func (h *RosterHandler) CreateRoster(c *gin.Context) {
 	var param *models.RosterCreateRequest
@@ -73,9 +69,7 @@ func (h *RosterHandler) CreateRoster(c *gin.Context) {
 // GetRosters
 //
 //	@Summary	Get all rosters
-//
-// @Security BearerAuth
-//
+//	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
@@ -83,9 +77,7 @@ func (h *RosterHandler) CreateRoster(c *gin.Context) {
 //	@Success	200			{array}		models.Roster
 //	@Failure	400			{string}	string
 //	@Failure	404			{string}	string
-//
 //	@ID			getRosters
-//
 //	@Router		/roster/ [get]
 func (h *RosterHandler) GetRosters(c *gin.Context) {
 	date := c.Query("afterDate")
@@ -103,9 +95,7 @@ func (h *RosterHandler) GetRosters(c *gin.Context) {
 // GetRoster
 //
 //	@Summary	Get a roster using its ID
-//
-// @Security BearerAuth
-//
+//	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
@@ -113,9 +103,7 @@ func (h *RosterHandler) GetRosters(c *gin.Context) {
 //	@Success	200	{object}	models.Roster
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string
-//
 //	@ID			getRoster
-//
 //	@Router		/roster/{id} [get]
 func (h *RosterHandler) GetRoster(c *gin.Context) {
 	idParam := c.Param("id")
@@ -136,6 +124,7 @@ func (h *RosterHandler) GetRoster(c *gin.Context) {
 // UpdateRoster
 //
 //	@Summary	Update a roster
+//	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
@@ -143,9 +132,7 @@ func (h *RosterHandler) GetRoster(c *gin.Context) {
 //	@Param		updateParams	body		models.RosterUpdateRequest	true	"Roster input"
 //	@Success	200				{object}	models.Roster
 //	@Failure	400				{string}	string
-//
 //	@ID			updateRoster
-//
 //	@Router		/roster/{id} [patch]
 func (h *RosterHandler) UpdateRoster(c *gin.Context) {
 	idParam := c.Param("id")
@@ -173,6 +160,7 @@ func (h *RosterHandler) UpdateRoster(c *gin.Context) {
 // DeleteRoster
 //
 //	@Summary	DeleteRoster a roster
+//	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
@@ -180,9 +168,7 @@ func (h *RosterHandler) UpdateRoster(c *gin.Context) {
 //	@Success	200	{string}	string
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string
-//
 //	@ID			deleteRoster
-//
 //	@Router		/roster/{id} [delete]
 func (h *RosterHandler) DeleteRoster(c *gin.Context) {
 	rosterId, err := strconv.ParseUint(c.Param("id"), 10, 32)
@@ -204,16 +190,14 @@ func (h *RosterHandler) DeleteRoster(c *gin.Context) {
 // CreateRosterShift
 //
 //	@Summary	Create a new roster shift
+//	@Security	BearerAuth
 //	@Tags		Roster
-//
 //	@Accept		json
 //	@Produce	json
 //	@Param		createParams	body		models.RosterShiftCreateRequest	true	"Roster shift input"
 //	@Success	200				{object}	models.RosterShift
 //	@Failure	400				{string}	string
-//
 //	@ID			createRosterShift
-//
 //	@Router		/roster/shift [post]
 func (h *RosterHandler) CreateRosterShift(c *gin.Context) {
 	var param *models.RosterShiftCreateRequest
@@ -235,16 +219,14 @@ func (h *RosterHandler) CreateRosterShift(c *gin.Context) {
 // DeleteRosterShift
 //
 //	@Summary	Deletes a roster shift
+//	@Security	BearerAuth
 //	@Tags		Roster
-//
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int	true	"Roster Answer ID"
 //	@Success	200	{string}	string
 //	@Failure	400	{string}	string
-//
 //	@ID			deleteRosterShift
-//
 //	@Router		/roster/shift/{id} [delete]
 func (h *RosterHandler) DeleteRosterShift(c *gin.Context) {
 	rosterId, err := strconv.ParseUint(c.Param("id"), 10, 32)
@@ -266,16 +248,14 @@ func (h *RosterHandler) DeleteRosterShift(c *gin.Context) {
 // CreateRosterAnswer
 //
 //	@Summary	Create a new roster shift answer
+//	@Security	BearerAuth
 //	@Tags		Roster
-//
 //	@Accept		json
 //	@Produce	json
 //	@Param		createParams	body		models.RosterAnswerCreateRequest	true	"Roster answer input"
 //	@Success	200				{object}	models.RosterAnswer
 //	@Failure	400				{string}	string
-//
 //	@ID			createRosterAnswer
-//
 //	@Router		/roster/answer [post]
 func (h *RosterHandler) CreateRosterAnswer(c *gin.Context) {
 	var param *models.RosterAnswerCreateRequest
@@ -297,8 +277,8 @@ func (h *RosterHandler) CreateRosterAnswer(c *gin.Context) {
 // UpdateRosterAnswer
 //
 //	@Summary	Updates a roster answer with the new value
+//	@Security	BearerAuth
 //	@Tags		Roster
-//
 //	@Accept		json
 //	@Produce	json
 //	@Param		id				path		int									true	"Roster Answer ID"
@@ -306,9 +286,7 @@ func (h *RosterHandler) CreateRosterAnswer(c *gin.Context) {
 //	@Success	200				{object}	models.RosterAnswer
 //	@Failure	400				{string}	json
 //	@Failure	404				{string}	json
-//
 //	@ID			updateRosterAnswer
-//
 //	@Router		/roster/answer/{id} [patch]
 func (h *RosterHandler) UpdateRosterAnswer(c *gin.Context) {
 	idParam := c.Param("id")
@@ -336,6 +314,7 @@ func (h *RosterHandler) UpdateRosterAnswer(c *gin.Context) {
 // SaveRoster
 //
 //	@Summary	Save a specific roster
+//	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
@@ -369,17 +348,16 @@ func (h *RosterHandler) SaveRoster(c *gin.Context) {
 // UpdateSavedShift
 //
 //	@Summary	Update a specific saved shift
+//	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
 //	@Param		id				path		int								true	"SavedShift ID"
 //	@Param		updateParams	body		models.SavedShiftUpdateRequest	true	"Update data"
 //	@Success	200				{object}	models.SavedShift
-//	@Failure	400				{string}	string							"Invalid request"
-//	@Failure	404				{string}	string							"SavedShift not found"
-//
+//	@Failure	400				{string}	string	"Invalid request"
+//	@Failure	404				{string}	string	"SavedShift not found"
 //	@ID			updateSavedShift
-//
 //	@Router		/roster/saved-shift/{id} [patch]
 func (h *RosterHandler) UpdateSavedShift(c *gin.Context) {
 	idParam := c.Param("id")
@@ -411,6 +389,7 @@ func (h *RosterHandler) UpdateSavedShift(c *gin.Context) {
 // GetSavedRoster
 //
 //	@Summary	Get all saved shifts for a specific roster
+//	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
@@ -418,9 +397,7 @@ func (h *RosterHandler) UpdateSavedShift(c *gin.Context) {
 //	@Success	200	{array}		models.SavedShift	"Saved Shifts"
 //	@Failure	400	{string}	string				"Invalid request"
 //	@Failure	404	{string}	string				"SavedShift not found"
-//
 //	@ID			getSavedRoster
-//
 //	@Router		/roster/saved-shift/{id} [get]
 func (h *RosterHandler) GetSavedRoster(c *gin.Context) {
 	idParam := c.Param("id")

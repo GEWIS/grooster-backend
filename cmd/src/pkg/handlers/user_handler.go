@@ -31,6 +31,7 @@ func NewUserHandler(rg *gin.RouterGroup, userService services.UserServiceInterfa
 // Create
 //
 //	@Summary		CreateRoster a new user
+//	@Security		BearerAuth
 //	@Description	create user
 //	@Tags			User
 //	@Accept			json
@@ -61,10 +62,10 @@ func (h *UserHandler) Create(c *gin.Context) {
 // GetAll
 //
 //	@Summary	Get all users
+//	@Security	BearerAuth
 //	@Tags		User
 //	@Accept		json
 //	@Produce	json
-//
 //	@Success	200	{array}		models.User
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string
@@ -85,6 +86,7 @@ func (h *UserHandler) GetAll(c *gin.Context) {
 // Update
 //
 //	@Summary	UpdateRoster a user
+//	@Security	BearerAuth
 //	@Tags		User
 //	@Accept		json
 //	@Produce	json
@@ -121,11 +123,11 @@ func (h *UserHandler) Update(c *gin.Context) {
 // Delete
 //
 //	@Summary	DeleteRoster a user
+//	@Security	BearerAuth
 //	@Tags		User
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int	true	"User ID"
-//
 //	@Success	200	{string}	string
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string
