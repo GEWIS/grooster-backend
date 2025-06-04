@@ -7,6 +7,7 @@ import (
 
 type UserServiceInterface interface {
 	Create(*models.UserCreateOrUpdate) (*models.User, error)
+	GetUser(uint) (*models.User, error)
 	GetAll() ([]*models.User, error)
 	Update(uint, *models.UserCreateOrUpdate) (*models.User, error)
 	Delete(uint) error
@@ -22,10 +23,21 @@ func NewUserService(db *gorm.DB) *UserService {
 
 func (s *UserService) Create(createParams *models.UserCreateOrUpdate) (*models.User, error) {
 	user := models.User{
-		Name: createParams.Name,
+		Name:    *createParams.Name,
+		GEWISID: *createParams.GEWISID,
+		Organs:  createParams.Organs,
 	}
 
 	if err := s.db.Create(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (s *UserService) GetUser(gewisId uint) (*models.User, error) {
+	var user models.User
+	if err := s.db.Where("gewis_id = ?", gewisId).First(&user).Error; err != nil {
 		return nil, err
 	}
 

@@ -5,5 +5,5 @@ package models
 type Organ struct {
 	BaseModel
 
-	Name string
+	Name string `gorm:"uniqueIndex"`
 } // @name Organ

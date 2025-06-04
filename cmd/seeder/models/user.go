@@ -16,8 +16,9 @@ func SeedUser(d *gorm.DB, count int) {
 
 	for i := 0; i < count; i++ {
 		user := models.User{
-			Name:   "User" + strconv.Itoa(i),
-			Organs: organs,
+			Name:    "User" + strconv.Itoa(i),
+			GEWISID: uint(1000 + i),
+			Organs:  organs,
 		}
 
 		if err := d.Create(&user).Error; err != nil {

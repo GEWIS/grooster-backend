@@ -40,6 +40,9 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 // CreateRoster
 //
 //	@Summary	CreateRoster a new roster
+//
+// @Security BearerAuth
+//
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
@@ -70,6 +73,9 @@ func (h *RosterHandler) CreateRoster(c *gin.Context) {
 // GetRosters
 //
 //	@Summary	Get all rosters
+//
+// @Security BearerAuth
+//
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
@@ -97,6 +103,9 @@ func (h *RosterHandler) GetRosters(c *gin.Context) {
 // GetRoster
 //
 //	@Summary	Get a roster using its ID
+//
+// @Security BearerAuth
+//
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json

@@ -11,8 +11,8 @@ import (
 
 type RosterServiceInterface interface {
 	CreateRoster(*models.RosterCreateRequest) (*models.Roster, error)
-	GetRosters(*string) ([]*models.Roster, error)
-	GetRoster(uint) (*models.Roster, error)
+	GetRosters(*string) ([]*models.RosterResponse, error)
+	GetRoster(uint) (*models.RosterResponse, error)
 	UpdateRoster(uint, *models.RosterUpdateRequest) (*models.Roster, error)
 	DeleteRoster(ID uint) error
 
@@ -45,7 +45,6 @@ func (s *RosterService) CreateRoster(createParams *models.RosterCreateRequest) (
 	roster := models.Roster{
 		Name:   createParams.Name,
 		Values: values,
-		Users:  users,
 	}
 
 	if err := s.db.Create(&roster).Error; err != nil {
@@ -55,22 +54,52 @@ func (s *RosterService) CreateRoster(createParams *models.RosterCreateRequest) (
 	return &roster, nil
 }
 
-func (s *RosterService) GetRosters(date *string) ([]*models.Roster, error) {
+func (s *RosterService) GetRosters(date *string) ([]*models.RosterResponse, error) {
 	var rosters []*models.Roster
-	if err := s.db.Preload("RosterShift").Preload("Users").Preload("RosterAnswer").Where("Date > ?", date).Find(&rosters).Error; err != nil {
+	if err := s.db.Preload("RosterShift").Preload("RosterAnswer").Where("Date > ?", date).Find(&rosters).Error; err != nil {
 		return nil, err
 	}
 
-	return rosters, nil
+	var rosterResponses []*models.RosterResponse
+	for _, roster := range rosters {
+		var users []*models.User
+		if err := s.db.
+			Joins("JOIN user_organs ON users.id = user_organs.user_id").
+			Where("user_organs.organ_id = ?", roster.Organ).
+			Find(&users).Error; err != nil {
+			return nil, err
+		}
+
+		rosterResponse := models.RosterResponse{
+			Roster: roster,
+			Users:  users,
+		}
+		rosterResponses = append(rosterResponses, &rosterResponse)
+	}
+
+	return rosterResponses, nil
 }
 
-func (s *RosterService) GetRoster(ID uint) (*models.Roster, error) {
+func (s *RosterService) GetRoster(ID uint) (*models.RosterResponse, error) {
 	var roster models.Roster
 	if err := s.db.Preload(clause.Associations).First(&roster, "id = ?", ID).Error; err != nil {
 		return nil, err
 	}
 
-	return &roster, nil
+	var users []*models.User
+	if err := s.db.
+		Joins("JOIN user_organs ON users.id = user_organs.user_id").
+		Where("user_organs.organ_id = ?", roster.Organ).
+		Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	rosterResponse := models.RosterResponse{
+		Roster: &roster,
+		Users:  users,
+	}
+
+	return &rosterResponse, nil
 }
 
 func (s *RosterService) UpdateRoster(ID uint, updateParams *models.RosterUpdateRequest) (*models.Roster, error) {
@@ -79,15 +108,15 @@ func (s *RosterService) UpdateRoster(ID uint, updateParams *models.RosterUpdateR
 		return nil, err
 	}
 
-	if updateParams.UserIDs != nil {
-		var users []models.User
-		if err := s.db.Where("id IN ?", *updateParams.UserIDs).Find(&users).Error; err != nil {
-			return nil, err
-		}
-		if err := s.db.Model(&roster).Association("Users").Replace(&users); err != nil {
-			return nil, err
-		}
-	}
+	//if updateParams.UserIDs != nil {
+	//	var users []models.User
+	//	if err := s.db.Where("id IN ?", *updateParams.UserIDs).Find(&users).Error; err != nil {
+	//		return nil, err
+	//	}
+	//	if err := s.db.Model(&roster).Association("Users").Replace(&users); err != nil {
+	//		return nil, err
+	//	}
+	//}
 
 	return roster, nil
 }
