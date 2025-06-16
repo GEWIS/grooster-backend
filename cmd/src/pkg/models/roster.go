@@ -39,6 +39,8 @@ type RosterCreateRequest struct {
 type RosterUpdateRequest struct {
 } // @name RosterUpdateRequest
 
+// RosterResponse
+// @Description RosterResponse is the response  from a get roster request
 type RosterResponse struct {
 	Roster *Roster `json:"roster"`
 	Users  []*User `json:"users"`

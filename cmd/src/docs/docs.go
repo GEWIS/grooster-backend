@@ -86,8 +86,17 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Redirect to OIDC provider",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "State returned from provider",
+                        "name": "state",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
-                    "302": {
+                    "200": {
                         "description": "redirect",
                         "schema": {
                             "type": "string"
@@ -137,7 +146,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/Roster"
+                                "$ref": "#/definitions/RosterResponse"
                             }
                         }
                     },
@@ -201,6 +210,11 @@ const docTemplate = `{
         },
         "/roster/answer": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -241,6 +255,11 @@ const docTemplate = `{
         },
         "/roster/answer/{id}": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -294,6 +313,11 @@ const docTemplate = `{
         },
         "/roster/saved-shift/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -339,6 +363,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -392,6 +421,11 @@ const docTemplate = `{
         },
         "/roster/shift": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -432,6 +466,11 @@ const docTemplate = `{
         },
         "/roster/shift/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -484,12 +523,12 @@ const docTemplate = `{
                 "tags": [
                     "Roster"
                 ],
-                "summary": "Get a roster using its ID",
-                "operationId": "getRoster",
+                "summary": "Get the organs rosters",
+                "operationId": "getOrganRosters",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Roster ID",
+                        "description": "Organ ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -499,7 +538,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/Roster"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RosterResponse"
+                            }
                         }
                     },
                     "400": {
@@ -517,6 +559,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -559,6 +606,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -606,6 +658,11 @@ const docTemplate = `{
         },
         "/roster/{id}/save": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -648,8 +705,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/user": {
+        "/user/": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -687,6 +749,11 @@ const docTemplate = `{
         },
         "/user/create": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "create user",
                 "consumes": [
                     "application/json"
@@ -726,7 +793,61 @@ const docTemplate = `{
             }
         },
         "/user/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user by GEWIS id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "GEWIS ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/User"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -771,6 +892,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -832,6 +958,12 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.User"
+                    }
                 }
             }
         },
@@ -957,6 +1089,21 @@ const docTemplate = `{
                 }
             }
         },
+        "RosterResponse": {
+            "description": "RosterResponse is the response  from a get roster request",
+            "type": "object",
+            "properties": {
+                "roster": {
+                    "$ref": "#/definitions/Roster"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User"
+                    }
+                }
+            }
+        },
         "RosterShift": {
             "description": "One column of a roster",
             "type": "object",
@@ -1040,7 +1187,19 @@ const docTemplate = `{
                 }
             }
         },
-        "User": {
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.User": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -1066,18 +1225,6 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
-                }
-            }
-        },
-        "gorm.DeletedAt": {
-            "type": "object",
-            "properties": {
-                "time": {
-                    "type": "string"
-                },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
                 }
             }
         },

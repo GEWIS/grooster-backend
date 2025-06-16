@@ -1,7 +1,10 @@
 package middleware
 
 import (
+	"GEWIS-Rooster/cmd/src/pkg/services"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gin-gonic/gin"
@@ -21,16 +24,17 @@ type AuthMiddlewareInterface interface {
 	SetupOIDC() (*oidc.IDToken, *oidc.Config)
 }
 
-type AuthMiddleware struct{}
+type AuthMiddleware struct {
+	authService *services.AuthService
+}
 
-func NewAuthMiddleware() *AuthMiddleware {
-	return &AuthMiddleware{}
+func NewAuthMiddleware(auth *services.AuthService) *AuthMiddleware {
+	return &AuthMiddleware{authService: auth}
 }
 
 // AuthMiddlewareCheck creates a middleware that validates OIDC tokens
 func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Extract token from Authorization header
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -40,7 +44,6 @@ func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 			return
 		}
 
-		// Remove "Bearer " prefix
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -50,7 +53,6 @@ func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 			return
 		}
 
-		// Verify the ID token
 		if verifier == nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "OIDC verifier not initialized",
@@ -69,6 +71,34 @@ func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 			return
 		}
 
+		parts := strings.Split(tokenString, ".")
+		if len(parts) != 3 {
+			log.Error().Msg("invalid token format")
+			return
+		}
+
+		// parts[1] is the payload
+		payloadBytes, err := base64.RawURLEncoding.DecodeString(parts[1])
+		if err != nil {
+			log.Error().Msgf(err.Error())
+			return
+		}
+
+		// Unmarshal JSON into a map
+		var claims map[string]interface{}
+		err = json.Unmarshal(payloadBytes, &claims)
+		if err != nil {
+			log.Error().Msg(err.Error())
+			return
+		}
+
+		organs, err := a.authService.GetOrgans(claims)
+		if err != nil {
+			log.Error().Msg(err.Error())
+			return
+		}
+
+		c.Set("organs", organs)
 		c.Next()
 	}
 }

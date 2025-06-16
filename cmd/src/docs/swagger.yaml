@@ -12,6 +12,10 @@ definitions:
         type: string
       updatedAt:
         type: string
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
     type: object
   Roster:
     description: Roster info with a gorm model, name, users, shifts and values
@@ -95,6 +99,16 @@ definitions:
         description: Organ that the roster belongs to
         type: integer
     type: object
+  RosterResponse:
+    description: RosterResponse is the response  from a get roster request
+    properties:
+      roster:
+        $ref: '#/definitions/Roster'
+      users:
+        items:
+          $ref: '#/definitions/User'
+        type: array
+    type: object
   RosterShift:
     description: One column of a roster
     properties:
@@ -150,7 +164,15 @@ definitions:
           type: integer
         type: array
     type: object
-  User:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.User:
     properties:
       createdAt:
         type: string
@@ -168,14 +190,6 @@ definitions:
         type: array
       updatedAt:
         type: string
-    type: object
-  gorm.DeletedAt:
-    properties:
-      time:
-        type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
     type: object
   models.UserCreateOrUpdate:
     properties:
@@ -235,8 +249,14 @@ paths:
   /auth/redirect:
     get:
       description: Generates state, sets a cookie, and redirects to Google OIDC
+      parameters:
+      - description: State returned from provider
+        in: query
+        name: state
+        required: true
+        type: string
       responses:
-        "302":
+        "200":
           description: redirect
           schema:
             type: string
@@ -268,7 +288,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/Roster'
+              $ref: '#/definitions/RosterResponse'
             type: array
         "400":
           description: Bad Request
@@ -336,15 +356,17 @@ paths:
           description: Not Found
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: DeleteRoster a roster
       tags:
       - Roster
     get:
       consumes:
       - application/json
-      operationId: getRoster
+      operationId: getOrganRosters
       parameters:
-      - description: Roster ID
+      - description: Organ ID
         in: path
         name: id
         required: true
@@ -355,7 +377,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Roster'
+            items:
+              $ref: '#/definitions/RosterResponse'
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -366,7 +390,7 @@ paths:
             type: string
       security:
       - BearerAuth: []
-      summary: Get a roster using its ID
+      summary: Get the organs rosters
       tags:
       - Roster
     patch:
@@ -396,6 +420,8 @@ paths:
           description: Bad Request
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Update a roster
       tags:
       - Roster
@@ -425,6 +451,8 @@ paths:
           description: Not Found
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Save a specific roster
       tags:
       - Roster
@@ -451,6 +479,8 @@ paths:
           description: Bad Request
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Create a new roster shift answer
       tags:
       - Roster
@@ -486,6 +516,8 @@ paths:
           description: Not Found
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Updates a roster answer with the new value
       tags:
       - Roster
@@ -517,6 +549,8 @@ paths:
           description: SavedShift not found
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Get all saved shifts for a specific roster
       tags:
       - Roster
@@ -551,6 +585,8 @@ paths:
           description: SavedShift not found
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Update a specific saved shift
       tags:
       - Roster
@@ -577,6 +613,8 @@ paths:
           description: Bad Request
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Create a new roster shift
       tags:
       - Roster
@@ -602,10 +640,12 @@ paths:
           description: Bad Request
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Deletes a roster shift
       tags:
       - Roster
-  /user:
+  /user/:
     get:
       consumes:
       - application/json
@@ -626,6 +666,8 @@ paths:
           description: Not Found
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: Get all users
       tags:
       - User
@@ -654,7 +696,40 @@ paths:
           description: Not Found
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: DeleteRoster a user
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: GEWIS ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get user by GEWIS id
       tags:
       - User
     put:
@@ -683,6 +758,8 @@ paths:
           description: Bad Request
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: UpdateRoster a user
       tags:
       - User
@@ -709,6 +786,8 @@ paths:
           description: Bad Request
           schema:
             type: string
+      security:
+      - BearerAuth: []
       summary: CreateRoster a new user
       tags:
       - User

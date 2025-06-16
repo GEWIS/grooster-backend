@@ -3,7 +3,7 @@ package handlers
 import (
 	"GEWIS-Rooster/cmd/src/pkg/middleware"
 	"GEWIS-Rooster/cmd/src/pkg/services"
-	"encoding/json"
+	"fmt"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -37,7 +37,8 @@ func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface, aut
 //	@Description	Generates state, sets a cookie, and redirects to Google OIDC
 //	@Security		BasicAuth
 //	@Tags			Auth
-//	@Success		302	{string}	string				"redirect"
+//	@Param			state	query		string				true	"State returned from provider"
+//	@Success		200	{string}	string				"redirect"
 //	@Failure		500	{object}	map[string]string	"pkg server error"
 //	@Router			/auth/redirect [get]
 func (h *AuthHandler) AuthRedirect(c *gin.Context) {
@@ -50,7 +51,8 @@ func (h *AuthHandler) AuthRedirect(c *gin.Context) {
 	h.service.SetCallBackCookie(c, state)
 
 	redirectURL := h.config.AuthCodeURL(state)
-	c.JSON(http.StatusOK, gin.H{"state": state, "redirectURL": redirectURL})
+
+	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 }
 
 // AuthCallback
@@ -82,23 +84,8 @@ func (h *AuthHandler) AuthCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not exchange token"})
 	}
 
-	userInfo, err := h.provider.UserInfo(c.Request.Context(), oauth2.StaticTokenSource(oauth2Token))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get user info" + err.Error()})
-		return
-	}
-
-	resp := struct {
-		OAuth2Token *oauth2.Token
-		UserInfo    *oidc.UserInfo
-	}{oauth2Token, userInfo}
-
 	h.service.ProcessUserInfo(oauth2Token)
 
-	data, err := json.MarshalIndent(resp, "", "  ")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": string(data)})
+	redirectUrl := fmt.Sprintf("http://localhost:5173/callback?token=%s", oauth2Token.AccessToken)
+	c.Redirect(http.StatusTemporaryRedirect, redirectUrl)
 }

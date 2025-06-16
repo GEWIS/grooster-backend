@@ -19,6 +19,7 @@ type AuthServiceInterface interface {
 	SetCallBackCookie(*gin.Context, string)
 	RandString(int) (string, error)
 	ProcessUserInfo(*oauth2.Token)
+	GetOrgans(claims map[string]interface{}) ([]*models.Organ, error)
 }
 
 type AuthService struct {
@@ -92,19 +93,17 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 		}
 	}
 
-	organs, err := getOrgans(claims, s.db)
+	organs, err := s.GetOrgans(claims)
 	if err != nil {
 		log.Error().Msg("Failed to get organs" + err.Error())
 	}
-
+	log.Print(organs)
 	if err := s.db.Model(user).Association("Organs").Replace(organs); err != nil {
 		log.Error().Msg("Failed to update user organs" + err.Error())
 	}
-
-	log.Print(idInt, username, user, organs)
 }
 
-func getOrgans(claims map[string]interface{}, db *gorm.DB) ([]*models.Organ, error) {
+func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]*models.Organ, error) {
 	resourceAccess, ok := claims["resource_access"].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("resource_access not found or wrong type")
@@ -130,7 +129,7 @@ func getOrgans(claims map[string]interface{}, db *gorm.DB) ([]*models.Organ, err
 				organ := models.Organ{
 					Name: organString,
 				}
-				db.FirstOrCreate(&organ, models.Organ{Name: organString})
+				s.db.FirstOrCreate(&organ, models.Organ{Name: organString})
 
 				organs = append(organs, &organ)
 			}

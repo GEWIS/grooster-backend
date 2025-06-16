@@ -22,6 +22,7 @@ func NewUserHandler(rg *gin.RouterGroup, userService services.UserServiceInterfa
 
 	g.POST("/create", h.Create)
 	g.GET("/", h.GetAll)
+	g.GET("/:id", h.Get)
 	g.PATCH("/:id", h.Update)
 	g.DELETE("/:id", h.Delete)
 
@@ -69,7 +70,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 //	@Success	200	{array}		models.User
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string
-//	@Router		/user [get]
+//	@Router		/user/ [get]
 func (h *UserHandler) GetAll(c *gin.Context) {
 	users, err := h.userService.GetAll()
 
@@ -77,10 +78,38 @@ func (h *UserHandler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	log.Print(users[0])
+	c.JSON(http.StatusOK, users)
+}
 
-	c.JSON(http.StatusOK, gin.H{
-		"users": users,
-	})
+// Get
+//
+//	@Summary	Get user by GEWIS id
+//	@Security	BearerAuth
+//	@Tags		User
+//	@Accept		json
+//	@Produce	json
+//	@Param		id				path		uint						true	"GEWIS ID"
+//	@Success	200	{array}		models.User
+//	@Failure	400	{string}	string
+//	@Failure	404	{string}	string
+//	@Router		/user/{id} [get]
+func (h *UserHandler) Get(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	user, err := h.userService.GetUser(uint(id))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }
 
 // Update

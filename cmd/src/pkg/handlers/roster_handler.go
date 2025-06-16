@@ -21,7 +21,7 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 
 	g.POST("/", h.CreateRoster)
 	g.GET("/", h.GetRosters)
-	g.GET("/:id", h.GetRoster)
+	g.GET("/:id", h.GetOrganRosters)
 	g.PATCH("/:id", h.UpdateRoster)
 	g.DELETE("/:id", h.DeleteRoster)
 
@@ -74,7 +74,7 @@ func (h *RosterHandler) CreateRoster(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		afterDate	query		string	false	"Roster after this date"
-//	@Success	200			{array}		models.Roster
+//	@Success	200			{array}		models.RosterResponse
 //	@Failure	400			{string}	string
 //	@Failure	404			{string}	string
 //	@ID			getRosters
@@ -92,20 +92,20 @@ func (h *RosterHandler) GetRosters(c *gin.Context) {
 	c.JSON(http.StatusOK, rosters)
 }
 
-// GetRoster
+// GetOrganRosters
 //
-//	@Summary	Get a roster using its ID
+//	@Summary	Get the organs rosters
 //	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
-//	@Param		id	path		uint	true	"Roster ID"
-//	@Success	200	{object}	models.Roster
+//	@Param		id	path		uint	true	"Organ ID"
+//	@Success	200	{array}	models.RosterResponse
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string
-//	@ID			getRoster
+//	@ID			getOrganRosters
 //	@Router		/roster/{id} [get]
-func (h *RosterHandler) GetRoster(c *gin.Context) {
+func (h *RosterHandler) GetOrganRosters(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 64)
 	if err != nil {
@@ -113,12 +113,37 @@ func (h *RosterHandler) GetRoster(c *gin.Context) {
 		return
 	}
 
-	roster, err := h.rosterService.GetRoster(uint(id))
+	organsContext, ext := c.Get("organs")
+	if !ext {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Could not find any organs"})
+		return
+	}
+
+	organs, ok := organsContext.([]*models.Organ)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not get organs from context"})
+		return
+	}
+
+	found := false
+	for _, organ := range organs {
+		if uint64(organ.ID) == id {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		c.JSON(http.StatusForbidden, gin.H{"error": "User not in organ"})
+		return
+	}
+
+	rosters, err := h.rosterService.GetOrganRosters(uint(id))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, roster)
+	c.JSON(http.StatusOK, rosters)
 }
 
 // UpdateRoster

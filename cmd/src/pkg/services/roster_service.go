@@ -12,7 +12,7 @@ import (
 type RosterServiceInterface interface {
 	CreateRoster(*models.RosterCreateRequest) (*models.Roster, error)
 	GetRosters(*string) ([]*models.RosterResponse, error)
-	GetRoster(uint) (*models.RosterResponse, error)
+	GetOrganRosters(uint) ([]*models.RosterResponse, error)
 	UpdateRoster(uint, *models.RosterUpdateRequest) (*models.Roster, error)
 	DeleteRoster(ID uint) error
 
@@ -45,6 +45,7 @@ func (s *RosterService) CreateRoster(createParams *models.RosterCreateRequest) (
 	roster := models.Roster{
 		Name:   createParams.Name,
 		Values: values,
+		Organ:  createParams.OrganID,
 	}
 
 	if err := s.db.Create(&roster).Error; err != nil {
@@ -80,26 +81,29 @@ func (s *RosterService) GetRosters(date *string) ([]*models.RosterResponse, erro
 	return rosterResponses, nil
 }
 
-func (s *RosterService) GetRoster(ID uint) (*models.RosterResponse, error) {
-	var roster models.Roster
-	if err := s.db.Preload(clause.Associations).First(&roster, "id = ?", ID).Error; err != nil {
+func (s *RosterService) GetOrganRosters(organID uint) ([]*models.RosterResponse, error) {
+	var rosters []*models.Roster
+	if err := s.db.Preload(clause.Associations).Find(&rosters, "organ = ?", organID).Error; err != nil {
 		return nil, err
 	}
 
 	var users []*models.User
 	if err := s.db.
 		Joins("JOIN user_organs ON users.id = user_organs.user_id").
-		Where("user_organs.organ_id = ?", roster.Organ).
+		Where("user_organs.organ_id = ?", organID).
 		Find(&users).Error; err != nil {
 		return nil, err
 	}
-
-	rosterResponse := models.RosterResponse{
-		Roster: &roster,
-		Users:  users,
+	log.Print(&rosters)
+	var responses []*models.RosterResponse
+	for _, roster := range rosters {
+		responses = append(responses, &models.RosterResponse{
+			Roster: roster,
+			Users:  users,
+		})
 	}
 
-	return &rosterResponse, nil
+	return responses, nil
 }
 
 func (s *RosterService) UpdateRoster(ID uint, updateParams *models.RosterUpdateRequest) (*models.Roster, error) {

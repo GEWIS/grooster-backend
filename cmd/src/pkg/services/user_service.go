@@ -37,7 +37,7 @@ func (s *UserService) Create(createParams *models.UserCreateOrUpdate) (*models.U
 
 func (s *UserService) GetUser(gewisId uint) (*models.User, error) {
 	var user models.User
-	if err := s.db.Where("gewis_id = ?", gewisId).First(&user).Error; err != nil {
+	if err := s.db.Preload("Organs").Where("gewis_id = ?", gewisId).First(&user).Error; err != nil {
 		return nil, err
 	}
 
@@ -47,7 +47,7 @@ func (s *UserService) GetUser(gewisId uint) (*models.User, error) {
 func (s *UserService) GetAll() ([]*models.User, error) {
 	var users []*models.User
 
-	if err := s.db.Find(&users).Error; err != nil {
+	if err := s.db.Preload("Organs").Find(&users).Error; err != nil {
 		return nil, err
 	}
 
