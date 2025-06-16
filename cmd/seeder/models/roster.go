@@ -31,7 +31,6 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 	for i := 0; i < count; i++ {
 		r := &models.Roster{
 			Name:   "Roster" + strconv.Itoa(i),
-			Users:  users,
 			Values: values,
 			Organ:  organs[0].ID,
 			Date:   time.Now(),
@@ -63,12 +62,19 @@ func rosterShift(db *gorm.DB, roster []*models.Roster) {
 
 func rosterAnswer(db *gorm.DB, roster []*models.Roster) {
 	for _, roster := range roster {
-		var users []models.User
+		var users []*models.User
 		var shifts []models.RosterShift
 
-		err := db.Model(roster).Association("Users").Find(&users)
+		var organ models.Organ
+
+		err := db.First(&organ, roster.Organ).Error
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to create roster answers")
+			log.Error().Err(err).Msg("Could not get organ")
+		}
+
+		err = db.Model(&organ).Association("Users").Find(&users)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not get users")
 		}
 		db.Where("roster_id = ?", roster.ID).Find(&shifts)
 
