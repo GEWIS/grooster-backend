@@ -89,7 +89,7 @@ func (h *UserHandler) GetAll(c *gin.Context) {
 //	@Tags		User
 //	@Accept		json
 //	@Produce	json
-//	@Param		id				path		uint						true	"GEWIS ID"
+//	@Param		id	path		uint	true	"GEWIS ID"
 //	@Success	200	{array}		models.User
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string

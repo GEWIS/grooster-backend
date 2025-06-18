@@ -2,17 +2,17 @@ package services
 
 import (
 	"GEWIS-Rooster/cmd/src/pkg/models"
+	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"slices"
+	"time"
 )
 
 type RosterServiceInterface interface {
 	CreateRoster(*models.RosterCreateRequest) (*models.Roster, error)
-	GetRosters(*string) ([]*models.RosterResponse, error)
-	GetOrganRosters(uint) ([]*models.RosterResponse, error)
+	GetRosters(*models.RosterFilterParams) ([]*models.Roster, error)
 	UpdateRoster(uint, *models.RosterUpdateRequest) (*models.Roster, error)
 	DeleteRoster(ID uint) error
 
@@ -34,93 +34,85 @@ func NewRosterService(db *gorm.DB) *RosterService {
 	return &RosterService{db: db}
 }
 
-func (s *RosterService) CreateRoster(createParams *models.RosterCreateRequest) (*models.Roster, error) {
-	var users []*models.User
-	var values = models.Values{"Ja", "X", "L", "Nee"}
+func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*models.Roster, error) {
+	var users []models.User
+	var values = models.Values{"Ja", "X", "L", "Nee"} //TODO Change this to input values
 
 	if err := s.db.Find(&users).Error; err != nil {
 		return nil, err
 	}
+	if err := s.db.Find(&models.Organ{}, params.OrganID).Error; err != nil {
+		return nil, err
+	}
+	if !isAfterToday(params.Date) {
+		return nil, errors.New("date must be after the current date")
+	}
+	if params.Name == "" {
+		return nil, errors.New("name is required")
+	}
 
 	roster := models.Roster{
-		Name:   createParams.Name,
-		Values: values,
-		Organ:  createParams.OrganID,
+		Name:    params.Name,
+		Date:    params.Date,
+		OrganID: params.OrganID,
+		Values:  values,
 	}
 
 	if err := s.db.Create(&roster).Error; err != nil {
 		return nil, err
 	}
 
+	if err := s.db.Preload("Organ").First(&roster, roster.ID).Error; err != nil {
+		return nil, err
+	}
+
 	return &roster, nil
 }
 
-func (s *RosterService) GetRosters(date *string) ([]*models.RosterResponse, error) {
+func (s *RosterService) GetRosters(params *models.RosterFilterParams) ([]*models.Roster, error) {
+	db := s.db.Model(&models.Roster{})
+
+	if params.ID != nil {
+		db = db.Where("id = ?", *params.ID)
+	}
+
+	if params.Date != nil {
+		db = db.Where("date = ?", *params.Date)
+	}
+
+	if params.OrganID != nil {
+		db = db.Where("organ_id = ?", *params.OrganID)
+	}
+
 	var rosters []*models.Roster
-	if err := s.db.Preload("RosterShift").Preload("RosterAnswer").Where("Date > ?", date).Find(&rosters).Error; err != nil {
+	if err := db.Find(&rosters).Error; err != nil {
 		return nil, err
 	}
 
-	var rosterResponses []*models.RosterResponse
-	for _, roster := range rosters {
-		var users []*models.User
-		if err := s.db.
-			Joins("JOIN user_organs ON users.id = user_organs.user_id").
-			Where("user_organs.organ_id = ?", roster.Organ).
-			Find(&users).Error; err != nil {
-			return nil, err
-		}
-
-		rosterResponse := models.RosterResponse{
-			Roster: roster,
-			Users:  users,
-		}
-		rosterResponses = append(rosterResponses, &rosterResponse)
-	}
-
-	return rosterResponses, nil
+	return rosters, nil
 }
 
-func (s *RosterService) GetOrganRosters(organID uint) ([]*models.RosterResponse, error) {
-	var rosters []*models.Roster
-	if err := s.db.Preload(clause.Associations).Find(&rosters, "organ = ?", organID).Error; err != nil {
-		return nil, err
-	}
-
-	var users []*models.User
-	if err := s.db.
-		Joins("JOIN user_organs ON users.id = user_organs.user_id").
-		Where("user_organs.organ_id = ?", organID).
-		Find(&users).Error; err != nil {
-		return nil, err
-	}
-	log.Print(&rosters)
-	var responses []*models.RosterResponse
-	for _, roster := range rosters {
-		responses = append(responses, &models.RosterResponse{
-			Roster: roster,
-			Users:  users,
-		})
-	}
-
-	return responses, nil
-}
-
-func (s *RosterService) UpdateRoster(ID uint, updateParams *models.RosterUpdateRequest) (*models.Roster, error) {
+func (s *RosterService) UpdateRoster(id uint, params *models.RosterUpdateRequest) (*models.Roster, error) {
 	var roster *models.Roster
-	if err := s.db.First(&roster, ID).Error; err != nil {
+
+	if err := s.db.First(&roster, id).Error; err != nil {
 		return nil, err
 	}
 
-	//if updateParams.UserIDs != nil {
-	//	var users []models.User
-	//	if err := s.db.Where("id IN ?", *updateParams.UserIDs).Find(&users).Error; err != nil {
-	//		return nil, err
-	//	}
-	//	if err := s.db.Model(&roster).Association("Users").Replace(&users); err != nil {
-	//		return nil, err
-	//	}
-	//}
+	if params.Date != nil && !isAfterToday(*params.Date) {
+		return nil, errors.New("date must be after the current date")
+	}
+
+	if params.Date != nil {
+		roster.Date = *params.Date
+	}
+	if params.Name != nil {
+		roster.Name = *params.Name
+	}
+
+	if err := s.db.Save(&roster).Error; err != nil {
+		return nil, err
+	}
 
 	return roster, nil
 }
@@ -162,26 +154,26 @@ func (s *RosterService) DeleteRosterShift(ID uint) error {
 	return nil
 }
 
-func (s *RosterService) CreateRosterAnswer(createParams *models.RosterAnswerCreateRequest) (*models.RosterAnswer, error) {
+func (s *RosterService) CreateRosterAnswer(params *models.RosterAnswerCreateRequest) (*models.RosterAnswer, error) {
 	var roster *models.Roster
-	if err := s.db.First(&roster, createParams.RosterID).Error; err != nil {
+	if err := s.db.First(&roster, params.RosterID).Error; err != nil {
 		return nil, fmt.Errorf("roster not found: %w", err)
 	}
 
 	var rosterShift *models.RosterShift
-	if err := s.db.First(&rosterShift, roster.ID).Error; err != nil {
-		return nil, fmt.Errorf("roster not found: %w", err)
+	if err := s.db.First(&rosterShift, params.RosterShiftID).Error; err != nil {
+		return nil, fmt.Errorf("roster shift not found: %w", err)
 	}
 
-	if !slices.Contains(roster.Values, createParams.Value) {
-		return nil, fmt.Errorf("%s is not a valid value for this roster", createParams.Value)
+	if !slices.Contains(roster.Values, params.Value) {
+		return nil, fmt.Errorf("%s is not a valid value for this roster", params.Value)
 	}
 
 	rosterAnswer := models.RosterAnswer{
-		UserID:        createParams.UserID,
+		UserID:        params.UserID,
 		RosterID:      roster.ID,
-		RosterShiftID: createParams.RosterShiftID,
-		Value:         createParams.Value,
+		RosterShiftID: params.RosterShiftID,
+		Value:         params.Value,
 	}
 
 	if err := s.db.Create(&rosterAnswer).Error; err != nil {
@@ -212,7 +204,7 @@ func (s *RosterService) SaveRoster(ID uint) error {
 	}
 
 	for _, shift := range roster.RosterShift {
-		if err := s.createSavedShift(roster.ID, shift); err != nil {
+		if err := s.createSavedShift(roster.ID, &shift); err != nil {
 			return err
 		}
 	}
@@ -253,7 +245,7 @@ func (s *RosterService) UpdateSavedShift(ID uint, updateParams *models.SavedShif
 			return nil, err
 		}
 	}
-	log.Print(saved)
+
 	return saved, nil
 }
 
@@ -268,4 +260,11 @@ func (s *RosterService) createSavedShift(rID uint, shift *models.RosterShift) er
 		return err
 	}
 	return nil
+}
+
+func isAfterToday(date time.Time) bool {
+	today := time.Now().Truncate(24 * time.Hour)
+	inputDate := date.Truncate(24 * time.Hour)
+
+	return inputDate.After(today)
 }

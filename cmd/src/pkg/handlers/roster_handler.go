@@ -21,7 +21,7 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 
 	g.POST("/", h.CreateRoster)
 	g.GET("/", h.GetRosters)
-	g.GET("/:id", h.GetOrganRosters)
+	g.GET(":id", h.GetRoster)
 	g.PATCH("/:id", h.UpdateRoster)
 	g.DELETE("/:id", h.DeleteRoster)
 
@@ -68,82 +68,67 @@ func (h *RosterHandler) CreateRoster(c *gin.Context) {
 
 // GetRosters
 //
-//	@Summary	Get all rosters
+//	@Summary	Get all rosters or query by date and organ
 //	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
-//	@Param		afterDate	query		string	false	"Roster after this date"
-//	@Success	200			{array}		models.RosterResponse
-//	@Failure	400			{string}	string
-//	@Failure	404			{string}	string
+//	@Param		date	query		string	false	"Date filter (ISO format)"
+//	@Param		organId	query		uint	false	"Organ ID filter"
+//	@Success	200		{array}		models.Roster
+//	@Failure	400		{string}	string
 //	@ID			getRosters
 //	@Router		/roster/ [get]
 func (h *RosterHandler) GetRosters(c *gin.Context) {
-	date := c.Query("afterDate")
+	var params models.RosterFilterParams
+	if err := c.ShouldBindQuery(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
 
-	rosters, err := h.rosterService.GetRosters(&date)
-
+	rosters, err := h.rosterService.GetRosters(&params)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
 	}
 
 	c.JSON(http.StatusOK, rosters)
 }
 
-// GetOrganRosters
+// GetRoster
 //
-//	@Summary	Get the organs rosters
+//	@Summary	Get a specific roster by id
 //	@Security	BearerAuth
 //	@Tags		Roster
 //	@Accept		json
 //	@Produce	json
-//	@Param		id	path		uint	true	"Organ ID"
-//	@Success	200	{array}	models.RosterResponse
+//
+// @Param   id      path     uint   true  "Roster ID"
+//
+//	@Success	200	{object}		models.Roster
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string
-//	@ID			getOrganRosters
+//	@ID			getRoster
 //	@Router		/roster/{id} [get]
-func (h *RosterHandler) GetOrganRosters(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.ParseUint(idParam, 10, 64)
+func (h *RosterHandler) GetRoster(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid roster ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
-	organsContext, ext := c.Get("organs")
-	if !ext {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Could not find any organs"})
-		return
-	}
+	id := uint(id64)
 
-	organs, ok := organsContext.([]*models.Organ)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not get organs from context"})
-		return
+	params := &models.RosterFilterParams{
+		ID: &id,
 	}
-
-	found := false
-	for _, organ := range organs {
-		if uint64(organ.ID) == id {
-			found = true
-			break
-		}
-	}
-
-	if !found {
-		c.JSON(http.StatusForbidden, gin.H{"error": "User not in organ"})
-		return
-	}
-
-	rosters, err := h.rosterService.GetOrganRosters(uint(id))
+	roster, err := h.rosterService.GetRosters(params)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.JSON(http.StatusOK, rosters)
+	c.JSON(http.StatusOK, roster)
 }
 
 // UpdateRoster

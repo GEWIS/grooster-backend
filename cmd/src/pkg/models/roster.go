@@ -4,50 +4,28 @@ import (
 	"time"
 )
 
-// Roster
-// @Description Roster info
-// @Description with a gorm model, name, users, shifts and values
+type Values []string
+
 type Roster struct {
 	BaseModel
 
 	Name string `json:"name"`
 
-	RosterShift []*RosterShift `json:"rosterShift"`
+	RosterShift []RosterShift `json:"rosterShift"`
 
-	RosterAnswer []*RosterAnswer `json:"rosterAnswer" gorm:"foreignKey:RosterID"`
+	RosterAnswer []RosterAnswer `json:"rosterAnswer" gorm:"foreignKey:RosterID"`
 
 	Values Values `json:"values" gorm:"serializer:json"`
 
-	Organ uint `json:"organ" gorm:"foreignKey:OrganID"`
+	OrganID uint `json:"organId"`
+
+	Organ Organ `json:"organ" gorm:"foreignKey:OrganID"`
 
 	Date time.Time `json:"date"`
 
 	Saved bool `json:"saved" gorm:"default:false"`
 } // @name Roster
 
-// RosterCreateRequest
-// @Description Roster create request
-type RosterCreateRequest struct {
-	// Name the name of the new roster
-	Name string `json:"name"`
-	// Date the date that this roster will take place
-	Date time.Time `json:"date"`
-	// Organ that the roster belongs to
-	OrganID uint `json:"organId"`
-} // @name RosterCreateRequest
-
-type RosterUpdateRequest struct {
-} // @name RosterUpdateRequest
-
-// RosterResponse
-// @Description RosterResponse is the response  from a get roster request
-type RosterResponse struct {
-	Roster *Roster `json:"roster"`
-	Users  []*User `json:"users"`
-} // @name RosterResponse
-
-// RosterShift
-// @Description One column of a roster
 type RosterShift struct {
 	BaseModel
 
@@ -56,8 +34,6 @@ type RosterShift struct {
 	RosterID uint `json:"rosterId"`
 } // @name RosterShift
 
-// RosterAnswer
-// @Description An answer from a user to a shift.
 type RosterAnswer struct {
 	BaseModel
 
@@ -70,8 +46,6 @@ type RosterAnswer struct {
 	Value string `json:"value"`
 } // @name RosterAnswer
 
-// SavedShift
-// @Description A saved roster
 type SavedShift struct {
 	BaseModel
 
@@ -84,7 +58,19 @@ type SavedShift struct {
 	Users []*User `json:"users" gorm:"many2many:user_shift_saved;"`
 } // @name SavedShift
 
-type Values []string
+type RosterCreateRequest struct {
+	Name string `json:"name"`
+
+	Date time.Time `json:"date"`
+
+	OrganID uint `json:"organId"`
+} // @name RosterCreateRequest
+
+type RosterUpdateRequest struct {
+	Name *string `json:"name"`
+
+	Date *time.Time `json:"date"`
+} // @name RosterUpdateRequest
 
 type RosterShiftCreateRequest struct {
 	Name string `json:"name"`
@@ -102,14 +88,16 @@ type RosterAnswerCreateRequest struct {
 	Value string `json:"value"`
 } // @name RosterAnswerCreateRequest
 
-// RosterAnswerUpdateRequest
-// @Description Request to update a certain roster answer
 type RosterAnswerUpdateRequest struct {
 	Value string `json:"value"`
 } // @name RosterAnswerUpdateRequest
 
-// SavedShiftUpdateRequest
-// @Description Request to update a certain saved shift
 type SavedShiftUpdateRequest struct {
 	UserIDs []uint `json:"users"`
 } // @name SavedShiftUpdateRequest
+
+type RosterFilterParams struct {
+	ID      *uint      `form:"id"`
+	Date    *time.Time `form:"date" time_format:"2006-01-02"`
+	OrganID *uint      `form:"organId"`
+} // @name RosterFilterParams

@@ -38,8 +38,8 @@ func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface, aut
 //	@Security		BasicAuth
 //	@Tags			Auth
 //	@Param			state	query		string				true	"State returned from provider"
-//	@Success		200	{string}	string				"redirect"
-//	@Failure		500	{object}	map[string]string	"pkg server error"
+//	@Success		200		{string}	string				"redirect"
+//	@Failure		500		{object}	map[string]string	"pkg server error"
 //	@Router			/auth/redirect [get]
 func (h *AuthHandler) AuthRedirect(c *gin.Context) {
 	state, err := h.service.RandString(32)

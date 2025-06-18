@@ -60,7 +60,7 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 	// Decode the payload (second part)
 	payloadBytes, err := base64.RawURLEncoding.DecodeString(infoString)
 	if err != nil {
-		log.Error().Msgf(err.Error())
+		log.Error().Msg(err.Error())
 		return
 	}
 
