@@ -1,6 +1,7 @@
 package main
 
 import (
+	"GEWIS-Rooster/cmd/seeder/seeder"
 	database "GEWIS-Rooster/cmd/src/pkg"
 	"GEWIS-Rooster/cmd/src/pkg/models"
 	"database/sql"
@@ -10,7 +11,7 @@ import (
 )
 
 func main() {
-	db := database.ConnectDB()
+	db := database.ConnectDB("local")
 	sqlDB, _ := db.DB()
 
 	err := wipeAllTables(db)
@@ -30,7 +31,7 @@ func main() {
 		return
 	}
 
-	Seeder(db)
+	seeder.Seeder(db)
 }
 
 func wipeAllTables(db *gorm.DB) error {

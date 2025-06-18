@@ -1,4 +1,4 @@
-package main
+package seeder
 
 import (
 	"GEWIS-Rooster/cmd/seeder/models"

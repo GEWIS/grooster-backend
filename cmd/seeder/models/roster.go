@@ -30,11 +30,12 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 
 	for i := 0; i < count; i++ {
 		r := &models.Roster{
-			Name:   "Roster" + strconv.Itoa(i),
-			Values: values,
-			Organ:  organs[0].ID,
-			Date:   time.Now(),
-			Saved:  false,
+			Name:    "Roster" + strconv.Itoa(i),
+			Values:  values,
+			OrganID: organs[i].ID,
+			Organ:   *organs[i],
+			Date:    time.Now(),
+			Saved:   false,
 		}
 		if err := db.Create(r).Error; err != nil {
 			log.Printf("Seeder Error: %v", err)
