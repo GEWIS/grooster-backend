@@ -6,15 +6,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func ConnectDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+func ConnectDB(name string) *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(name), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 
 	db.Exec("PRAGMA foreign_keys = ON")
 
-	if err := db.AutoMigrate(&models.User{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}, &models.Organ{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Organ{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}); err != nil {
 		panic(err)
 	}
 

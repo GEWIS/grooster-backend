@@ -29,7 +29,7 @@ func main() {
 		log.Fatal().Msg("Error loading .env file")
 	}
 
-	db := database.ConnectDB()
+	db := database.ConnectDB("test.db")
 	sqlDB, _ := db.DB()
 
 	docs.SwaggerInfo.Host = "localhost:8080"
@@ -66,11 +66,11 @@ func main() {
 	handlers.NewAuthHandler(authGroup, authService, authMiddle)
 
 	protectedGroup := api.Group("")
-	protectedGroup.Use(authMiddle.AuthMiddlewareCheck())
-	{
-		handlers.NewUserHandler(protectedGroup, userService)
-		handlers.NewRosterHandler(rosterService, protectedGroup)
-	}
+	//protectedGroup.Use(authMiddle.AuthMiddlewareCheck())
+	//{
+	handlers.NewUserHandler(protectedGroup, userService)
+	handlers.NewRosterHandler(rosterService, protectedGroup)
+	//}
 
 	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
