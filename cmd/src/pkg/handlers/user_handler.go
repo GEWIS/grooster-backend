@@ -23,7 +23,6 @@ func NewUserHandler(rg *gin.RouterGroup, userService services.UserServiceInterfa
 	g.POST("/create", h.Create)
 	g.GET("/", h.GetAll)
 	g.GET("/:id", h.Get)
-	g.PATCH("/:id", h.Update)
 	g.DELETE("/:id", h.Delete)
 
 	return h
@@ -42,7 +41,7 @@ func NewUserHandler(rg *gin.RouterGroup, userService services.UserServiceInterfa
 //	@Failure		400				{string}	string
 //	@Router			/user/create [post]
 func (h *UserHandler) Create(c *gin.Context) {
-	var param *models.UserCreateOrUpdate
+	var param *models.UserCreateRequest
 
 	if err := c.ShouldBindJSON(&param); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
@@ -110,43 +109,6 @@ func (h *UserHandler) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
-}
-
-// Update
-//
-//	@Summary	UpdateRoster a user
-//	@Security	BearerAuth
-//	@Tags		User
-//	@Accept		json
-//	@Produce	json
-//	@Param		id				path		uint						true	"User ID"
-//	@Param		updateParams	body		models.UserCreateOrUpdate	true	"User input"
-//	@Success	200				{object}	models.User
-//	@Failure	400				{string}	string
-//	@Router		/user/{id} [put]
-func (h *UserHandler) Update(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.ParseUint(idParam, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
-	}
-
-	var updateParams models.UserCreateOrUpdate
-	if err := c.ShouldBindJSON(&updateParams); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-		return
-	}
-
-	updatedUser, err := h.userService.Update(uint(id), &updateParams)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"user": updatedUser,
-	})
 }
 
 // Delete

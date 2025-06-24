@@ -2,14 +2,14 @@ package services
 
 import (
 	"GEWIS-Rooster/cmd/src/pkg/models"
+	"errors"
 	"gorm.io/gorm"
 )
 
 type UserServiceInterface interface {
-	Create(*models.UserCreateOrUpdate) (*models.User, error)
+	Create(*models.UserCreateRequest) (*models.User, error)
 	GetUser(uint) (*models.User, error)
 	GetAll() ([]*models.User, error)
-	Update(uint, *models.UserCreateOrUpdate) (*models.User, error)
 	Delete(uint) error
 }
 
@@ -21,10 +21,14 @@ func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{db: db}
 }
 
-func (s *UserService) Create(createParams *models.UserCreateOrUpdate) (*models.User, error) {
+func (s *UserService) Create(createParams *models.UserCreateRequest) (*models.User, error) {
+	if createParams.Name == "" {
+		return nil, errors.New("name is required")
+	}
+
 	user := models.User{
-		Name:    *createParams.Name,
-		GEWISID: *createParams.GEWISID,
+		Name:    createParams.Name,
+		GEWISID: createParams.GEWISID,
 		Organs:  createParams.Organs,
 	}
 
@@ -54,24 +58,16 @@ func (s *UserService) GetAll() ([]*models.User, error) {
 	return users, nil
 }
 
-func (s *UserService) Update(ID uint, updateParams *models.UserCreateOrUpdate) (*models.User, error) {
-	var user models.User
-	if err := s.db.First(&user, ID).Error; err != nil {
-		return nil, err
-	}
-
-	if err := s.db.Model(&user).Updates(updateParams).Error; err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}
-
 func (s *UserService) Delete(ID uint) error {
 	var user models.User
+	result := s.db.Delete(&user, ID)
 
-	if err := s.db.Delete(&user, ID).Error; err != nil {
-		return err
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
 
 	return nil

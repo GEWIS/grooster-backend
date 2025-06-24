@@ -9,13 +9,13 @@ type User struct {
 
 	GEWISID uint `json:"gewis_id" gorm:"uniqueIndex:idx_name"`
 
-	Organs []*Organ `json:"organs" gorm:"many2many:user_organs;"`
+	Organs []Organ `json:"organs" gorm:"many2many:user_organs;"`
 } // @name User
 
-type UserCreateOrUpdate struct {
-	Name *string
+type UserCreateRequest struct {
+	Name string
 
-	GEWISID *uint
+	GEWISID uint
 
-	Organs []*Organ
+	Organs []Organ
 }

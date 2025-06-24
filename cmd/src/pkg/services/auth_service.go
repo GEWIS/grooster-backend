@@ -83,27 +83,38 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 	user, err := s.u.GetUser(uint(idInt))
 	if user == nil || err != nil {
 		id := uint(idInt)
-		params := models.UserCreateOrUpdate{
-			Name:    &username,
-			GEWISID: &id,
+
+		organs, organErr := s.GetOrgans(claims)
+		if organErr != nil {
+			log.Error().Msg("Failed to get organs: " + organErr.Error())
+			return
 		}
+
+		params := models.UserCreateRequest{
+			Name:    username,
+			GEWISID: id,
+			Organs:  organs,
+		}
+
 		user, err = s.u.Create(&params)
 		if err != nil {
 			log.Error().Msg(err.Error())
+			return
 		}
-	}
+	} else {
+		organs, organErr := s.GetOrgans(claims)
+		if organErr != nil {
+			log.Error().Msg("Failed to get organs: " + organErr.Error())
+			return
+		}
 
-	organs, err := s.GetOrgans(claims)
-	if err != nil {
-		log.Error().Msg("Failed to get organs" + err.Error())
-	}
-	log.Print(organs)
-	if err := s.db.Model(user).Association("Organs").Replace(organs); err != nil {
-		log.Error().Msg("Failed to update user organs" + err.Error())
+		if err := s.db.Model(user).Association("Organs").Replace(organs); err != nil {
+			log.Error().Msg("Failed to update user organs: " + err.Error())
+		}
 	}
 }
 
-func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]*models.Organ, error) {
+func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]models.Organ, error) {
 	resourceAccess, ok := claims["resource_access"].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("resource_access not found or wrong type")
@@ -119,7 +130,7 @@ func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]*models.Organ,
 		return nil, fmt.Errorf("roles not found or wrong type")
 	}
 
-	var organs []*models.Organ
+	var organs []models.Organ
 
 	for _, role := range roles {
 		if roleStr, ok := role.(string); ok {
@@ -131,7 +142,7 @@ func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]*models.Organ,
 				}
 				s.db.FirstOrCreate(&organ, models.Organ{Name: organString})
 
-				organs = append(organs, &organ)
+				organs = append(organs, organ)
 			}
 		}
 	}

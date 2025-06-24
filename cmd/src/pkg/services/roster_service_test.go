@@ -11,20 +11,20 @@ import (
 	"time"
 )
 
-type TestSuite struct {
+type TestRosterSuite struct {
 	suite.Suite
 	db      *gorm.DB
 	service RosterService
 }
 
-func (suite *TestSuite) SetupTest() {
+func (suite *TestRosterSuite) SetupTest() {
 	db := database.ConnectDB(":memory:")
 	seeder.Seeder(db)
 	suite.db = db
 	suite.service = RosterService{db: db}
 }
 
-func (suite *TestSuite) TestCreateRoster_ValidInput() {
+func (suite *TestRosterSuite) TestCreateRoster_ValidInput() {
 	params := models.RosterCreateRequest{
 		Name:    "Valid Name",
 		Date:    time.Now().Add(25 * time.Hour),
@@ -39,7 +39,7 @@ func (suite *TestSuite) TestCreateRoster_ValidInput() {
 	assert.Equal(suite.T(), params.OrganID, roster.OrganID)
 }
 
-func (suite *TestSuite) TestCreateRoster_EmptyName() {
+func (suite *TestRosterSuite) TestCreateRoster_EmptyName() {
 	params := models.RosterCreateRequest{
 		Name:    "",
 		Date:    time.Now(),
@@ -51,7 +51,7 @@ func (suite *TestSuite) TestCreateRoster_EmptyName() {
 	assert.Nil(suite.T(), roster)
 }
 
-func (suite *TestSuite) TestCreateRoster_ZeroDate() {
+func (suite *TestRosterSuite) TestCreateRoster_ZeroDate() {
 	params := models.RosterCreateRequest{
 		Name:    "Valid Name",
 		Date:    time.Time{},
@@ -63,7 +63,7 @@ func (suite *TestSuite) TestCreateRoster_ZeroDate() {
 	assert.Nil(suite.T(), roster)
 }
 
-func (suite *TestSuite) TestCreateRoster_InvalidOrganID() {
+func (suite *TestRosterSuite) TestCreateRoster_InvalidOrganID() {
 	params := models.RosterCreateRequest{
 		Name:    "Valid Name",
 		Date:    time.Now(),
@@ -75,7 +75,7 @@ func (suite *TestSuite) TestCreateRoster_InvalidOrganID() {
 	assert.Nil(suite.T(), roster)
 }
 
-func (suite *TestSuite) TestGetRosters_All() {
+func (suite *TestRosterSuite) TestGetRosters_All() {
 	cParams := models.RosterCreateRequest{
 		Name:    "Valid Name",
 		Date:    time.Now().Add(25 * time.Hour),
@@ -97,7 +97,7 @@ func (suite *TestSuite) TestGetRosters_All() {
 	assert.True(suite.T(), found, "Expected to find a roster with name %q", cParams.Name)
 }
 
-func (suite *TestSuite) TestGetRosters_FilterByID() {
+func (suite *TestRosterSuite) TestGetRosters_FilterByID() {
 	cParams := models.RosterCreateRequest{
 		Name:    "RosterByID",
 		Date:    time.Now().Add(25 * time.Hour),
@@ -116,7 +116,7 @@ func (suite *TestSuite) TestGetRosters_FilterByID() {
 	assert.Equal(suite.T(), cParams.Name, rosters[0].Name)
 }
 
-func (suite *TestSuite) TestGetRosters_FilterByDate() {
+func (suite *TestRosterSuite) TestGetRosters_FilterByDate() {
 	targetDate := time.Now().Add(25 * time.Hour)
 
 	cParams := models.RosterCreateRequest{
@@ -144,7 +144,7 @@ func (suite *TestSuite) TestGetRosters_FilterByDate() {
 	assert.True(suite.T(), found, "Expected to find a roster with date %v and name %q", targetDate, cParams.Name)
 }
 
-func (suite *TestSuite) TestGetRosters_FilterByOrganID() {
+func (suite *TestRosterSuite) TestGetRosters_FilterByOrganID() {
 	organID := uint(1)
 	cParams := models.RosterCreateRequest{
 		Name:    "RosterByOrgan",
@@ -166,7 +166,7 @@ func (suite *TestSuite) TestGetRosters_FilterByOrganID() {
 	}
 }
 
-func (suite *TestSuite) TestGetRosters_FilterByMultipleFields() {
+func (suite *TestRosterSuite) TestGetRosters_FilterByMultipleFields() {
 	organID := uint(1)
 	targetDate := time.Now().Add(25 * time.Hour)
 
@@ -195,7 +195,7 @@ func (suite *TestSuite) TestGetRosters_FilterByMultipleFields() {
 	assert.True(suite.T(), found, "Expected to find a roster with date %v, organID %d and name %q", targetDate, organID, cParams.Name)
 }
 
-func (suite *TestSuite) TestGetRosters_ReturnEmpty() {
+func (suite *TestRosterSuite) TestGetRosters_ReturnEmpty() {
 	var roster models.Roster
 	suite.db.Last(&roster)
 	assert.NotEmpty(suite.T(), roster)
@@ -210,7 +210,7 @@ func (suite *TestSuite) TestGetRosters_ReturnEmpty() {
 	assert.Empty(suite.T(), rosters)
 }
 
-func (suite *TestSuite) TestUpdateRoster_Valid() {
+func (suite *TestRosterSuite) TestUpdateRoster_Valid() {
 	var roster *models.Roster
 	suite.db.First(&roster)
 
@@ -224,7 +224,7 @@ func (suite *TestSuite) TestUpdateRoster_Valid() {
 	assert.Equal(suite.T(), name, roster.Name)
 }
 
-func (suite *TestSuite) TestUpdateRoster_OnlyDate() {
+func (suite *TestRosterSuite) TestUpdateRoster_OnlyDate() {
 	var roster *models.Roster
 	suite.db.First(&roster)
 
@@ -238,7 +238,7 @@ func (suite *TestSuite) TestUpdateRoster_OnlyDate() {
 	assert.WithinDuration(suite.T(), newDate, updatedRoster.Date, time.Second)
 }
 
-func (suite *TestSuite) TestUpdateRoster_InvalidDate() {
+func (suite *TestRosterSuite) TestUpdateRoster_InvalidDate() {
 	var roster *models.Roster
 	suite.db.First(&roster)
 
@@ -251,7 +251,7 @@ func (suite *TestSuite) TestUpdateRoster_InvalidDate() {
 	assert.Error(suite.T(), err)
 }
 
-func (suite *TestSuite) TestUpdateRoster_NameAndDate() {
+func (suite *TestRosterSuite) TestUpdateRoster_NameAndDate() {
 	var roster *models.Roster
 	suite.db.First(&roster)
 
@@ -268,7 +268,7 @@ func (suite *TestSuite) TestUpdateRoster_NameAndDate() {
 	assert.WithinDuration(suite.T(), newDate, updatedRoster.Date, time.Second)
 }
 
-func (suite *TestSuite) TestUpdateRoster_NoFields() {
+func (suite *TestRosterSuite) TestUpdateRoster_NoFields() {
 	var roster *models.Roster
 	suite.db.First(&roster)
 
@@ -283,7 +283,7 @@ func (suite *TestSuite) TestUpdateRoster_NoFields() {
 	assert.WithinDuration(suite.T(), originalDate, updatedRoster.Date, time.Second)
 }
 
-func (suite *TestSuite) TestUpdateRoster_NotFound() {
+func (suite *TestRosterSuite) TestUpdateRoster_NotFound() {
 	var roster *models.Roster
 	suite.db.Last(&roster)
 	nonExistID := roster.ID + 1
@@ -298,7 +298,7 @@ func (suite *TestSuite) TestUpdateRoster_NotFound() {
 	assert.Nil(suite.T(), updatedRoster)
 }
 
-func (suite *TestSuite) TestDeleteRoster_Valid() {
+func (suite *TestRosterSuite) TestDeleteRoster_Valid() {
 	cParams := models.RosterCreateRequest{
 		Name:    "Valid Name",
 		Date:    time.Now().Add(25 * time.Hour),
@@ -316,7 +316,7 @@ func (suite *TestSuite) TestDeleteRoster_Valid() {
 	assert.Empty(suite.T(), rosters)
 }
 
-func (suite *TestSuite) TestCreateRosterShift_Valid() {
+func (suite *TestRosterSuite) TestCreateRosterShift_Valid() {
 	roster := models.Roster{
 		Name:    "Test Roster",
 		Values:  []string{"yes", "no"},
@@ -337,7 +337,7 @@ func (suite *TestSuite) TestCreateRosterShift_Valid() {
 	assert.Equal(suite.T(), createParams.RosterID, shift.RosterID)
 }
 
-func (suite *TestSuite) TestCreateRosterShift_RosterNotFound() {
+func (suite *TestRosterSuite) TestCreateRosterShift_RosterNotFound() {
 	createParams := &models.RosterShiftCreateRequest{
 		Name:     "Evening Shift",
 		RosterID: 9999,
@@ -350,7 +350,7 @@ func (suite *TestSuite) TestCreateRosterShift_RosterNotFound() {
 	assert.Contains(suite.T(), err.Error(), "roster not found")
 }
 
-func (suite *TestSuite) TestDeleteRosterShift_Valid() {
+func (suite *TestRosterSuite) TestDeleteRosterShift_Valid() {
 	roster := models.Roster{
 		Name:    "Roster for Deletion",
 		Values:  []string{"yes", "no"},
@@ -374,14 +374,14 @@ func (suite *TestSuite) TestDeleteRosterShift_Valid() {
 	assert.Equal(suite.T(), gorm.ErrRecordNotFound, result.Error)
 }
 
-func (suite *TestSuite) TestDeleteRosterShift_NotFound() {
+func (suite *TestRosterSuite) TestDeleteRosterShift_NotFound() {
 	nonExistentID := uint(999999)
 	err := suite.service.DeleteRosterShift(nonExistentID)
 
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *TestSuite) TestCreateRosterAnswer_Valid() {
+func (suite *TestRosterSuite) TestCreateRosterAnswer_Valid() {
 	roster := models.Roster{
 		Name:   "Test Roster",
 		Values: []string{"yes", "no"},
@@ -408,7 +408,7 @@ func (suite *TestSuite) TestCreateRosterAnswer_Valid() {
 	assert.Equal(suite.T(), createParams.UserID, answer.UserID)
 }
 
-func (suite *TestSuite) TestCreateRosterAnswer_InvalidValue() {
+func (suite *TestRosterSuite) TestCreateRosterAnswer_InvalidValue() {
 	roster := models.Roster{
 		Name:    "Test Roster",
 		Values:  []string{"yes", "no"},
@@ -435,7 +435,7 @@ func (suite *TestSuite) TestCreateRosterAnswer_InvalidValue() {
 	assert.Contains(suite.T(), err.Error(), "is not a valid value")
 }
 
-func (suite *TestSuite) TestCreateRosterAnswer_RosterNotFound() {
+func (suite *TestRosterSuite) TestCreateRosterAnswer_RosterNotFound() {
 	createParams := &models.RosterAnswerCreateRequest{
 		UserID:        1,
 		RosterID:      9999,
@@ -450,7 +450,7 @@ func (suite *TestSuite) TestCreateRosterAnswer_RosterNotFound() {
 	assert.Contains(suite.T(), err.Error(), "roster not found")
 }
 
-func (suite *TestSuite) TestCreateRosterAnswer_RosterShiftNotFound() {
+func (suite *TestRosterSuite) TestCreateRosterAnswer_RosterShiftNotFound() {
 	roster := models.Roster{
 		Name:    "Test Roster",
 		Values:  []string{"yes"},
@@ -472,7 +472,7 @@ func (suite *TestSuite) TestCreateRosterAnswer_RosterShiftNotFound() {
 	assert.Contains(suite.T(), err.Error(), "roster shift not found")
 }
 
-func (suite *TestSuite) TestUpdateRosterAnswer_Valid() {
+func (suite *TestRosterSuite) TestUpdateRosterAnswer_Valid() {
 	var answer *models.RosterAnswer
 	suite.db.First(&answer)
 
@@ -487,7 +487,7 @@ func (suite *TestSuite) TestUpdateRosterAnswer_Valid() {
 	assert.Equal(suite.T(), "new value", updatedAnswer.Value)
 }
 
-func (suite *TestSuite) TestUpdateRosterAnswer_NotFound() {
+func (suite *TestRosterSuite) TestUpdateRosterAnswer_NotFound() {
 	nonExistentID := uint(99999)
 	updateParams := &models.RosterAnswerUpdateRequest{
 		Value: "new value",
@@ -499,7 +499,7 @@ func (suite *TestSuite) TestUpdateRosterAnswer_NotFound() {
 	assert.Nil(suite.T(), updatedAnswer)
 }
 
-func (suite *TestSuite) TestSaveRoster_Success() {
+func (suite *TestRosterSuite) TestSaveRoster_Success() {
 	roster := models.Roster{
 		Name:    "Test Roster",
 		OrganID: 1,
@@ -524,12 +524,12 @@ func (suite *TestSuite) TestSaveRoster_Success() {
 	assert.True(suite.T(), savedRoster.Saved)
 }
 
-func (suite *TestSuite) TestSaveRoster_RosterNotFound() {
+func (suite *TestRosterSuite) TestSaveRoster_RosterNotFound() {
 	err := suite.service.SaveRoster(99999)
 	assert.Error(suite.T(), err)
 }
 
-func (suite *TestSuite) TestUpdateSavedShift_Success() {
+func (suite *TestRosterSuite) TestUpdateSavedShift_Success() {
 	var user models.User
 	suite.db.First(&user)
 
@@ -553,7 +553,7 @@ func (suite *TestSuite) TestUpdateSavedShift_Success() {
 	assert.Equal(suite.T(), user.ID, users[0].ID)
 }
 
-func (suite *TestSuite) TestUpdateSavedShift_UserLoadFailure() {
+func (suite *TestRosterSuite) TestUpdateSavedShift_UserLoadFailure() {
 	err := suite.service.SaveRoster(1)
 	assert.NoError(suite.T(), err)
 
@@ -573,5 +573,5 @@ func (suite *TestSuite) TestUpdateSavedShift_UserLoadFailure() {
 }
 
 func TestRosterService(t *testing.T) {
-	suite.Run(t, new(TestSuite))
+	suite.Run(t, new(TestRosterSuite))
 }

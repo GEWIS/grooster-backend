@@ -8,7 +8,7 @@ import (
 )
 
 func SeedUser(d *gorm.DB, count int) {
-	var organs []*models.Organ
+	var organs []models.Organ
 
 	if err := d.Find(&organs).Error; err != nil {
 		log.Printf("Seeder Error")
