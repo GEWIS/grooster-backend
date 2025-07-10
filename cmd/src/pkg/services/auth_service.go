@@ -19,7 +19,7 @@ type AuthServiceInterface interface {
 	SetCallBackCookie(*gin.Context, string)
 	RandString(int) (string, error)
 	ProcessUserInfo(*oauth2.Token)
-	GetOrgans(claims map[string]interface{}) ([]*models.Organ, error)
+	GetOrgans(claims map[string]interface{}) ([]models.Organ, error)
 }
 
 type AuthService struct {

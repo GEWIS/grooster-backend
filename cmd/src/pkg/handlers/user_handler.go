@@ -4,7 +4,6 @@ import (
 	"GEWIS-Rooster/cmd/src/pkg/models"
 	"GEWIS-Rooster/cmd/src/pkg/services"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
 )
@@ -18,11 +17,9 @@ func NewUserHandler(rg *gin.RouterGroup, userService services.UserServiceInterfa
 
 	g := rg.Group("/user")
 
-	log.Printf("Path %s", g.BasePath())
-
 	g.POST("/create", h.Create)
-	g.GET("/", h.GetUsers)
-	g.GET("/:id", h.GetUsers)
+	g.GET("/", h.GetAllUsers)
+	g.GET("/:id", h.GetUserByID)
 	g.DELETE("/:id", h.Delete)
 
 	return h
@@ -59,42 +56,58 @@ func (h *UserHandler) Create(c *gin.Context) {
 	})
 }
 
-// GetUsers
+// GetAllUsers
 //
-//	@Summary	Get users optionally filtered by parameters
-//	@Security	BearerAuth
-//	@Tags		User
-//	@Accept		json
-//	@Produce	json
-//	@Param		id			path		uint	true	"ID"
-//	@Param		filter	query		models.UserFilterParams	false	"Filter parameters"
-//	@Success	200			{array}		models.User
-//	@Failure	400			{string}	string
-//	@Router		/users [get]
-func (h *UserHandler) GetUsers(c *gin.Context) {
+//	@Summary      Get all users with optional filtering
+//	@Description  Retrieve a list of users with optional query parameter filtering
+//	@Security     BearerAuth
+//	@Tags         User
+//	@Accept       json
+//	@Produce      json
+//	@Param        filters    query     models.UserFilterParams    false  "Filter"
+//	@Success      200         {array}   models.User
+//	@Failure      400         {object}  map[string]string
+//	@Router       /user/ [get]
+func (h *UserHandler) GetAllUsers(c *gin.Context) {
+	f := models.UserFilterParams{}
+	if err := c.ShouldBindQuery(&f); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	users, err := h.userService.GetUsers(&f)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}
+
+// GetUserByID
+//
+//	@Summary      Get user by ID
+//	@Description  Retrieve a specific user by their unique ID
+//	@Security     BearerAuth
+//	@Tags         User
+//	@Accept       json
+//	@Produce      json
+//	@Param        id          path      uint    true   "User ID"
+//	@Success      200         {object}  models.User
+//	@Failure      400         {object}  map[string]string
+//	@Failure      404         {object}  map[string]string
+//	@Router       /user/{id} [get]
+func (h *UserHandler) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 
-	var filters *models.UserFilterParams
-
-	if idParam != "" {
-		id, err := strconv.ParseUint(idParam, 10, 64)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid User ID"})
-			return
-		}
-		idUint := uint(id)
-		filters = &models.UserFilterParams{ID: &idUint}
-	} else {
-		f := models.UserFilterParams{}
-		if err := c.ShouldBindQuery(&f); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		if f.ID == nil && f.OrganID == nil && f.GEWISID == nil {
-			filters = &f
-		}
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid User ID"})
+		return
 	}
+
+	idUint := uint(id)
+	filters := &models.UserFilterParams{ID: &idUint}
 
 	users, err := h.userService.GetUsers(filters)
 	if err != nil {

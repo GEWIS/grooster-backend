@@ -19,8 +19,8 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 
 	g := rg.Group("/roster")
 
-	g.POST("/", h.CreateRoster)
-	g.GET("/", h.GetRosters)
+	g.POST("", h.CreateRoster)
+	g.GET("", h.GetRosters)
 	g.GET(":id", h.GetRoster)
 	g.PATCH("/:id", h.UpdateRoster)
 	g.DELETE("/:id", h.DeleteRoster)
@@ -48,7 +48,7 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 //	@Success	200				{object}	models.Roster
 //	@Failure	400				{string}	string
 //	@ID			createRoster
-//	@Router		/roster/ [post]
+//	@Router		/roster [post]
 func (h *RosterHandler) CreateRoster(c *gin.Context) {
 	var param *models.RosterCreateRequest
 
@@ -78,7 +78,7 @@ func (h *RosterHandler) CreateRoster(c *gin.Context) {
 //	@Success	200		{array}		models.Roster
 //	@Failure	400		{string}	string
 //	@ID			getRosters
-//	@Router		/roster/ [get]
+//	@Router		/roster [get]
 func (h *RosterHandler) GetRosters(c *gin.Context) {
 	var params models.RosterFilterParams
 	if err := c.ShouldBindQuery(&params); err != nil {

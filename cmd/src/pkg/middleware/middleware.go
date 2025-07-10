@@ -35,6 +35,11 @@ func NewAuthMiddleware(auth *services.AuthService) *AuthMiddleware {
 // AuthMiddlewareCheck creates a middleware that validates OIDC tokens
 func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if os.Getenv("DEV_TYPE") == "local" {
+			c.Next()
+			return
+		}
+
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
