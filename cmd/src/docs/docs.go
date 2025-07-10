@@ -222,7 +222,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roster"
+                    "Roster Answer"
                 ],
                 "summary": "Create a new roster shift answer",
                 "operationId": "createRosterAnswer",
@@ -267,7 +267,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roster"
+                    "Roster Answer"
                 ],
                 "summary": "Updates a roster answer with the new value",
                 "operationId": "updateRosterAnswer",
@@ -325,7 +325,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roster"
+                    "Saved Shift"
                 ],
                 "summary": "Get all saved shifts for a specific roster",
                 "operationId": "getSavedRoster",
@@ -375,7 +375,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roster"
+                    "Saved Shift"
                 ],
                 "summary": "Update a specific saved shift",
                 "operationId": "updateSavedShift",
@@ -433,7 +433,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roster"
+                    "Roster Shift"
                 ],
                 "summary": "Create a new roster shift",
                 "operationId": "createRosterShift",
@@ -478,7 +478,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roster"
+                    "Roster Shift"
                 ],
                 "summary": "Deletes a roster shift",
                 "operationId": "deleteRosterShift",
@@ -667,7 +667,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roster"
+                    "Saved Shift"
                 ],
                 "summary": "Save a specific roster",
                 "operationId": "rosterSave",
@@ -685,48 +685,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get all users",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/User"
-                            }
                         }
                     },
                     "400": {
@@ -769,7 +727,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserCreateOrUpdate"
+                            "$ref": "#/definitions/UserCreateRequest"
                         }
                     }
                 ],
@@ -790,104 +748,6 @@ const docTemplate = `{
             }
         },
         "/user/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get user by GEWIS id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "GEWIS ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/User"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "UpdateRoster a user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "User input",
-                        "name": "updateParams",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UserCreateOrUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/User"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
             "delete": {
                 "security": [
                     {
@@ -928,6 +788,66 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get users optionally filtered by parameters",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "gewisId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "organId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/User"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "string"
                         }
@@ -1172,6 +1092,23 @@ const docTemplate = `{
                 }
             }
         },
+        "UserCreateRequest": {
+            "type": "object",
+            "properties": {
+                "gewisid": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Organ"
+                    }
+                }
+            }
+        },
         "gorm.DeletedAt": {
             "type": "object",
             "properties": {
@@ -1207,23 +1144,6 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/User"
-                    }
-                }
-            }
-        },
-        "models.UserCreateOrUpdate": {
-            "type": "object",
-            "properties": {
-                "gewisid": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "organs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/Organ"
                     }
                 }
             }

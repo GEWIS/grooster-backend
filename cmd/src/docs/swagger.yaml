@@ -152,6 +152,17 @@ definitions:
       updatedAt:
         type: string
     type: object
+  UserCreateRequest:
+    properties:
+      gewisid:
+        type: integer
+      name:
+        type: string
+      organs:
+        items:
+          $ref: '#/definitions/Organ'
+        type: array
+    type: object
   gorm.DeletedAt:
     properties:
       time:
@@ -176,17 +187,6 @@ definitions:
       users:
         items:
           $ref: '#/definitions/User'
-        type: array
-    type: object
-  models.UserCreateOrUpdate:
-    properties:
-      gewisid:
-        type: integer
-      name:
-        type: string
-      organs:
-        items:
-          $ref: '#/definitions/Organ'
         type: array
     type: object
 info:
@@ -440,7 +440,7 @@ paths:
       - BearerAuth: []
       summary: Save a specific roster
       tags:
-      - Roster
+      - Saved Shift
   /roster/answer:
     post:
       consumes:
@@ -468,7 +468,7 @@ paths:
       - BearerAuth: []
       summary: Create a new roster shift answer
       tags:
-      - Roster
+      - Roster Answer
   /roster/answer/{id}:
     patch:
       consumes:
@@ -505,7 +505,7 @@ paths:
       - BearerAuth: []
       summary: Updates a roster answer with the new value
       tags:
-      - Roster
+      - Roster Answer
   /roster/saved-shift/{id}:
     get:
       consumes:
@@ -538,7 +538,7 @@ paths:
       - BearerAuth: []
       summary: Get all saved shifts for a specific roster
       tags:
-      - Roster
+      - Saved Shift
     patch:
       consumes:
       - application/json
@@ -574,7 +574,7 @@ paths:
       - BearerAuth: []
       summary: Update a specific saved shift
       tags:
-      - Roster
+      - Saved Shift
   /roster/shift:
     post:
       consumes:
@@ -602,7 +602,7 @@ paths:
       - BearerAuth: []
       summary: Create a new roster shift
       tags:
-      - Roster
+      - Roster Shift
   /roster/shift/{id}:
     delete:
       consumes:
@@ -629,33 +629,7 @@ paths:
       - BearerAuth: []
       summary: Deletes a roster shift
       tags:
-      - Roster
-  /user/:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/User'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "404":
-          description: Not Found
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: Get all users
-      tags:
-      - User
+      - Roster Shift
   /user/{id}:
     delete:
       consumes:
@@ -686,68 +660,6 @@ paths:
       summary: DeleteRoster a user
       tags:
       - User
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: GEWIS ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/User'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "404":
-          description: Not Found
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: Get user by GEWIS id
-      tags:
-      - User
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: User input
-        in: body
-        name: updateParams
-        required: true
-        schema:
-          $ref: '#/definitions/models.UserCreateOrUpdate'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/User'
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: UpdateRoster a user
-      tags:
-      - User
   /user/create:
     post:
       consumes:
@@ -759,7 +671,7 @@ paths:
         name: createParams
         required: true
         schema:
-          $ref: '#/definitions/models.UserCreateOrUpdate'
+          $ref: '#/definitions/UserCreateRequest'
       produces:
       - application/json
       responses:
@@ -774,6 +686,43 @@ paths:
       security:
       - BearerAuth: []
       summary: CreateRoster a new user
+      tags:
+      - User
+  /users:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: query
+        name: gewisId
+        type: integer
+      - in: query
+        name: id
+        type: integer
+      - in: query
+        name: organId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get users optionally filtered by parameters
       tags:
       - User
 securityDefinitions:
