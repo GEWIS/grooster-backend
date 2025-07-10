@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	db := database.ConnectDB("local")
+	db := database.ConnectDB("local.db")
 	sqlDB, _ := db.DB()
 
 	err := wipeAllTables(db)
