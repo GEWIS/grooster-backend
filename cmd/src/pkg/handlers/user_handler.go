@@ -21,8 +21,8 @@ func NewUserHandler(rg *gin.RouterGroup, userService services.UserServiceInterfa
 	log.Printf("Path %s", g.BasePath())
 
 	g.POST("/create", h.Create)
-	g.GET("/", h.GetAll)
-	g.GET("/:id", h.Get)
+	g.GET("/", h.GetUsers)
+	g.GET("/:id", h.GetUsers)
 	g.DELETE("/:id", h.Delete)
 
 	return h
@@ -36,7 +36,7 @@ func NewUserHandler(rg *gin.RouterGroup, userService services.UserServiceInterfa
 //	@Tags			User
 //	@Accept			json
 //	@Produce		json
-//	@Param			createParams	body		models.UserCreateOrUpdate	true	"User input"
+//	@Param			createParams	body		models.UserCreateRequest	true	"User input"
 //	@Success		200				{object}	models.User
 //	@Failure		400				{string}	string
 //	@Router			/user/create [post]
@@ -59,56 +59,50 @@ func (h *UserHandler) Create(c *gin.Context) {
 	})
 }
 
-// GetAll
+// GetUsers
 //
-//	@Summary	Get all users
+//	@Summary	Get users optionally filtered by parameters
 //	@Security	BearerAuth
 //	@Tags		User
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{array}		models.User
-//	@Failure	400	{string}	string
-//	@Failure	404	{string}	string
-//	@Router		/user/ [get]
-func (h *UserHandler) GetAll(c *gin.Context) {
-	users, err := h.userService.GetAll()
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	log.Print(users[0])
-	c.JSON(http.StatusOK, users)
-}
-
-// Get
-//
-//	@Summary	Get user by GEWIS id
-//	@Security	BearerAuth
-//	@Tags		User
-//	@Accept		json
-//	@Produce	json
-//	@Param		id	path		uint	true	"GEWIS ID"
-//	@Success	200	{array}		models.User
-//	@Failure	400	{string}	string
-//	@Failure	404	{string}	string
-//	@Router		/user/{id} [get]
-func (h *UserHandler) Get(c *gin.Context) {
+//	@Param		id			path		uint	true	"ID"
+//	@Param		filter	query		models.UserFilterParams	false	"Filter parameters"
+//	@Success	200			{array}		models.User
+//	@Failure	400			{string}	string
+//	@Router		/users [get]
+func (h *UserHandler) GetUsers(c *gin.Context) {
 	idParam := c.Param("id")
-	id, err := strconv.ParseUint(idParam, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
+
+	var filters *models.UserFilterParams
+
+	if idParam != "" {
+		id, err := strconv.ParseUint(idParam, 10, 64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid User ID"})
+			return
+		}
+		idUint := uint(id)
+		filters = &models.UserFilterParams{ID: &idUint}
+	} else {
+		f := models.UserFilterParams{}
+		if err := c.ShouldBindQuery(&f); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if f.ID == nil && f.OrganID == nil && f.GEWISID == nil {
+			filters = &f
+		}
 	}
 
-	user, err := h.userService.GetUser(uint(id))
-
+	users, err := h.userService.GetUsers(filters)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, users)
 }
 
 // Delete

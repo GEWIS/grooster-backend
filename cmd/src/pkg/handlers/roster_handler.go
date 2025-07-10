@@ -102,9 +102,9 @@ func (h *RosterHandler) GetRosters(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //
-// @Param   id      path     uint   true  "Roster ID"
+//	@Param		id	path		uint	true	"Roster ID"
 //
-//	@Success	200	{object}		models.Roster
+//	@Success	200	{object}	models.Roster
 //	@Failure	400	{string}	string
 //	@Failure	404	{string}	string
 //	@ID			getRoster
@@ -201,7 +201,7 @@ func (h *RosterHandler) DeleteRoster(c *gin.Context) {
 //
 //	@Summary	Create a new roster shift
 //	@Security	BearerAuth
-//	@Tags		Roster
+//	@Tags		Roster Shift
 //	@Accept		json
 //	@Produce	json
 //	@Param		createParams	body		models.RosterShiftCreateRequest	true	"Roster shift input"
@@ -230,7 +230,7 @@ func (h *RosterHandler) CreateRosterShift(c *gin.Context) {
 //
 //	@Summary	Deletes a roster shift
 //	@Security	BearerAuth
-//	@Tags		Roster
+//	@Tags		Roster Shift
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int	true	"Roster Answer ID"
@@ -259,7 +259,7 @@ func (h *RosterHandler) DeleteRosterShift(c *gin.Context) {
 //
 //	@Summary	Create a new roster shift answer
 //	@Security	BearerAuth
-//	@Tags		Roster
+//	@Tags		Roster Answer
 //	@Accept		json
 //	@Produce	json
 //	@Param		createParams	body		models.RosterAnswerCreateRequest	true	"Roster answer input"
@@ -288,7 +288,7 @@ func (h *RosterHandler) CreateRosterAnswer(c *gin.Context) {
 //
 //	@Summary	Updates a roster answer with the new value
 //	@Security	BearerAuth
-//	@Tags		Roster
+//	@Tags		Roster Answer
 //	@Accept		json
 //	@Produce	json
 //	@Param		id				path		int									true	"Roster Answer ID"
@@ -325,7 +325,7 @@ func (h *RosterHandler) UpdateRosterAnswer(c *gin.Context) {
 //
 //	@Summary	Save a specific roster
 //	@Security	BearerAuth
-//	@Tags		Roster
+//	@Tags		Saved Shift
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int	true	"Roster ID"
@@ -359,7 +359,7 @@ func (h *RosterHandler) SaveRoster(c *gin.Context) {
 //
 //	@Summary	Update a specific saved shift
 //	@Security	BearerAuth
-//	@Tags		Roster
+//	@Tags		Saved Shift
 //	@Accept		json
 //	@Produce	json
 //	@Param		id				path		int								true	"SavedShift ID"
@@ -400,7 +400,7 @@ func (h *RosterHandler) UpdateSavedShift(c *gin.Context) {
 //
 //	@Summary	Get all saved shifts for a specific roster
 //	@Security	BearerAuth
-//	@Tags		Roster
+//	@Tags		Saved Shift
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int					true	"Roster ID"
