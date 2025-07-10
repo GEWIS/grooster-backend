@@ -80,8 +80,24 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 	}
 	username := claims["given_name"].(string)
 
-	user, err := s.u.GetUser(uint(idInt))
-	if user == nil || err != nil {
+	id := uint(idInt)
+	filters := &models.UserFilterParams{
+		ID: &id,
+	}
+
+	users, err := s.u.GetUsers(filters)
+	var user *models.User
+
+	if err != nil {
+		log.Error().Msg("Failed to get users: " + err.Error())
+		return
+	}
+
+	if len(users) > 0 {
+		user = users[0]
+	}
+
+	if user == nil {
 		id := uint(idInt)
 
 		organs, organErr := s.GetOrgans(claims)

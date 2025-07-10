@@ -18,4 +18,10 @@ type UserCreateRequest struct {
 	GEWISID uint
 
 	Organs []Organ
-}
+} // @name UserCreateRequest
+
+type UserFilterParams struct {
+	ID      *uint `form:"id"`
+	GEWISID *uint `form:"gewisId"`
+	OrganID *uint `form:"organId"`
+} // @name UserFilterParams

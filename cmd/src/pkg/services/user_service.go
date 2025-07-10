@@ -8,8 +8,7 @@ import (
 
 type UserServiceInterface interface {
 	Create(*models.UserCreateRequest) (*models.User, error)
-	GetUser(uint) (*models.User, error)
-	GetAll() ([]*models.User, error)
+	GetUsers(*models.UserFilterParams) ([]*models.User, error)
 	Delete(uint) error
 }
 
@@ -39,19 +38,24 @@ func (s *UserService) Create(createParams *models.UserCreateRequest) (*models.Us
 	return &user, nil
 }
 
-func (s *UserService) GetUser(gewisId uint) (*models.User, error) {
-	var user models.User
-	if err := s.db.Preload("Organs").Where("gewis_id = ?", gewisId).First(&user).Error; err != nil {
-		return nil, err
+func (s *UserService) GetUsers(filters *models.UserFilterParams) ([]*models.User, error) {
+	db := s.db.Model(&models.User{}).Preload("Organs")
+
+	if filters != nil {
+		if filters.ID != nil {
+			db = db.Where("id = ?", *filters.ID)
+		}
+		if filters.GEWISID != nil {
+			db = db.Where("gewis_id = ?", *filters.GEWISID)
+		}
+		if filters.OrganID != nil {
+			db = db.Joins("JOIN user_organs ON user_organs.user_id = users.id").
+				Where("user_organs.organ_id = ?", *filters.OrganID)
+		}
 	}
 
-	return &user, nil
-}
-
-func (s *UserService) GetAll() ([]*models.User, error) {
 	var users []*models.User
-
-	if err := s.db.Preload("Organs").Find(&users).Error; err != nil {
+	if err := db.Find(&users).Error; err != nil {
 		return nil, err
 	}
 

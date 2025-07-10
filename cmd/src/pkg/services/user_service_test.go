@@ -90,22 +90,102 @@ func (suite *TestUserSuite) TestCreateUser_EmptyName() {
 }
 
 func (suite *TestUserSuite) TestGetUser_ValidInput() {
-	var user models.User
-	suite.db.First(&user)
-
-	getUser, err := suite.service.GetUser(user.GEWISID)
+	var users []*models.User
+	err := suite.db.Find(&users).Error
 	assert.NoError(suite.T(), err)
-	assert.NotNil(suite.T(), getUser)
-	assert.Equal(suite.T(), user.Name, getUser.Name)
+
+	getUsers, err := suite.service.GetUsers(nil)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), getUsers)
+	assert.Equal(suite.T(), len(users), len(getUsers))
 }
 
-func (suite *TestUserSuite) TestGetUser_NotFound() {
-	var user models.User
-	suite.db.Last(&user)
+func (suite *TestUserSuite) TestGetUser_ByID() {
+	var organ models.Organ
+	err := suite.db.First(&organ).Error
+	assert.NoError(suite.T(), err)
 
-	getUser, err := suite.service.GetUser(user.GEWISID + 1)
-	assert.Error(suite.T(), err)
-	assert.Nil(suite.T(), getUser)
+	req := &models.UserCreateRequest{
+		Name:    "Test User",
+		GEWISID: uint(10),
+		Organs:  []models.Organ{organ},
+	}
+
+	user, err := suite.service.Create(req)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), user)
+
+	filters := &models.UserFilterParams{ID: &user.ID}
+	users, err := suite.service.GetUsers(filters)
+
+	assert.NoError(suite.T(), err)
+	assert.Len(suite.T(), users, 1)
+	assert.Equal(suite.T(), user.ID, users[0].ID)
+}
+
+func (suite *TestUserSuite) TestGetUser_ByGEWISID() {
+	gewisID := uint(456)
+	var organ models.Organ
+	err := suite.db.First(&organ).Error
+	assert.NoError(suite.T(), err)
+
+	req := &models.UserCreateRequest{
+		Name:    "Test User",
+		GEWISID: gewisID,
+		Organs:  []models.Organ{organ},
+	}
+
+	user, err := suite.service.Create(req)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), user)
+
+	filters := &models.UserFilterParams{GEWISID: &gewisID}
+	users, err := suite.service.GetUsers(filters)
+
+	assert.NoError(suite.T(), err)
+	assert.Len(suite.T(), users, 1)
+	assert.Equal(suite.T(), gewisID, users[0].GEWISID)
+}
+
+func (suite *TestUserSuite) TestGetUser_ByOrganID() {
+	var organ models.Organ
+	err := suite.db.First(&organ).Error
+	assert.NoError(suite.T(), err)
+
+	req := &models.UserCreateRequest{
+		Name:    "Test User",
+		GEWISID: uint(10),
+		Organs:  []models.Organ{organ},
+	}
+
+	user, err := suite.service.Create(req)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), user)
+
+	organID := organ.ID
+
+	filters := &models.UserFilterParams{OrganID: &organID}
+	users, err := suite.service.GetUsers(filters)
+
+	assert.NoError(suite.T(), err)
+	found := false
+	for _, organ := range users[0].Organs {
+		if organ.ID == organID {
+			found = true
+			break
+		}
+	}
+	assert.True(suite.T(), found, "Expected user to be linked to organ ID %d", organID)
+}
+
+func (suite *TestUserSuite) TestGetUser_NoMatch() {
+	nonExistentID := uint(99999)
+	filters := &models.UserFilterParams{ID: &nonExistentID}
+
+	users, err := suite.service.GetUsers(filters)
+
+	assert.NoError(suite.T(), err)
+	assert.Empty(suite.T(), users)
 }
 
 func (suite *TestUserSuite) TestDeleteUser_ValidInput() {
