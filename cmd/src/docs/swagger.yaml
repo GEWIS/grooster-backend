@@ -75,10 +75,6 @@ definitions:
         type: string
       organId:
         type: integer
-      shifts:
-        items:
-          type: string
-        type: array
     type: object
   RosterShift:
     properties:
@@ -101,32 +97,6 @@ definitions:
         type: string
       rosterId:
         type: integer
-    type: object
-  RosterTemplate:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
-      id:
-        type: integer
-      organId:
-        type: integer
-      shifts:
-        items:
-          type: string
-        type: array
-      updatedAt:
-        type: string
-    type: object
-  RosterTemplateCreateRequest:
-    properties:
-      organId:
-        type: integer
-      shifts:
-        items:
-          type: string
-        type: array
     type: object
   RosterUpdateRequest:
     properties:
@@ -660,122 +630,6 @@ paths:
       summary: Deletes a roster shift
       tags:
       - Roster Shift
-  /roster/template:
-    get:
-      consumes:
-      - application/json
-      operationId: getRosterTemplates
-      parameters:
-      - in: query
-        name: organId
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/RosterTemplate'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: Get all rosters templates or query by organ ID
-      tags:
-      - Roster
-    post:
-      consumes:
-      - application/json
-      operationId: createRosterTemplate
-      parameters:
-      - description: Template Params
-        in: body
-        name: params
-        schema:
-          $ref: '#/definitions/RosterTemplateCreateRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Created Template
-          schema:
-            items:
-              $ref: '#/definitions/SavedShift'
-            type: array
-        "400":
-          description: Invalid request
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: Creates a template of a roster by defining the name of the shifts
-      tags:
-      - Roster
-  /roster/template/{id}:
-    delete:
-      consumes:
-      - application/json
-      operationId: deleteRosterTemplate
-      parameters:
-      - description: Template ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "404":
-          description: Not Found
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: Deletes a roster template by ID
-      tags:
-      - Roster
-    get:
-      consumes:
-      - application/json
-      operationId: getRosterTemplate
-      parameters:
-      - description: Template ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/RosterTemplate'
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "404":
-          description: Not Found
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: Get a roster template by ID
-      tags:
-      - Roster
   /user/:
     get:
       consumes:
@@ -784,11 +638,11 @@ paths:
       parameters:
       - description: Organ ID
         in: query
-        name: organId
+        name: organ_id
         type: integer
       - description: GEWIS ID
         in: query
-        name: gewisId
+        name: gewis_id
         type: integer
       produces:
       - application/json

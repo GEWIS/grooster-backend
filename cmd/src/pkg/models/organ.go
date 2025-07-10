@@ -5,7 +5,7 @@ package models
 type Organ struct {
 	BaseModel
 
-	Name string `json:"name" gorm:"uniqueIndex"`
+	Name string `gorm:"uniqueIndex"`
 
 	Users []*User `json:"users" gorm:"many2many:user_organs;"`
 } // @name Organ

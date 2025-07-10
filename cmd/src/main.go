@@ -13,7 +13,6 @@ import (
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"os"
 )
 
 // @title						GRooster
@@ -30,12 +29,12 @@ func main() {
 		log.Fatal().Msg("Error loading .env file")
 	}
 
-	db := database.ConnectDB(os.Getenv("DATABASE"))
+	db := database.ConnectDB("local.db")
 	sqlDB, _ := db.DB()
 
-	docs.SwaggerInfo.Host = os.Getenv("HOST")
-	docs.SwaggerInfo.Title = "Docs for grooster"
-	docs.SwaggerInfo.BasePath = os.Getenv("BASE_PATH")
+	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.Title = "Docs for this"
+	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
@@ -49,13 +48,13 @@ func main() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{os.Getenv("ALLOWED_ORIGINS")}, // Frontend URL
+		AllowOrigins:     []string{"http://localhost:5173"}, // Frontend URL
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true, // If you need to support cookies or authentication
 	}))
 
-	api := r.Group(os.Getenv("BASE_PATH"))
+	api := r.Group("/api/v1")
 
 	userService := services.NewUserService(db)
 	rosterService := services.NewRosterService(db)

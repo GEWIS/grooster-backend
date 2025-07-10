@@ -24,11 +24,6 @@ type RosterServiceInterface interface {
 	SaveRoster(uint) error
 	UpdateSavedShift(uint, *models.SavedShiftUpdateRequest) (*models.SavedShift, error)
 	GetSavedRoster(uint) ([]*models.SavedShift, error)
-
-	CreateRosterTemplate(*models.RosterTemplateCreateRequest) (*models.RosterTemplate, error)
-	GetRosterTemplate(uint) (*models.RosterTemplate, error)
-	GetRosterTemplates(*models.RosterTemplateFilterParams) ([]*models.RosterTemplate, error)
-	DeleteRosterTemplate(ID uint) error
 }
 
 type RosterService struct {
@@ -67,20 +62,7 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 		return nil, err
 	}
 
-	if params.Shifts != nil && len(params.Shifts) > 0 {
-		for _, shift := range params.Shifts {
-			rosterShift := &models.RosterShift{
-				Name:     shift,
-				RosterID: roster.ID,
-			}
-
-			if err := s.db.Create(&rosterShift).Error; err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	if err := s.db.Preload("Organ").Preload("RosterShift").First(&roster, roster.ID).Error; err != nil {
+	if err := s.db.Preload("Organ").First(&roster, roster.ID).Error; err != nil {
 		return nil, err
 	}
 
@@ -101,11 +83,6 @@ func (s *RosterService) GetRosters(params *models.RosterFilterParams) ([]*models
 	if params.OrganID != nil {
 		db = db.Where("organ_id = ?", *params.OrganID)
 	}
-
-	db.
-		Preload("RosterShift").
-		Preload("RosterAnswer").
-		Preload("Organ")
 
 	var rosters []*models.Roster
 	if err := db.Find(&rosters).Error; err != nil {
@@ -216,9 +193,7 @@ func (s *RosterService) UpdateRosterAnswer(ID uint, updateParams *models.RosterA
 	if err := s.db.Model(&answer).Updates(updateParams).Error; err != nil {
 		return nil, err
 	}
-	if err := s.db.First(&answer, ID).Error; err != nil {
-		return nil, err
-	}
+
 	return answer, nil
 }
 
@@ -259,6 +234,7 @@ func (s *RosterService) UpdateSavedShift(ID uint, updateParams *models.SavedShif
 	}
 
 	if updateParams.UserIDs != nil {
+
 		var users []*models.User
 		if err := s.db.Where("ID IN ?", updateParams.UserIDs).Find(&users).Error; err != nil {
 
@@ -268,73 +244,9 @@ func (s *RosterService) UpdateSavedShift(ID uint, updateParams *models.SavedShif
 		if err := s.db.Model(&saved).Association("Users").Replace(users); err != nil {
 			return nil, err
 		}
-		// Reload associations to get fresh data
-		if err := s.db.Preload("Users").Preload("RosterShift").First(&saved, ID).Error; err != nil {
-			return nil, err
-		}
 	}
 
 	return saved, nil
-}
-
-func (s *RosterService) CreateRosterTemplate(params *models.RosterTemplateCreateRequest) (*models.RosterTemplate, error) {
-	var organ models.Organ
-
-	if err := s.db.First(&organ, params.OrganID).Error; err != nil {
-		return nil, err
-	}
-
-	if len(params.Shifts) == 0 {
-		return nil, errors.New("no shifts were given")
-	}
-
-	template := models.RosterTemplate{
-		OrganID: organ.ID,
-		Shifts:  params.Shifts,
-	}
-
-	if err := s.db.Create(&template).Error; err != nil {
-		return nil, err
-	}
-
-	return &template, nil
-}
-
-func (s *RosterService) GetRosterTemplate(ID uint) (*models.RosterTemplate, error) {
-	var template models.RosterTemplate
-	if err := s.db.First(&template, ID).Error; err != nil {
-		return nil, err
-	}
-
-	return &template, nil
-}
-
-func (s *RosterService) GetRosterTemplates(params *models.RosterTemplateFilterParams) ([]*models.RosterTemplate, error) {
-	var templates []*models.RosterTemplate
-	db := s.db.Model(&models.RosterTemplate{})
-
-	if params != nil {
-		if params.OrganID != nil {
-			db.Where("organ_id = ?", params.OrganID)
-		}
-	}
-
-	if err := db.Find(&templates).Error; err != nil {
-		return nil, err
-	}
-
-	return templates, nil
-}
-
-func (s *RosterService) DeleteRosterTemplate(ID uint) error {
-	result := s.db.Where("id = ?", ID).Delete(&models.RosterTemplate{})
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("roster template with ID %d not found", ID)
-	}
-	return nil
 }
 
 func (s *RosterService) createSavedShift(rID uint, shift *models.RosterShift) error {

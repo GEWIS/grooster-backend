@@ -26,7 +26,7 @@ func main() {
 		}
 	}(sqlDB)
 
-	err = db.AutoMigrate(&models.User{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}, &models.Organ{}, &models.RosterTemplate{})
+	err = db.AutoMigrate(&models.User{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}, &models.Organ{})
 	if err != nil {
 		return
 	}

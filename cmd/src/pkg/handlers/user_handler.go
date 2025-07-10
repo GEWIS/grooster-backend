@@ -64,8 +64,8 @@ func (h *UserHandler) Create(c *gin.Context) {
 //		@Tags         User
 //		@Accept       json
 //		@Produce      json
-//	 @Param        organId    query     uint    false  "Organ ID"
-//	 @Param        gewisId    query     uint    false  "GEWIS ID"
+//	 @Param        organ_id    query     uint    false  "Organ ID"
+//	 @Param        gewis_id    query     uint    false  "GEWIS ID"
 //		@Success      200         {array}   models.User
 //		@Failure      400         {object}  map[string]string
 //		@Router       /user/ [get]

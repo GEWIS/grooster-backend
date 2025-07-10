@@ -507,191 +507,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/roster/template": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Roster"
-                ],
-                "summary": "Get all rosters templates or query by organ ID",
-                "operationId": "getRosterTemplates",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "organId",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/RosterTemplate"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Roster"
-                ],
-                "summary": "Creates a template of a roster by defining the name of the shifts",
-                "operationId": "createRosterTemplate",
-                "parameters": [
-                    {
-                        "description": "Template Params",
-                        "name": "params",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/RosterTemplateCreateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Created Template",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/SavedShift"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/roster/template/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Roster"
-                ],
-                "summary": "Get a roster template by ID",
-                "operationId": "getRosterTemplate",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Template ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/RosterTemplate"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Roster"
-                ],
-                "summary": "Deletes a roster template by ID",
-                "operationId": "deleteRosterTemplate",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Template ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/roster/{id}": {
             "get": {
                 "security": [
@@ -909,13 +724,13 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Organ ID",
-                        "name": "organId",
+                        "name": "organ_id",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "description": "GEWIS ID",
-                        "name": "gewisId",
+                        "name": "gewis_id",
                         "in": "query"
                     }
                 ],
@@ -1204,12 +1019,6 @@ const docTemplate = `{
                 },
                 "organId": {
                     "type": "integer"
-                },
-                "shifts": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
@@ -1244,46 +1053,6 @@ const docTemplate = `{
                 },
                 "rosterId": {
                     "type": "integer"
-                }
-            }
-        },
-        "RosterTemplate": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "organId": {
-                    "type": "integer"
-                },
-                "shifts": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "RosterTemplateCreateRequest": {
-            "type": "object",
-            "properties": {
-                "organId": {
-                    "type": "integer"
-                },
-                "shifts": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
