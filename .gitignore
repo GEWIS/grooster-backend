@@ -27,6 +27,6 @@ go.work.sum
 # IDE settings
 .idea
 
-test.db
+local.db
 
 cmd/src/src
