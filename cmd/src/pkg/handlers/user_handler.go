@@ -58,16 +58,17 @@ func (h *UserHandler) Create(c *gin.Context) {
 
 // GetAllUsers
 //
-//	@Summary      Get all users with optional filtering
-//	@Description  Retrieve a list of users with optional query parameter filtering
-//	@Security     BearerAuth
-//	@Tags         User
-//	@Accept       json
-//	@Produce      json
-//	@Param        filters    query     models.UserFilterParams    false  "Filter"
-//	@Success      200         {array}   models.User
-//	@Failure      400         {object}  map[string]string
-//	@Router       /user/ [get]
+//		@Summary      Get all users with optional filtering
+//		@Description  Retrieve a list of users with optional query parameter filtering
+//		@Security     BearerAuth
+//		@Tags         User
+//		@Accept       json
+//		@Produce      json
+//	 @Param        organ_id    query     uint    false  "Organ ID"
+//	 @Param        gewis_id    query     uint    false  "GEWIS ID"
+//		@Success      200         {array}   models.User
+//		@Failure      400         {object}  map[string]string
+//		@Router       /user/ [get]
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	f := models.UserFilterParams{}
 	if err := c.ShouldBindQuery(&f); err != nil {

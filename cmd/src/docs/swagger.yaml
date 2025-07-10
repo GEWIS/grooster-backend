@@ -636,14 +636,13 @@ paths:
       - application/json
       description: Retrieve a list of users with optional query parameter filtering
       parameters:
-      - in: query
-        name: gewisId
+      - description: Organ ID
+        in: query
+        name: organ_id
         type: integer
-      - in: query
-        name: id
-        type: integer
-      - in: query
-        name: organId
+      - description: GEWIS ID
+        in: query
+        name: gewis_id
         type: integer
       produces:
       - application/json
