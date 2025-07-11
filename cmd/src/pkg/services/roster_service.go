@@ -84,6 +84,11 @@ func (s *RosterService) GetRosters(params *models.RosterFilterParams) ([]*models
 		db = db.Where("organ_id = ?", *params.OrganID)
 	}
 
+	db.
+		Preload("RosterShift").
+		Preload("RosterAnswer").
+		Preload("Organ")
+
 	var rosters []*models.Roster
 	if err := db.Find(&rosters).Error; err != nil {
 		return nil, err
@@ -193,7 +198,9 @@ func (s *RosterService) UpdateRosterAnswer(ID uint, updateParams *models.RosterA
 	if err := s.db.Model(&answer).Updates(updateParams).Error; err != nil {
 		return nil, err
 	}
-
+	if err := s.db.First(&answer, ID).Error; err != nil {
+		return nil, err
+	}
 	return answer, nil
 }
 
@@ -234,7 +241,6 @@ func (s *RosterService) UpdateSavedShift(ID uint, updateParams *models.SavedShif
 	}
 
 	if updateParams.UserIDs != nil {
-
 		var users []*models.User
 		if err := s.db.Where("ID IN ?", updateParams.UserIDs).Find(&users).Error; err != nil {
 
@@ -242,6 +248,10 @@ func (s *RosterService) UpdateSavedShift(ID uint, updateParams *models.SavedShif
 		}
 		// Replace existing users with the new set
 		if err := s.db.Model(&saved).Association("Users").Replace(users); err != nil {
+			return nil, err
+		}
+		// Reload associations to get fresh data
+		if err := s.db.Preload("Users").Preload("RosterShift").First(&saved, ID).Error; err != nil {
 			return nil, err
 		}
 	}
