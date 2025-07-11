@@ -42,7 +42,7 @@ func (suite *TestRosterSuite) TestCreateRoster_ValidInput() {
 func (suite *TestRosterSuite) TestCreateRoster_EmptyName() {
 	params := models.RosterCreateRequest{
 		Name:    "",
-		Date:    time.Now(),
+		Date:    time.Now().Add(25 * time.Hour),
 		OrganID: 1,
 	}
 
@@ -66,13 +66,37 @@ func (suite *TestRosterSuite) TestCreateRoster_ZeroDate() {
 func (suite *TestRosterSuite) TestCreateRoster_InvalidOrganID() {
 	params := models.RosterCreateRequest{
 		Name:    "Valid Name",
-		Date:    time.Now(),
+		Date:    time.Now().Add(25 * time.Hour),
 		OrganID: 0,
 	}
 
 	roster, err := suite.service.CreateRoster(&params)
 	assert.Error(suite.T(), err, "Expected error for invalid organ ID")
 	assert.Nil(suite.T(), roster)
+}
+
+func (suite *TestRosterSuite) TestCreateRoster_WithShifts() {
+	var organ models.Organ
+	suite.db.First(&organ)
+
+	shift := []string{"Shift 1", "Shift 42"}
+
+	params := models.RosterCreateRequest{
+		Name:    "Valid Name",
+		Date:    time.Now().Add(25 * time.Hour),
+		OrganID: organ.ID,
+		Shifts:  &shift,
+	}
+
+	roster, err := suite.service.CreateRoster(&params)
+	assert.NoError(suite.T(), err)
+
+	var rosterShiftNames []string
+	for _, rs := range roster.RosterShift {
+		rosterShiftNames = append(rosterShiftNames, rs.Name)
+	}
+
+	assert.ElementsMatch(suite.T(), shift, rosterShiftNames)
 }
 
 func (suite *TestRosterSuite) TestGetRosters_All() {
@@ -580,6 +604,57 @@ func (suite *TestRosterSuite) TestUpdateSavedShift_UserLoadFailure() {
 	err = suite.db.Model(updatedSavedShift).Association("Users").Find(&users)
 	assert.NoError(suite.T(), err)
 	assert.Len(suite.T(), users, 0)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateCreate_Valid() {
+	var organ models.Organ
+	suite.db.First(&organ)
+
+	expectedShifts := []string{"Shift 1", "Shift 42"}
+
+	params := models.RosterTemplateCreateRequest{
+		OrganID: organ.ID,
+		Shifts:  expectedShifts,
+	}
+
+	template, err := suite.service.CreateRosterTemplate(&params)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), template)
+
+	assert.Equal(suite.T(), organ.ID, template.OrganID)
+	assert.ElementsMatch(suite.T(), expectedShifts, template.Shifts)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateCreate_InValidOrgan() {
+	var organ models.Organ
+	suite.db.Last(&organ)
+
+	expectedShifts := []string{"Shift 1", "Shift 42"}
+
+	params := models.RosterTemplateCreateRequest{
+		OrganID: uint(999),
+		Shifts:  expectedShifts,
+	}
+
+	template, err := suite.service.CreateRosterTemplate(&params)
+	assert.Error(suite.T(), err)
+	assert.Nil(suite.T(), template)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateCreate_NoShifts() {
+	var organ models.Organ
+	suite.db.Last(&organ)
+
+	expectedShifts := []string{}
+
+	params := models.RosterTemplateCreateRequest{
+		OrganID: uint(999),
+		Shifts:  expectedShifts,
+	}
+
+	template, err := suite.service.CreateRosterTemplate(&params)
+	assert.Error(suite.T(), err)
+	assert.Nil(suite.T(), template)
 }
 
 func TestRosterService(t *testing.T) {
