@@ -87,14 +87,22 @@ func (suite *TestRosterSuite) TestGetRosters_All() {
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), rosters)
 
-	found := false
+	var foundRoster *models.Roster
 	for _, r := range rosters {
 		if r.Name == cParams.Name {
-			found = true
+			foundRoster = r
 			break
 		}
 	}
-	assert.True(suite.T(), found, "Expected to find a roster with name %q", cParams.Name)
+	assert.NotNil(suite.T(), foundRoster, "Expected to find a roster with name %q", cParams.Name)
+	if foundRoster == nil {
+		return
+	}
+
+	assert.NotNil(suite.T(), foundRoster.RosterShift, "RosterShift should not be nil")
+	assert.NotNil(suite.T(), foundRoster.RosterAnswer, "RosterAnswer should not be nil")
+	assert.NotNil(suite.T(), foundRoster.Organ, "Organ should be loaded")
+	assert.Equal(suite.T(), cParams.OrganID, foundRoster.OrganID)
 }
 
 func (suite *TestRosterSuite) TestGetRosters_FilterByID() {
