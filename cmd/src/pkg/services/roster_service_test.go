@@ -382,9 +382,11 @@ func (suite *TestRosterSuite) TestDeleteRosterShift_NotFound() {
 }
 
 func (suite *TestRosterSuite) TestCreateRosterAnswer_Valid() {
+
 	roster := models.Roster{
-		Name:   "Test Roster",
-		Values: []string{"yes", "no"},
+		Name:    "Test Roster",
+		Values:  []string{"yes", "no"},
+		OrganID: uint(1),
 	}
 	suite.db.Create(&roster)
 

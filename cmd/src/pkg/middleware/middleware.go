@@ -85,7 +85,7 @@ func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 		// parts[1] is the payload
 		payloadBytes, err := base64.RawURLEncoding.DecodeString(parts[1])
 		if err != nil {
-			log.Error().Msgf(err.Error())
+			log.Error().Msg(err.Error())
 			return
 		}
 

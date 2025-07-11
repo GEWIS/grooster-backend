@@ -638,11 +638,11 @@ paths:
       parameters:
       - description: Organ ID
         in: query
-        name: organ_id
+        name: organId
         type: integer
       - description: GEWIS ID
         in: query
-        name: gewis_id
+        name: gewisId
         type: integer
       produces:
       - application/json

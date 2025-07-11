@@ -263,7 +263,7 @@ func (h *RosterHandler) DeleteRosterShift(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		createParams	body		models.RosterAnswerCreateRequest	true	"Roster answer input"
-//	@Success	200				{object}	models.RosterAnswer
+//	@Success	200				{object}	models.Roster Answer
 //	@Failure	400				{string}	string
 //	@ID			createRosterAnswer
 //	@Router		/roster/answer [post]

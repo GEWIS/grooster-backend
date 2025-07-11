@@ -724,13 +724,13 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Organ ID",
-                        "name": "organ_id",
+                        "name": "organId",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "description": "GEWIS ID",
-                        "name": "gewis_id",
+                        "name": "gewisId",
                         "in": "query"
                     }
                 ],
