@@ -1,6 +1,7 @@
 package models
 
 import (
+	"gorm.io/datatypes"
 	"time"
 )
 
@@ -58,12 +59,24 @@ type SavedShift struct {
 	Users []*User `json:"users" gorm:"many2many:user_shift_saved;"`
 } // @name SavedShift
 
+type RosterTemplate struct {
+	BaseModel
+
+	OrganID uint `json:"organId"`
+
+	Organ *Organ `json:"organ" gorm:"foreignKey:OrganID"`
+
+	Shifts datatypes.JSONSlice[string] `gorm:"serializer:json"`
+} // @name RosterTemplate
+
 type RosterCreateRequest struct {
 	Name string `json:"name"`
 
 	Date time.Time `json:"date"`
 
 	OrganID uint `json:"organId"`
+
+	Shifts *[]string `json:"shifts"`
 } // @name RosterCreateRequest
 
 type RosterUpdateRequest struct {
@@ -101,3 +114,9 @@ type RosterFilterParams struct {
 	Date    *time.Time `form:"date" time_format:"2006-01-02"`
 	OrganID *uint      `form:"organId"`
 } // @name RosterFilterParams
+
+type RosterTemplateCreateRequest struct {
+	OrganID uint `json:"organId"`
+
+	Shifts []string `json:"shifts"`
+} // @name RosterTemplateCreateRequest

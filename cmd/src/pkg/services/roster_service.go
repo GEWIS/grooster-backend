@@ -24,6 +24,8 @@ type RosterServiceInterface interface {
 	SaveRoster(uint) error
 	UpdateSavedShift(uint, *models.SavedShiftUpdateRequest) (*models.SavedShift, error)
 	GetSavedRoster(uint) ([]*models.SavedShift, error)
+
+	CreateRosterTemplate(*models.RosterTemplateCreateRequest) (*models.RosterTemplate, error)
 }
 
 type RosterService struct {
@@ -62,7 +64,20 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 		return nil, err
 	}
 
-	if err := s.db.Preload("Organ").First(&roster, roster.ID).Error; err != nil {
+	if params.Shifts != nil && len(*params.Shifts) > 0 {
+		for _, shift := range *params.Shifts {
+			rosterShift := &models.RosterShift{
+				Name:     shift,
+				RosterID: roster.ID,
+			}
+
+			if err := s.db.Create(&rosterShift).Error; err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if err := s.db.Preload("Organ").Preload("RosterShift").First(&roster, roster.ID).Error; err != nil {
 		return nil, err
 	}
 
@@ -257,6 +272,30 @@ func (s *RosterService) UpdateSavedShift(ID uint, updateParams *models.SavedShif
 	}
 
 	return saved, nil
+}
+
+func (s *RosterService) CreateRosterTemplate(params *models.RosterTemplateCreateRequest) (*models.RosterTemplate, error) {
+	var organ models.Organ
+
+	if err := s.db.First(&organ, params.OrganID).Error; err != nil {
+		return nil, err
+	}
+
+	if len(params.Shifts) == 0 {
+		return nil, errors.New("no shifts were given")
+	}
+
+	template := models.RosterTemplate{
+		OrganID: organ.ID,
+		Organ:   &organ,
+		Shifts:  params.Shifts,
+	}
+
+	if err := s.db.Create(&template).Error; err != nil {
+		return nil, err
+	}
+
+	return &template, nil
 }
 
 func (s *RosterService) createSavedShift(rID uint, shift *models.RosterShift) error {
