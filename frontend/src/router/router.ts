@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
 import RosterView from "@/views/RosterView.vue";
 import OrganView from "@/views/OrganView.vue";
-import {isAuthenticated, loginRedirect} from "@/helpers/TokenHelper";
+import {getGEWISId, isAuthenticated, loginRedirect} from "@/helpers/TokenHelper";
 import ApiService from "@/services/ApiService";
 
 const routes: RouteRecordRaw[] = [
@@ -12,9 +12,17 @@ const routes: RouteRecordRaw[] = [
         component: RosterView,
         beforeEnter: async (to, from, next) => {
             try {
-                const id = to.params.id as string;
-                await ApiService.roster.getRoster(parseInt(id));
-                next();
+                const gewisId = getGEWISId();
+                const response = await ApiService.user.userGet(undefined, gewisId);
+                const user = response.data[0];
+                const organs = user.organs;
+                const id = to.params.id;
+                if (organs.some((organ) => organ.id === parseInt(id as string))) {
+                    await ApiService.roster.getRoster(parseInt(id as string));
+                    next();
+                } else {
+                    next('/');
+                }
             } catch (error) {
                 next('/');
             }
