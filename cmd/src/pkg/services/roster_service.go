@@ -26,6 +26,9 @@ type RosterServiceInterface interface {
 	GetSavedRoster(uint) ([]*models.SavedShift, error)
 
 	CreateRosterTemplate(*models.RosterTemplateCreateRequest) (*models.RosterTemplate, error)
+	GetRosterTemplate(uint) (*models.RosterTemplate, error)
+	GetRosterTemplates(*models.RosterTemplateFilterParams) ([]*models.RosterTemplate, error)
+	DeleteRosterTemplate(ID uint) error
 }
 
 type RosterService struct {
@@ -64,8 +67,8 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 		return nil, err
 	}
 
-	if params.Shifts != nil && len(*params.Shifts) > 0 {
-		for _, shift := range *params.Shifts {
+	if params.Shifts != nil && len(params.Shifts) > 0 {
+		for _, shift := range params.Shifts {
 			rosterShift := &models.RosterShift{
 				Name:     shift,
 				RosterID: roster.ID,
@@ -287,7 +290,6 @@ func (s *RosterService) CreateRosterTemplate(params *models.RosterTemplateCreate
 
 	template := models.RosterTemplate{
 		OrganID: organ.ID,
-		Organ:   &organ,
 		Shifts:  params.Shifts,
 	}
 
@@ -296,6 +298,43 @@ func (s *RosterService) CreateRosterTemplate(params *models.RosterTemplateCreate
 	}
 
 	return &template, nil
+}
+
+func (s *RosterService) GetRosterTemplate(ID uint) (*models.RosterTemplate, error) {
+	var template models.RosterTemplate
+	if err := s.db.First(&template, ID).Error; err != nil {
+		return nil, err
+	}
+
+	return &template, nil
+}
+
+func (s *RosterService) GetRosterTemplates(params *models.RosterTemplateFilterParams) ([]*models.RosterTemplate, error) {
+	var templates []*models.RosterTemplate
+	db := s.db.Model(&models.RosterTemplate{})
+
+	if params != nil {
+		if params.OrganID != nil {
+			db.Where("organ_id = ?", params.OrganID)
+		}
+	}
+
+	if err := db.Find(&templates).Error; err != nil {
+		return nil, err
+	}
+
+	return templates, nil
+}
+
+func (s *RosterService) DeleteRosterTemplate(ID uint) error {
+	result := s.db.Where("id = ?", ID).Delete(&models.RosterTemplate{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("roster template with ID %d not found", ID)
+	}
+	return nil
 }
 
 func (s *RosterService) createSavedShift(rID uint, shift *models.RosterShift) error {

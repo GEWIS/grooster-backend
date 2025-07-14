@@ -64,8 +64,6 @@ type RosterTemplate struct {
 
 	OrganID uint `json:"organId"`
 
-	Organ *Organ `json:"organ" gorm:"foreignKey:OrganID"`
-
 	Shifts datatypes.JSONSlice[string] `gorm:"serializer:json"`
 } // @name RosterTemplate
 
@@ -76,7 +74,7 @@ type RosterCreateRequest struct {
 
 	OrganID uint `json:"organId"`
 
-	Shifts *[]string `json:"shifts"`
+	Shifts []string `json:"shifts"`
 } // @name RosterCreateRequest
 
 type RosterUpdateRequest struct {
@@ -120,3 +118,7 @@ type RosterTemplateCreateRequest struct {
 
 	Shifts []string `json:"shifts"`
 } // @name RosterTemplateCreateRequest
+
+type RosterTemplateFilterParams struct {
+	OrganID *uint `form:"organId"`
+} // @name RosterTemplateFilterParams
