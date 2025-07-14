@@ -1,0 +1,8 @@
+services:
+  grooster-backend:
+    image: test-image
+    container_name: grooster-backend
+    environment:
+      - PORT=:80
+    ports:
+      - "8080:80"
