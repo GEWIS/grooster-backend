@@ -2,6 +2,7 @@ package models
 
 import (
 	"GEWIS-Rooster/cmd/src/pkg/models"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"strconv"
@@ -12,6 +13,7 @@ func SeedRosters(db *gorm.DB, count int) {
 	rosters := roster(db, count)
 	rosterShift(db, rosters)
 	rosterAnswer(db, rosters)
+	rosterTemplates(db, count)
 }
 
 func roster(db *gorm.DB, count int) []*models.Roster {
@@ -98,6 +100,25 @@ func rosterAnswer(db *gorm.DB, roster []*models.Roster) {
 
 		if err := db.Create(&answers).Error; err != nil {
 			log.Error().Err(err).Msg("Failed to create roster answers")
+		}
+	}
+}
+
+func rosterTemplates(db *gorm.DB, count int) {
+	for i := range count {
+		shiftString := fmt.Sprintf("Shift %d", i)
+		shifts := []string{shiftString}
+
+		var organ *models.Organ
+		db.First(&organ)
+
+		shift := models.RosterTemplate{
+			OrganID: organ.ID,
+			Shifts:  shifts,
+		}
+
+		if err := db.Create(&shift).Error; err != nil {
+			log.Error().Err(err).Msg("Failed to create roster templates")
 		}
 	}
 }

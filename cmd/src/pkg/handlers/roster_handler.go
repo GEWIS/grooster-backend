@@ -34,6 +34,11 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 	g.PATCH("/saved-shift/:id", h.UpdateSavedShift)
 	g.GET("/saved-shift/:id", h.GetSavedRoster)
 
+	g.POST("/template", h.CreateRosterTemplate)
+	g.GET("/template", h.GetRosterTemplates)
+	g.GET("/template/:id", h.GetRosterTemplate)
+	g.DELETE("/template/:id", h.DeleteRosterTemplate)
+
 	return h
 }
 
@@ -263,7 +268,7 @@ func (h *RosterHandler) DeleteRosterShift(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		createParams	body		models.RosterAnswerCreateRequest	true	"Roster answer input"
-//	@Success	200				{object}	models.Roster Answer
+//	@Success	200				{object}	models.RosterAnswer
 //	@Failure	400				{string}	string
 //	@ID			createRosterAnswer
 //	@Router		/roster/answer [post]
@@ -424,4 +429,122 @@ func (h *RosterHandler) GetSavedRoster(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, savedShifts)
+}
+
+// CreateRosterTemplate
+//
+//	@Summary	Creates a template of a roster by defining the name of the shifts
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		params	body		models.RosterTemplateCreateRequest					false	"Template Params"
+//	@Success	200	{array}		models.SavedShift	"Created Template"
+//	@Failure	400	{string}	string				"Invalid request"
+//	@ID			createRosterTemplate
+//	@Router		/roster/template [post]
+func (h *RosterHandler) CreateRosterTemplate(c *gin.Context) {
+	var param *models.RosterTemplateCreateRequest
+
+	if err := c.ShouldBindJSON(&param); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	createdTemplate, err := h.rosterService.CreateRosterTemplate(param)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, createdTemplate)
+}
+
+// GetRosterTemplates
+//
+//	@Summary	Get all rosters templates or query by organ ID
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		params	query		models.RosterTemplateFilterParams	false	"Date filter (ISO format)"
+//	@Success	200		{array}		models.RosterTemplate
+//	@Failure	400		{string}	string
+//	@ID			getRosterTemplates
+//	@Router		/roster/template [get]
+func (h *RosterHandler) GetRosterTemplates(c *gin.Context) {
+	var params models.RosterTemplateFilterParams
+	if err := c.ShouldBindQuery(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	rosterTemplates, err := h.rosterService.GetRosterTemplates(&params)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, rosterTemplates)
+}
+
+// GetRosterTemplate
+//
+//	@Summary	Get a roster template by ID
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"Template ID"
+//	@Success	200		{object}		models.RosterTemplate
+//	@Failure 	404 	{string} 	string
+//	@Failure	400		{string}	string
+//	@ID			getRosterTemplate
+//	@Router		/roster/template/{id} [get]
+func (h *RosterHandler) GetRosterTemplate(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	id := uint(id64)
+
+	rosterTemplate, err := h.rosterService.GetRosterTemplate(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, rosterTemplate)
+}
+
+// DeleteRosterTemplate
+//
+//	@Summary	Deletes a roster template by ID
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"Template ID"
+//	@Success	200		{string}	string
+//	@Failure 	404 	{string} 	string
+//	@Failure	400		{string}	string
+//	@ID			deleteRosterTemplate
+//	@Router		/roster/template/{id} [delete]
+func (h *RosterHandler) DeleteRosterTemplate(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	id := uint(id64)
+
+	err = h.rosterService.DeleteRosterTemplate(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Deleted successfully"})
 }

@@ -85,7 +85,7 @@ func (suite *TestRosterSuite) TestCreateRoster_WithShifts() {
 		Name:    "Valid Name",
 		Date:    time.Now().Add(25 * time.Hour),
 		OrganID: organ.ID,
-		Shifts:  &shift,
+		Shifts:  shift,
 	}
 
 	roster, err := suite.service.CreateRoster(&params)
@@ -655,6 +655,80 @@ func (suite *TestRosterSuite) TestRosterTemplateCreate_NoShifts() {
 	template, err := suite.service.CreateRosterTemplate(&params)
 	assert.Error(suite.T(), err)
 	assert.Nil(suite.T(), template)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateGet_OneValid() {
+	var template models.RosterTemplate
+
+	suite.db.First(&template)
+
+	newTemplate, err := suite.service.GetRosterTemplate(template.ID)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), template.ID, newTemplate.ID)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateGet_OneInValid() {
+	invalidID := uint(9999)
+
+	newTemplate, err := suite.service.GetRosterTemplate(invalidID)
+	assert.Error(suite.T(), err)
+	assert.Nil(suite.T(), newTemplate)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateGet_All() {
+	var count int64
+	suite.db.Model(&models.RosterTemplate{}).Count(&count)
+
+	templates, err := suite.service.GetRosterTemplates(nil)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), templates)
+	assert.Len(suite.T(), templates, int(count))
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateGet_ByOrganID() {
+	var template *models.RosterTemplate
+	suite.db.First(&template)
+
+	params := models.RosterTemplateFilterParams{OrganID: &template.OrganID}
+
+	templates, err := suite.service.GetRosterTemplates(&params)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), templates)
+
+	assert.Equal(suite.T(), template.ID, templates[0].ID)
+	assert.Equal(suite.T(), template.OrganID, templates[0].OrganID)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateGet_AllInvalid() {
+	var template *models.RosterTemplate
+	suite.db.First(&template)
+
+	ID := uint(9999)
+	params := models.RosterTemplateFilterParams{OrganID: &ID}
+
+	templates, err := suite.service.GetRosterTemplates(&params)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), len(templates), 0)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateDelete_Valid() {
+	var template *models.RosterTemplate
+	suite.db.First(&template)
+
+	err := suite.service.DeleteRosterTemplate(template.ID)
+	assert.NoError(suite.T(), err)
+
+	var newTemplate *models.RosterTemplate
+	suite.db.First(&newTemplate)
+
+	assert.NotEqual(suite.T(), template.ID, newTemplate.ID)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateDelete_InValid() {
+	ID := uint(9999)
+
+	err := suite.service.DeleteRosterTemplate(ID)
+	assert.Error(suite.T(), err)
 }
 
 func TestRosterService(t *testing.T) {
