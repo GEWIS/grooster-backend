@@ -1,11 +1,11 @@
 {
   "include": [
-    "src/client/**/*"
+    "src/**/*"
   ],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "./client/",
+    "rootDir": "src",
     "module": "CommonJS",
     "moduleResolution": "node",
     "target": "ES2020",
