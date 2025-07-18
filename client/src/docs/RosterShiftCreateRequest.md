@@ -1,21 +1,20 @@
 # RosterShiftCreateRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**name** | **string** |  | [optional] [default to undefined]
-**rosterId** | **number** |  | [optional] [default to undefined]
+| Name         | Type       | Description | Notes                             |
+| ------------ | ---------- | ----------- | --------------------------------- |
+| **name**     | **string** |             | [optional] [default to undefined] |
+| **rosterId** | **number** |             | [optional] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { RosterShiftCreateRequest } from './api';
+import { RosterShiftCreateRequest } from "./api";
 
 const instance: RosterShiftCreateRequest = {
-    name,
-    rosterId,
+  name,
+  rosterId,
 };
 ```
 
