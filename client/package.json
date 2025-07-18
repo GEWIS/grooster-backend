@@ -3,7 +3,7 @@
   "main": "./index.js",
   "version": "0.0.0",
   "repository": {
-    "url": "https://github.com/GEWIS/pdf-compiler",
+    "url": "https://github.com/GEWIS/grooster-backend",
     "type": "git",
     "directory": "client"
   },
