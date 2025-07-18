@@ -59,7 +59,6 @@ func main() {
 
 	userService := services.NewUserService(db)
 	rosterService := services.NewRosterService(db)
-	organService := services.NewOrganService(db)
 	authService := services.NewAuthService(userService, db)
 	authMiddle := middleware.NewAuthMiddleware(authService)
 
@@ -72,7 +71,6 @@ func main() {
 	{
 		handlers.NewUserHandler(protectedGroup, userService)
 		handlers.NewRosterHandler(rosterService, protectedGroup)
-		handlers.NewOrganHandler(organService, protectedGroup)
 	}
 
 	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
