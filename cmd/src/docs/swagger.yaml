@@ -1,4 +1,22 @@
 definitions:
+  Organ:
+    description: An organ that users can be part of.
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/User'
+        type: array
+    type: object
   Roster:
     properties:
       createdAt:
@@ -177,7 +195,7 @@ definitions:
         type: string
       organs:
         items:
-          $ref: '#/definitions/models.Organ'
+          $ref: '#/definitions/Organ'
         type: array
       updatedAt:
         type: string
@@ -200,24 +218,6 @@ definitions:
       valid:
         description: Valid is true if Time is not NULL
         type: boolean
-    type: object
-  models.Organ:
-    description: An organ that users can be part of.
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
-      id:
-        type: integer
-      name:
-        type: string
-      updatedAt:
-        type: string
-      users:
-        items:
-          $ref: '#/definitions/User'
-        type: array
     type: object
 info:
   contact: {}
