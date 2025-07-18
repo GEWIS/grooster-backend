@@ -1,23 +1,22 @@
 # UserCreateRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**gewisid** | **number** |  | [optional] [default to undefined]
-**name** | **string** |  | [optional] [default to undefined]
-**organs** | [**Array&lt;Organ&gt;**](Organ.md) |  | [optional] [default to undefined]
+| Name        | Type                               | Description | Notes                             |
+| ----------- | ---------------------------------- | ----------- | --------------------------------- |
+| **gewisid** | **number**                         |             | [optional] [default to undefined] |
+| **name**    | **string**                         |             | [optional] [default to undefined] |
+| **organs**  | [**Array&lt;Organ&gt;**](Organ.md) |             | [optional] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { UserCreateRequest } from './api';
+import { UserCreateRequest } from "./api";
 
 const instance: UserCreateRequest = {
-    gewisid,
-    name,
-    organs,
+  gewisid,
+  name,
+  organs,
 };
 ```
 

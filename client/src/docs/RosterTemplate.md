@@ -1,29 +1,28 @@
 # RosterTemplate
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**createdAt** | **string** |  | [optional] [default to undefined]
-**deletedAt** | [**GormDeletedAt**](GormDeletedAt.md) |  | [optional] [default to undefined]
-**id** | **number** |  | [optional] [default to undefined]
-**organId** | **number** |  | [optional] [default to undefined]
-**shifts** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
-**updatedAt** | **string** |  | [optional] [default to undefined]
+| Name          | Type                                  | Description | Notes                             |
+| ------------- | ------------------------------------- | ----------- | --------------------------------- |
+| **createdAt** | **string**                            |             | [optional] [default to undefined] |
+| **deletedAt** | [**GormDeletedAt**](GormDeletedAt.md) |             | [optional] [default to undefined] |
+| **id**        | **number**                            |             | [optional] [default to undefined] |
+| **organId**   | **number**                            |             | [optional] [default to undefined] |
+| **shifts**    | **Array&lt;string&gt;**               |             | [optional] [default to undefined] |
+| **updatedAt** | **string**                            |             | [optional] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { RosterTemplate } from './api';
+import { RosterTemplate } from "./api";
 
 const instance: RosterTemplate = {
-    createdAt,
-    deletedAt,
-    id,
-    organId,
-    shifts,
-    updatedAt,
+  createdAt,
+  deletedAt,
+  id,
+  organId,
+  shifts,
+  updatedAt,
 };
 ```
 
