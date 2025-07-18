@@ -1,0 +1,22 @@
+{
+  "name": "@gewis/grooster-backend-ts",
+  "main": "./index.js",
+  "version": "0.0.0",
+  "repository": {
+    "url": "https://github.com/GEWIS/pdf-compiler",
+    "type": "git",
+    "directory": "client"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --ignore-path .gitignore --check ./src/",
+    "format:fix": "prettier --ignore-path .gitignore --write ./src"
+  },
+  "dependencies": {
+    "@gewis/eslint-config-typescript": "^2.4.0",
+    "@gewis/prettier-config": "^2.2.2",
+    "eslint": "^9.31.0",
+    "prettier": "^3.6.2"
+  }
+}
