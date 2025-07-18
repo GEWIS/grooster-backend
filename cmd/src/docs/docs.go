@@ -1089,6 +1089,33 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "Organ": {
+            "description": "An organ that users can be part of.",
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User"
+                    }
+                }
+            }
+        },
         "Roster": {
             "type": "object",
             "properties": {
@@ -1362,7 +1389,7 @@ const docTemplate = `{
                 "organs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Organ"
+                        "$ref": "#/definitions/Organ"
                     }
                 },
                 "updatedAt": {
@@ -1396,33 +1423,6 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
-                }
-            }
-        },
-        "models.Organ": {
-            "description": "An organ that users can be part of.",
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "users": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/User"
-                    }
                 }
             }
         }
