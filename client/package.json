@@ -12,7 +12,8 @@
     "build": "tsc",
     "lint:fix": "eslint --fix .",
     "format": "prettier --ignore-path .gitignore --check ./src/",
-    "format:fix": "prettier --ignore-path .gitignore --write ./src"
+    "format:fix": "prettier --ignore-path .gitignore --write ./src",
+    "prepublishOnly": "yarn install --frozen-lockfile && yarn build"
   },
   "dependencies": {
     "@gewis/eslint-config-typescript": "^2.4.0",
