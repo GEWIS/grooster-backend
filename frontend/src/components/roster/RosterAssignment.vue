@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {User, SavedShiftUpdateRequest} from "../../../ts-client";
+import {User, SavedShiftUpdateRequest} from "@gewis/grooster-backend-ts";
 import {onMounted, reactive, computed, watch, ref} from "vue";
 import {useRosterStore} from "@/stores/roster.store";
 import ApiService from "@/services/ApiService";

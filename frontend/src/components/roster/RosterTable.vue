@@ -4,7 +4,7 @@ import {
     RosterAnswer,
     RosterAnswerUpdateRequest,
     Roster, RosterAnswerCreateRequest, User,
-} from "../../../ts-client";
+} from "@gewis/grooster-backend-ts";
 import {useRosterStore} from "@/stores/roster.store";
 import {getGEWISId} from "@/helpers/TokenHelper";
 import ApiService from "@/services/ApiService";

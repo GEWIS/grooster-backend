@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {AddRosterForm} from "@/types/roster.types";
 import {computed, ref} from "vue";
-import {RosterCreateRequest} from "../../../../ts-client";
+import {RosterCreateRequest} from "@gewis/grooster-backend-ts";
 import {useRosterStore} from "@/stores/roster.store";
 import {useRoute} from "vue-router";
 

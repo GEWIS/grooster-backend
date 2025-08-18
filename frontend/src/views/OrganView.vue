@@ -3,7 +3,7 @@ import {onMounted, ref} from "vue";
 import ApiService from "@/services/ApiService";
 import {getGEWISId} from "@/helpers/TokenHelper";
 import {Select} from "primevue";
-import {Organ} from "../../ts-client";
+import {Organ} from "@gewis/grooster-backend-ts";
 import {useRouter} from "vue-router";
 
 const router = useRouter();
@@ -19,9 +19,10 @@ onMounted(() => {
 async function loadUser() {
     const gewisId = getGEWISId();
     const response = await ApiService.user.userGet(undefined, gewisId);
-
+    console.log(response);
     user.value = response.data[0];
     organs.value = user.value.organs;
+    console.log(organs  .value);
 }
 
 const onSelect = () => {
@@ -35,7 +36,7 @@ const onSelect = () => {
         <Select
             v-model="selectedOrgan"
             :options="organs"
-            option-label="Name"
+            option-label="name"
             option-value="id"
             placeholder="Select an organ"
             @change="onSelect"

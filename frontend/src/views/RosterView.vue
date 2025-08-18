@@ -3,7 +3,7 @@ import {computed, onMounted, ref, watch} from "vue";
 import RosterTable from "@/components/roster/RosterTable.vue";
 import RosterAssignment from "@/components/roster/RosterAssignment.vue";
 import {useRosterStore} from "@/stores/roster.store.js";
-import {Roster} from "../../ts-client";
+import {Roster} from "@gewis/grooster-backend-ts";
 import RosterAddDialog from "@/components/roster/dialogs/RosterAddDialog.vue";
 import {useRoute} from "vue-router";
 import ApiService from "@/services/ApiService";

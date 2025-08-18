@@ -4,7 +4,7 @@ import {
     RosterShiftCreateRequest,
     SavedShift,
     SavedShiftUpdateRequest, RosterCreateRequest, Roster, RosterAnswerCreateRequest
-} from "../../ts-client";
+} from "@gewis/grooster-backend-ts";
 import ApiService from "@/services/ApiService";
 
 export const useRosterStore = defineStore('roster', {

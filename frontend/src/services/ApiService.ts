@@ -1,5 +1,5 @@
-import {RosterApi, UserApi, AuthApi, RosterAnswerApi, RosterShiftApi, SavedShiftApi} from "../../ts-client"
-import { Configuration } from "../../ts-client";
+import { RosterApi, UserApi, AuthApi, RosterAnswerApi, RosterShiftApi, SavedShiftApi } from "@gewis/grooster-backend-ts";
+import { Configuration } from "@gewis/grooster-backend-ts";
 import { getTokenFromStorage } from "@/helpers/TokenHelper";
 
 class ApiService {
