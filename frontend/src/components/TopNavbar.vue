@@ -1,7 +1,9 @@
 <script setup>
 import { useRoute } from 'vue-router'
+import {useOrganStore} from "@/stores/organ.store.js";
 
-const route = useRoute()
+const route = useRoute();
+const store = useOrganStore();
 
 const isActive = (path) => route.path === path;
 </script>
@@ -15,6 +17,14 @@ const isActive = (path) => route.path === path;
                 :class="{ 'bg-gray-400': isActive('/') }"
             >
                 Home
+            </RouterLink>
+            <RouterLink
+                v-if="route.path !== '/' && store.organ"
+                :to="`/templates/${store.organ}`"
+                class="px-4 py-2 rounded-lg hover:bg-gray-400"
+                :class="{ 'bg-gray-400': isActive('/templates/' + store.organ) }"
+            >
+                Templates
             </RouterLink>
         </div>
     </nav>

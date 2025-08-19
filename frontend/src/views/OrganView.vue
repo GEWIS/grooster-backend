@@ -5,8 +5,10 @@ import {getGEWISId} from "@/helpers/TokenHelper";
 import {Select} from "primevue";
 import {Organ} from "@gewis/grooster-backend-ts";
 import {useRouter} from "vue-router";
+import {useOrganStore} from "@/stores/organ.store";
 
 const router = useRouter();
+const organStore = useOrganStore();
 
 const user = ref();
 const organs = ref<Organ[]>();
@@ -19,14 +21,13 @@ onMounted(() => {
 async function loadUser() {
     const gewisId = getGEWISId();
     const response = await ApiService.user.userGet(undefined, gewisId);
-    console.log(response);
+
     user.value = response.data[0];
     organs.value = user.value.organs;
-    console.log(organs  .value);
 }
 
 const onSelect = () => {
-    router.push({ name: 'roster', params: {id: selectedOrgan.value} });
+    router.push({ name: 'rosters', params: {id: selectedOrgan.value} });
 }
 
 </script>
