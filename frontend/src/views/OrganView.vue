@@ -3,7 +3,7 @@ import {onMounted, ref} from "vue";
 import ApiService from "@/services/ApiService";
 import {getGEWISId} from "@/helpers/TokenHelper";
 import {Select} from "primevue";
-import {Organ} from "@gewis/grooster-backend-ts";
+import type {Organ} from "@gewis/grooster-backend-ts";
 import {useRouter} from "vue-router";
 import {useOrganStore} from "@/stores/organ.store";
 

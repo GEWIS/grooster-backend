@@ -3,7 +3,7 @@ import {computed, onMounted, ref, watch} from "vue";
 import RosterTable from "@/components/roster/RosterTable.vue";
 import RosterAssignment from "@/components/roster/RosterAssignment.vue";
 import {useRosterStore} from "@/stores/roster.store.js";
-import {Roster} from "@gewis/grooster-backend-ts";
+import type {Roster} from "@gewis/grooster-backend-ts";
 import RosterAddDialog from "@/components/roster/dialogs/RosterAddDialog.vue";
 import {useRoute} from "vue-router";
 import ApiService from "@/services/ApiService";
@@ -14,7 +14,7 @@ const rosterStore = useRosterStore();
 const rosters = computed(() => Object.values(rosterStore.rosters));
 const users = ref();
 
-const selectedRoster = ref(null);
+const selectedRoster = ref<Roster | null>(null);
 const addDialog = ref(false);
 
 onMounted(async () => {
@@ -58,7 +58,7 @@ async function fetchRosters() {
         <template #content>
             <div class="flex flex-col gap-5 h-full">
 
-                <div v-if="selectedRoster" class="flex flex-col gap-5 flex-1">
+                <div v-if="selectedRoster?.id" class="flex flex-col gap-5 flex-1">
                     <RosterTable :id="selectedRoster.id" />
                     <RosterAssignment
                         v-if="selectedRoster.saved"

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import {
+import type {
     RosterAnswerUpdateRequest,
     RosterShiftCreateRequest,
     SavedShift,
@@ -27,7 +27,9 @@ export const useRosterStore = defineStore('roster', {
         async fetchRosters(organId: number) {
             await ApiService.roster.getRosters(undefined, organId).then((res) => {
                 res.data.forEach((roster: Roster) => {
-                    this.rosters[roster.id] = roster;
+                    if (roster.id != null) {
+                        this.rosters[roster.id] = roster;
+                    }
                 });
                 return this.rosters;
             });
@@ -35,51 +37,59 @@ export const useRosterStore = defineStore('roster', {
         async createRoster(params: RosterCreateRequest) {
             await ApiService.roster.createRoster(params).then((res) => {
                 const roster = res.data;
-                this.rosters[roster.id] = roster;
+                if (roster.id != null) {
+                    this.rosters[roster.id] = roster;
+                }
             });
         },
         async createAnswer(params: RosterAnswerCreateRequest) {
-            await ApiService.rosterAnswer.createRosterAnswer(params).then((res) => {
-                const roster = this.rosters[res.data.rosterId];
+            try {
+                const response = await ApiService.rosterAnswer.createRosterAnswer(params);
+                const rosterId = response.data?.rosterId;
+                const roster = rosterId && this.rosters[rosterId];
 
-                const existingAnswers = roster.rosterAnswer ?? [];
-
-                const updatedRoster: Roster = {
-                    ...roster,
-                    rosterAnswer: [...existingAnswers, res.data],
+                if (roster) {
+                    this.rosters[rosterId] = {
+                        ...roster,
+                        rosterAnswer: [...(roster.rosterAnswer ?? []), response.data],
+                    };
                 }
-                this.rosters = {
-                    ...this.rosters,
-                    [roster.id]: updatedRoster,
-                };
-            });
+            } catch (error) {
+                console.error('Failed to create roster answer:', error);
+            }
         },
         async updateAnswer(id: number, params: RosterAnswerUpdateRequest) {
-            await ApiService.rosterAnswer.updateRosterAnswer(id, params).then((res) => {
-                console.log(res);
-                const roster = this.rosters[res.data.rosterId];
+            try {
+                const response = await ApiService.rosterAnswer.updateRosterAnswer(id, params);
+                const rosterId = response.data?.rosterId;
 
+                if (!rosterId || !this.rosters[rosterId]) {
+                    console.warn('Invalid roster ID or roster not found');
+                    return;
+                }
+
+                const roster = this.rosters[rosterId];
                 const answers = roster.rosterAnswer ?? [];
                 const answerIndex = answers.findIndex(answer => answer.id === id);
 
                 if (answerIndex !== -1) {
                     const updatedAnswers = [
                         ...answers.slice(0, answerIndex),
-                        res.data,
+                        response.data,
                         ...answers.slice(answerIndex + 1),
                     ];
 
-                    const updatedRoster = {
-                        ...roster,
-                        rosterAnswer: updatedAnswers,
-                    };
-
                     this.rosters = {
                         ...this.rosters,
-                        [roster.id]: updatedRoster,
+                        [rosterId]: {
+                            ...roster,
+                            rosterAnswer: updatedAnswers,
+                        },
                     };
                 }
-            });
+            } catch (error) {
+                console.error('Failed to update roster answer:', error);
+            }
         },
         async createShift(params: RosterShiftCreateRequest) {
             await ApiService.rosterShift.createRosterShift(params).then((res) => {
