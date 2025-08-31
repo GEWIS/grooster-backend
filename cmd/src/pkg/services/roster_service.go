@@ -290,6 +290,7 @@ func (s *RosterService) CreateRosterTemplate(params *models.RosterTemplateCreate
 
 	template := models.RosterTemplate{
 		OrganID: organ.ID,
+		Name:    params.Name,
 		Shifts:  params.Shifts,
 	}
 
