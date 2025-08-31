@@ -614,6 +614,7 @@ func (suite *TestRosterSuite) TestRosterTemplateCreate_Valid() {
 
 	params := models.RosterTemplateCreateRequest{
 		OrganID: organ.ID,
+		Name:    "Test Template",
 		Shifts:  expectedShifts,
 	}
 
@@ -623,6 +624,7 @@ func (suite *TestRosterSuite) TestRosterTemplateCreate_Valid() {
 
 	assert.Equal(suite.T(), organ.ID, template.OrganID)
 	assert.ElementsMatch(suite.T(), expectedShifts, template.Shifts)
+	assert.Equal(suite.T(), "Test Template", template.Name)
 }
 
 func (suite *TestRosterSuite) TestRosterTemplateCreate_InValidOrgan() {

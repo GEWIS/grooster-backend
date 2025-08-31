@@ -64,7 +64,9 @@ type RosterTemplate struct {
 
 	OrganID uint `json:"organId"`
 
-	Shifts datatypes.JSONSlice[string] `gorm:"serializer:json"`
+	Name string `json:"name"`
+
+	Shifts datatypes.JSONSlice[string] `gorm:"serializer:json" json:"shifts"`
 } // @name RosterTemplate
 
 type RosterCreateRequest struct {
@@ -115,6 +117,8 @@ type RosterFilterParams struct {
 
 type RosterTemplateCreateRequest struct {
 	OrganID uint `json:"organId"`
+
+	Name string `json:"name"`
 
 	Shifts []string `json:"shifts"`
 } // @name RosterTemplateCreateRequest
