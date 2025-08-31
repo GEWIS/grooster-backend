@@ -1286,6 +1286,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "organId": {
                     "type": "integer"
                 },
@@ -1303,6 +1306,9 @@ const docTemplate = `{
         "RosterTemplateCreateRequest": {
             "type": "object",
             "properties": {
+                "name": {
+                    "type": "string"
+                },
                 "organId": {
                     "type": "integer"
                 },
