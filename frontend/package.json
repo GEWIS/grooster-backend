@@ -11,6 +11,7 @@
   "dependencies": {
     "@gewis/grooster-backend-ts": "^1.1.0",
     "@primeuix/themes": "^1.1.1",
+    "@primevue/forms": "^4.3.7",
     "@tailwindcss/vite": "^4.1.6",
     "axios": "^1.9.0",
     "jwt-decode": "^4.0.0",

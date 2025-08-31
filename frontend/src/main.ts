@@ -14,6 +14,7 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import ListBox from 'primevue/listbox';
 import DatePicker from 'primevue/datepicker';
+import { Form } from '@primevue/forms';
 import router from "@/router/router";
 
 const app = createApp(App);
@@ -39,6 +40,7 @@ app.component('Dialog', Dialog);
 app.component('InputText', InputText);
 app.component('ListBox', ListBox);
 app.component('DatePicker', DatePicker);
+app.component('Form', Form);
 
 app.use(pinia);
 app.use(router);
