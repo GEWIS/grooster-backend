@@ -1278,6 +1278,9 @@
                 "id": {
                     "type": "integer"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "organId": {
                     "type": "integer"
                 },
@@ -1295,6 +1298,9 @@
         "RosterTemplateCreateRequest": {
             "type": "object",
             "properties": {
+                "name": {
+                    "type": "string"
+                },
                 "organId": {
                     "type": "integer"
                 },
