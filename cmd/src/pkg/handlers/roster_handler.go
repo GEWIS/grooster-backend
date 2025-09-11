@@ -439,7 +439,7 @@ func (h *RosterHandler) GetSavedRoster(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		params	body		models.RosterTemplateCreateRequest					false	"Template Params"
-//	@Success	200	{array}		models.SavedShift	"Created Template"
+//	@Success	200	{array}		models.RosterTemplate	"Created Template"
 //	@Failure	400	{string}	string				"Invalid request"
 //	@ID			createRosterTemplate
 //	@Router		/roster/template [post]
