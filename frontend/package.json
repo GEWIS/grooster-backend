@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@gewis/grooster-backend-ts": "^1.2.0",
+    "@gewis/grooster-backend-ts": "^1.3.0",
     "@primeuix/themes": "^1.1.1",
     "@primevue/forms": "^4.3.7",
     "@tailwindcss/vite": "^4.1.6",

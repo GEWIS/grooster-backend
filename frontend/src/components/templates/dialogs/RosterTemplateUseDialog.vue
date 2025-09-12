@@ -28,11 +28,11 @@ const visible = computed({
 const date = ref(new Date());
 
 const addRoster = async () => {
-
     const createParams: RosterCreateRequest = {
         name: props.name,
         date: date.value.toISOString(),
-        organId: parseInt(route.params.id as string)
+        organId: parseInt(route.params.id as string),
+        shifts: props.shifts,
     }
 
     await ApiService.roster.createRoster(createParams);

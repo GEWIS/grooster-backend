@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {computed, nextTick, reactive, ref} from "vue";
-import ApiService from "@/services/ApiService";
 import {RosterTemplateCreateRequest} from "@gewis/grooster-backend-ts";
 import {useRoute} from "vue-router";
 import {useTemplateStore} from "@/stores/template.store";

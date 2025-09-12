@@ -47,7 +47,7 @@ const showDetail = ref<boolean>(false);
     </div>
 
     <RosterTemplateDelete :open="openDeleteDialog" :template-id="props.template.id" @close="openDeleteDialog=false"/>
-    <RosterTemplateUseDialog :open="openRosterDialog" :name="'test'" :shifts="[]" @close="openRosterDialog=false"/>
+    <RosterTemplateUseDialog :open="openRosterDialog" :name="props.template.name" :shifts="props.template.shifts" @close="openRosterDialog=false"/>
 <!--    <RosterTemplateEdit :open="openEditDialog" :template="props.template" @close="openEditDialog=false"/>-->
 </template>
 
