@@ -3,12 +3,14 @@ import {RosterTemplate as RosterTemplateModel} from "@gewis/grooster-backend-ts"
 import {ref} from "vue";
 import RosterTemplateDelete from "@/components/templates/dialogs/RosterTemplateDelete.vue";
 import RosterTemplateEdit from "@/components/templates/dialogs/RosterTemplateEdit.vue";
+import RosterTemplateUseDialog from "@/components/templates/dialogs/RosterTemplateUseDialog.vue";
 
 const props = defineProps<{
     template: RosterTemplateModel,
 }>();
 const openEditDialog = ref(false);
 const openDeleteDialog = ref(false);
+const openRosterDialog = ref(false);
 
 const showDetail = ref<boolean>(false);
 
@@ -16,12 +18,13 @@ const showDetail = ref<boolean>(false);
 
 <template>
     <div>
-    <Card class="w-1/3">
+    <Card>
         <template #content>
             <div class="grid grid-cols-3 gap-4">
                 <div class="col-span-2 flex items-center font-bold">{{props.template.name}}</div>
-                <div class="flex flex-row gap-2">
-                    <Button icon="pi pi-pencil" @click="openEditDialog=true" aria-label="Edit"/>
+                <div class="flex flex-row gap-2 justify-end">
+<!--                    <Button icon="pi pi-pencil" @click="openEditDialog=true" aria-label="Edit"/>-->
+                    <Button icon="pi pi-plus" @click="openRosterDialog=true"/>
                     <Button icon="pi pi-trash"  @click="openDeleteDialog=true" aria-label="Delete"/>
                 </div>
                 <div class="col-span-3 border-t border-gray-300  mx-auto my-4"></div>
@@ -44,7 +47,8 @@ const showDetail = ref<boolean>(false);
     </div>
 
     <RosterTemplateDelete :open="openDeleteDialog" :template-id="props.template.id" @close="openDeleteDialog=false"/>
-    <RosterTemplateEdit :open="openEditDialog" :template="props.template" @close="openEditDialog=false"/>
+    <RosterTemplateUseDialog :open="openRosterDialog" :name="'test'" :shifts="[]" @close="openRosterDialog=false"/>
+<!--    <RosterTemplateEdit :open="openEditDialog" :template="props.template" @close="openEditDialog=false"/>-->
 </template>
 
 <style scoped>

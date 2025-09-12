@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, reactive, ref} from "vue";
+import {computed, nextTick, reactive, ref} from "vue";
 import ApiService from "@/services/ApiService";
 import {RosterTemplateCreateRequest} from "@gewis/grooster-backend-ts";
 import {useRoute} from "vue-router";
@@ -30,6 +30,8 @@ const initialValues = reactive({
     shiftName: '',
 });
 const shifts = ref<string[]>([]);
+const templateName = ref<string>("");
+const shiftNameInput = ref<HTMLInputElement | null>(null);
 
 const resolver = ({ values }) => {
     const errors = { shiftName: [] };
@@ -47,6 +49,11 @@ const resolver = ({ values }) => {
 const onFormSubmit = (e) => {
     if (e.valid) {
         shifts.value.push(e.values.shiftName);
+        e.reset();
+
+        nextTick(() => {
+            shiftNameInput.value.focus;
+        });
     }
 }
 
@@ -56,7 +63,7 @@ const removeShift = (index: number) => {
 
 const saveTemplate = async () => {
     const params: RosterTemplateCreateRequest = {
-        name: 'Test',
+        name: templateName.value,
         organId: parseInt(route.params.id as string),
         shifts: shifts.value,
     }
@@ -82,17 +89,32 @@ const saveTemplate = async () => {
         </template>
         <div>
             <Form v-slot="$form" :resolver :initial-values @submit="onFormSubmit">
-                <div class="flex flex-col gap-1">
-                    <InputText name="shiftName" type="text" placeholder="ShiftName" />
+                <div class="flex flex-row gap-1">
+                    <InputText
+                        ref="shiftNameInput"
+                        name="shiftName"
+                        type="text"
+                        placeholder="Shift name"
+                        :pt="{
+                            root: {
+                                ref: shiftNameInput
+                            }
+                        }"
+                    />
                     <Message v-if="$form.shiftName?.invalid" severity="error" size="small" variant="simple">{{ $form.shiftName.error?.message }}</Message>
+                    <Button type="submit" severity="secondary" label="Add Shift" />
                 </div>
-                <Button type="submit" severity="secondary" label="Add roster" />
-                <Button @click="saveTemplate" severity="success" label="Save Template"/>
+
             </Form>
         </div>
         <div v-for="(shift, index) in shifts">
-            {{index}}: {{shift}}
+            {{shift}}
             <Button icon="pi pi-times" @click="removeShift(index)" style="font-size: 1rem"/>
+        </div>
+
+        <div class="flex flex-col justify-center gap-1">
+            <InputText v-model="templateName" type="text" placeholder="Template name"/>
+            <Button @click="saveTemplate" severity="success" label="Save Template"/>
         </div>
     </Dialog>
 </template>

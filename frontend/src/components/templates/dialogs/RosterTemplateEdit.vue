@@ -23,6 +23,7 @@ const visible = computed({
         emit('close');
     },
 });
+
 </script>
 
 <template>

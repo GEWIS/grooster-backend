@@ -21,17 +21,17 @@ onMounted(async () => {
     <div class="flex flex-col gap-2">
         <Card>
             <template #content>
-                <div class="flex flex-row gap-2">
-                    <div class="font-bold flex items-center">Shift Templates</div>
-
+                <div class="flex flex-row gap-2 justify-center">
                     <Button label="Create Template" @click="addDialog=true"/>
                 </div>
             </template>
         </Card>
-        <div v-if="templates.length > 0" v-for="template in templates" :key="template.id">
-            <RosterTemplate
-                :template="template"
-            />
+        <div class="grid grid-cols-3 gap-2">
+            <div v-if="templates.length > 0" v-for="template in templates" :key="template.id">
+                <RosterTemplate
+                    :template="template"
+                />
+            </div>
         </div>
     </div>
     <RosterTemplateAdd :open="addDialog" @close="addDialog=false"/>

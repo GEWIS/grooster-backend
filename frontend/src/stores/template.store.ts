@@ -39,7 +39,9 @@ export const useTemplateStore = defineStore('rosterTemplate', {
                 console.error('Failed to create template', error);
             }
         },
-        async updateTemplate(params: RosterTemplate) {},
+        async updateTemplate(params: RosterTemplate) {
+            // TODO make update in api
+        },
         async deleteTemplate(templateId: number) {
             try {
                 await ApiService.roster.deleteRosterTemplate(templateId);
