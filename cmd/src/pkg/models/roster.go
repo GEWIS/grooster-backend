@@ -126,3 +126,9 @@ type RosterTemplateCreateRequest struct {
 type RosterTemplateFilterParams struct {
 	OrganID *uint `form:"organId"`
 } // @name RosterTemplateFilterParams
+
+type RosterTemplateUpdateParams struct {
+	Name string `json:"name"`
+
+	Shifts []string `json:"shifts"`
+} // @name RosterTemplateUpdateParams

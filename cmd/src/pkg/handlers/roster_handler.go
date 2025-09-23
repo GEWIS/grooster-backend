@@ -37,6 +37,7 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 	g.POST("/template", h.CreateRosterTemplate)
 	g.GET("/template", h.GetRosterTemplates)
 	g.GET("/template/:id", h.GetRosterTemplate)
+	g.PUT("/template/:id", h.UpdateRosterTemplate)
 	g.DELETE("/template/:id", h.DeleteRosterTemplate)
 
 	return h
@@ -516,6 +517,50 @@ func (h *RosterHandler) GetRosterTemplate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, rosterTemplate)
+}
+
+// UpdateRosterTemplate
+//
+//	@Summary	Updates a roster template by ID
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"Template ID"
+//	@Param		params	body		models.RosterTemplateUpdateParams	false "Update params"
+//	@Success	200		{object}		models.RosterTemplate
+//	@Failure	400		{string}	string
+//	@Failure 	404 	{string} 	string
+//	@ID			updateRosterTemplate
+//	@Router		/roster/template/{id} [put]
+func (h *RosterHandler) UpdateRosterTemplate(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	id := uint(id64)
+
+	var updateParams models.RosterTemplateUpdateParams
+	if err := c.ShouldBindJSON(&updateParams); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON: " + err.Error()})
+		return
+	}
+
+	updatedTemplate, err := h.rosterService.UpdateRosterTemplate(id, &updateParams)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Roster template not found"})
+			return
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedTemplate)
 }
 
 // DeleteRosterTemplate

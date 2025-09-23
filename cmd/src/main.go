@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -24,10 +25,10 @@ import (
 func main() {
 	log.Print("Starting server")
 
-	//err := godotenv.Load()
-	//if err != nil {
-	//	log.Fatal().Msgf("Error loading .env file %s", err.Error())
-	//}
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal().Msgf("Error loading .env file %s", err.Error())
+	}
 
 	db := database.ConnectDB(os.Getenv("DATABASE"))
 	sqlDB, _ := db.DB()
