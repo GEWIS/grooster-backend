@@ -1,6 +1,6 @@
 # grooster-frontend
 
-This repository is for the frontend of the roster maker of GEWIS. It is build using 
+This repository is for the frontend of the roster maker of GEWIS. It is build using
 the Vue framework in typescript.
 
 For now this repository includes the API client of the GO backend. In the future this will be split.
@@ -18,4 +18,3 @@ npm install
 ```sh
 npm run dev
 ```
-

@@ -1,34 +1,34 @@
-import './assets/main.css'
+import './assets/main.css';
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App.vue'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 
-import Button from "primevue/button";
-import Card from "primevue/card";
-import Select from "primevue/select";
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import Select from 'primevue/select';
 import Menubar from 'primevue/menubar';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import ListBox from 'primevue/listbox';
 import DatePicker from 'primevue/datepicker';
 import { Form } from '@primevue/forms';
-import router from "@/router/router";
+import App from './App.vue';
+import router from '@/router/router';
 
 const app = createApp(App);
-const pinia = createPinia()
+const pinia = createPinia();
 
 app.use(PrimeVue, {
-    theme: {
-        preset: Aura,
-        options: {
-            prefix: 'p',
-            darkModeSelector: false,
-            cssLayer: false
-        }
-    }
+  theme: {
+    preset: Aura,
+    options: {
+      prefix: 'p',
+      darkModeSelector: false,
+      cssLayer: false,
+    },
+  },
 });
 
 // Components

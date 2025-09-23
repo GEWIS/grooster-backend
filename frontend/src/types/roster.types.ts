@@ -1,5 +1,5 @@
 export interface AddRosterForm {
-    name: string;
+  name: string;
 
-    date: Date;
+  date: Date;
 }
