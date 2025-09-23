@@ -3,6 +3,9 @@
   "main": "./dist/index.js",
   "version": "0.0.0",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "repository": {
     "url": "git+https://github.com/GEWIS/grooster-backend.git",
     "type": "git",

@@ -1,1 +1,9 @@
 # empty npmignore to ensure all required files (e.g., in the dist folder) are published by npm
+src/
+.prettierrc.mjs
+tsconfig.json
+tsconfig.eslint.json
+release.config.js
+eslint.config.mjs
+node_modules/
+.git/
