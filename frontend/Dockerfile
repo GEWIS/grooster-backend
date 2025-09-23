@@ -10,3 +10,8 @@ RUN npm install
 COPY . ./
 
 RUN npm run build
+
+FROM nginx:alpine AS target
+WORKDIR /app
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY --from=build --chown=nginx /dist /app
