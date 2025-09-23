@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"net/http"
+	"os"
 )
 
 type AuthHandler struct {
@@ -86,6 +87,6 @@ func (h *AuthHandler) AuthCallback(c *gin.Context) {
 
 	h.service.ProcessUserInfo(oauth2Token)
 
-	redirectUrl := fmt.Sprintf("http://localhost:5173/callback?token=%s", oauth2Token.AccessToken)
+	redirectUrl := fmt.Sprintf(os.Getenv("FRONTEND_CALLBACK"), oauth2Token.AccessToken)
 	c.Redirect(http.StatusTemporaryRedirect, redirectUrl)
 }
