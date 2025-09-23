@@ -433,6 +433,25 @@ export interface RosterTemplateCreateRequest {
 /**
  * 
  * @export
+ * @interface RosterTemplateUpdateParams
+ */
+export interface RosterTemplateUpdateParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterTemplateUpdateParams
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RosterTemplateUpdateParams
+     */
+    'shifts'?: Array<string>;
+}
+/**
+ * 
+ * @export
  * @interface RosterUpdateRequest
  */
 export interface RosterUpdateRequest {
@@ -1139,6 +1158,47 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Updates a roster template by ID
+         * @param {number} id Template ID
+         * @param {RosterTemplateUpdateParams} [params] Update params
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRosterTemplate: async (id: number, params?: RosterTemplateUpdateParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateRosterTemplate', 'id', id)
+            const localVarPath = `/roster/template/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(params, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1169,7 +1229,7 @@ export const RosterApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createRosterTemplate(params?: RosterTemplateCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<SavedShift>>> {
+        async createRosterTemplate(params?: RosterTemplateCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RosterTemplate>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createRosterTemplate(params, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.createRosterTemplate']?.[localVarOperationServerIndex]?.url;
@@ -1268,6 +1328,20 @@ export const RosterApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['RosterApi.updateRoster']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @summary Updates a roster template by ID
+         * @param {number} id Template ID
+         * @param {RosterTemplateUpdateParams} [params] Update params
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateRosterTemplate(id: number, params?: RosterTemplateUpdateParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterTemplate>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateRosterTemplate(id, params, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterApi.updateRosterTemplate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -1295,7 +1369,7 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createRosterTemplate(params?: RosterTemplateCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<SavedShift>> {
+        createRosterTemplate(params?: RosterTemplateCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<RosterTemplate>> {
             return localVarFp.createRosterTemplate(params, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1369,6 +1443,17 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
          */
         updateRoster(id: number, updateParams: RosterUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<Roster> {
             return localVarFp.updateRoster(id, updateParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Updates a roster template by ID
+         * @param {number} id Template ID
+         * @param {RosterTemplateUpdateParams} [params] Update params
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRosterTemplate(id: number, params?: RosterTemplateUpdateParams, options?: RawAxiosRequestConfig): AxiosPromise<RosterTemplate> {
+            return localVarFp.updateRosterTemplate(id, params, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1488,6 +1573,19 @@ export class RosterApi extends BaseAPI {
      */
     public updateRoster(id: number, updateParams: RosterUpdateRequest, options?: RawAxiosRequestConfig) {
         return RosterApiFp(this.configuration).updateRoster(id, updateParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Updates a roster template by ID
+     * @param {number} id Template ID
+     * @param {RosterTemplateUpdateParams} [params] Update params
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterApi
+     */
+    public updateRosterTemplate(id: number, params?: RosterTemplateUpdateParams, options?: RawAxiosRequestConfig) {
+        return RosterApiFp(this.configuration).updateRosterTemplate(id, params, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
