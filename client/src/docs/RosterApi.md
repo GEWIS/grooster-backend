@@ -13,6 +13,7 @@ All URIs are relative to *http://localhost*
 |[**getRosterTemplates**](#getrostertemplates) | **GET** /roster/template | Get all rosters templates or query by organ ID|
 |[**getRosters**](#getrosters) | **GET** /roster | Get all rosters or query by date and organ|
 |[**updateRoster**](#updateroster) | **PATCH** /roster/{id} | Update a roster|
+|[**updateRosterTemplate**](#updaterostertemplate) | **PUT** /roster/template/{id} | Updates a roster template by ID|
 
 # **createRoster**
 > Roster createRoster(createParams)
@@ -67,7 +68,7 @@ const { status, data } = await apiInstance.createRoster(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **createRosterTemplate**
-> Array<SavedShift> createRosterTemplate()
+> Array<RosterTemplate> createRosterTemplate()
 
 
 ### Example
@@ -98,7 +99,7 @@ const { status, data } = await apiInstance.createRosterTemplate(
 
 ### Return type
 
-**Array<SavedShift>**
+**Array<RosterTemplate>**
 
 ### Authorization
 
@@ -483,6 +484,62 @@ const { status, data } = await apiInstance.updateRoster(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**400** | Bad Request |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateRosterTemplate**
+> RosterTemplate updateRosterTemplate()
+
+
+### Example
+
+```typescript
+import {
+    RosterApi,
+    Configuration,
+    RosterTemplateUpdateParams
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterApi(configuration);
+
+let id: number; //Template ID (default to undefined)
+let params: RosterTemplateUpdateParams; //Update params (optional)
+
+const { status, data } = await apiInstance.updateRosterTemplate(
+    id,
+    params
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **params** | **RosterTemplateUpdateParams**| Update params | |
+| **id** | [**number**] | Template ID | defaults to undefined|
+
+
+### Return type
+
+**RosterTemplate**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
