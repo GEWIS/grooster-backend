@@ -150,6 +150,15 @@ definitions:
           type: string
         type: array
     type: object
+  RosterTemplateUpdateParams:
+    properties:
+      name:
+        type: string
+      shifts:
+        items:
+          type: string
+        type: array
+    type: object
   RosterUpdateRequest:
     properties:
       date:
@@ -708,7 +717,7 @@ paths:
           description: Created Template
           schema:
             items:
-              $ref: '#/definitions/SavedShift'
+              $ref: '#/definitions/RosterTemplate'
             type: array
         "400":
           description: Invalid request
@@ -778,6 +787,41 @@ paths:
       security:
       - BearerAuth: []
       summary: Get a roster template by ID
+      tags:
+      - Roster
+    put:
+      consumes:
+      - application/json
+      operationId: updateRosterTemplate
+      parameters:
+      - description: Template ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update params
+        in: body
+        name: params
+        schema:
+          $ref: '#/definitions/RosterTemplateUpdateParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RosterTemplate'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Updates a roster template by ID
       tags:
       - Roster
   /user/:

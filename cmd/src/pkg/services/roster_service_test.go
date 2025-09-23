@@ -6,6 +6,7 @@ import (
 	"GEWIS-Rooster/cmd/src/pkg/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"testing"
 	"time"
@@ -711,6 +712,33 @@ func (suite *TestRosterSuite) TestRosterTemplateGet_AllInvalid() {
 	templates, err := suite.service.GetRosterTemplates(&params)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), len(templates), 0)
+}
+
+func (suite *TestRosterSuite) TestRosterTemplateUpdate_Valid() {
+	var organ models.Organ
+	suite.db.First(&organ)
+
+	expectedShifts := []string{"Shift 1", "Shift 42"}
+
+	params := models.RosterTemplateCreateRequest{
+		OrganID: organ.ID,
+		Name:    "Test Template",
+		Shifts:  expectedShifts,
+	}
+
+	template, err := suite.service.CreateRosterTemplate(&params)
+	assert.NoError(suite.T(), err)
+
+	updateParams := models.RosterTemplateUpdateParams{
+		Name:   "Updated Template",
+		Shifts: []string{"Shift U1", "Shift U42"},
+	}
+
+	updatedTemplate, err := suite.service.UpdateRosterTemplate(template.ID, &updateParams)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), template.ID, updatedTemplate.ID)
+	assert.Equal(suite.T(), datatypes.JSONSlice[string](updateParams.Shifts), updatedTemplate.Shifts)
+	assert.Equal(suite.T(), updateParams.Name, updatedTemplate.Name)
 }
 
 func (suite *TestRosterSuite) TestRosterTemplateDelete_Valid() {

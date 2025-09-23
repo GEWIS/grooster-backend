@@ -4,6 +4,7 @@ import (
 	"GEWIS-Rooster/cmd/src/pkg/models"
 	"errors"
 	"fmt"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"slices"
@@ -28,6 +29,7 @@ type RosterServiceInterface interface {
 	CreateRosterTemplate(*models.RosterTemplateCreateRequest) (*models.RosterTemplate, error)
 	GetRosterTemplate(uint) (*models.RosterTemplate, error)
 	GetRosterTemplates(*models.RosterTemplateFilterParams) ([]*models.RosterTemplate, error)
+	UpdateRosterTemplate(uint, *models.RosterTemplateUpdateParams) (*models.RosterTemplate, error)
 	DeleteRosterTemplate(ID uint) error
 }
 
@@ -325,6 +327,24 @@ func (s *RosterService) GetRosterTemplates(params *models.RosterTemplateFilterPa
 	}
 
 	return templates, nil
+}
+
+func (s *RosterService) UpdateRosterTemplate(id uint, params *models.RosterTemplateUpdateParams) (*models.RosterTemplate, error) {
+	var template models.RosterTemplate
+	if err := s.db.First(&template, id).Error; err != nil {
+		return nil, err
+	}
+
+	updates := map[string]interface{}{
+		"name":   params.Name,
+		"shifts": datatypes.JSONSlice[string](params.Shifts),
+	}
+
+	if err := s.db.Model(&template).Updates(updates).Error; err != nil {
+		return nil, err
+	}
+
+	return &template, nil
 }
 
 func (s *RosterService) DeleteRosterTemplate(ID uint) error {

@@ -583,7 +583,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/SavedShift"
+                                "$ref": "#/definitions/RosterTemplate"
                             }
                         }
                     },
@@ -621,6 +621,61 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RosterTemplate"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roster"
+                ],
+                "summary": "Updates a roster template by ID",
+                "operationId": "updateRosterTemplate",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Template ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "params",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/RosterTemplateUpdateParams"
+                        }
                     }
                 ],
                 "responses": {
@@ -1311,6 +1366,20 @@ const docTemplate = `{
                 },
                 "organId": {
                     "type": "integer"
+                },
+                "shifts": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "RosterTemplateUpdateParams": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
                 },
                 "shifts": {
                     "type": "array",
