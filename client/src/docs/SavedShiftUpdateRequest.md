@@ -1,19 +1,18 @@
 # SavedShiftUpdateRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**users** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+| Name      | Type                    | Description | Notes                             |
+| --------- | ----------------------- | ----------- | --------------------------------- |
+| **users** | **Array&lt;number&gt;** |             | [optional] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { SavedShiftUpdateRequest } from './api';
+import { SavedShiftUpdateRequest } from "./api";
 
 const instance: SavedShiftUpdateRequest = {
-    users,
+  users,
 };
 ```
 
