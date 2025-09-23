@@ -1,21 +1,20 @@
 # RosterTemplateUpdateParams
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**name** | **string** |  | [optional] [default to undefined]
-**shifts** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
+| Name       | Type                    | Description | Notes                             |
+| ---------- | ----------------------- | ----------- | --------------------------------- |
+| **name**   | **string**              |             | [optional] [default to undefined] |
+| **shifts** | **Array&lt;string&gt;** |             | [optional] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { RosterTemplateUpdateParams } from './api';
+import { RosterTemplateUpdateParams } from "./api";
 
 const instance: RosterTemplateUpdateParams = {
-    name,
-    shifts,
+  name,
+  shifts,
 };
 ```
 
