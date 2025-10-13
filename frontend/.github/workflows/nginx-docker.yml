@@ -46,8 +46,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ${{ vars.DOCKER_REGISTRY }}
-          username: ${{ secrets.SVC_GH_ABCEOU_PWD }}
-          password: ${{ secrets.SVC_GH_ABCEOU_USERNAME }}
+          username: ${{ secrets.SVC_GH_ABCEOU_USERNAME }}
+          password: ${{ secrets.SVC_GH_ABCEOU_PWD }}
             
       # Build and push Docker image with Buildx
       - name: Build and push
