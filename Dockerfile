@@ -1,5 +1,5 @@
 # Use the official Go image (single stage)
-FROM golang:1.24
+FROM golang:1.24-alpine AS base
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -15,8 +15,11 @@ COPY ./cmd ./cmd
 
 RUN go build -o app ./cmd/src
 
-# Optional: expose your app's port (e.g., 8080)
-EXPOSE 8080
+FROM alpine:3.22
+
+WORKDIR /app
+
+COPY --from=base /app/app ./app
 
 # Run the app
 ENTRYPOINT ["./app"]
