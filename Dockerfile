@@ -4,6 +4,8 @@ FROM golang:1.24-alpine AS base
 # Set the working directory inside the container
 WORKDIR /app
 
+RUN apk add --no-cache gcc musl-dev
+
 # Copy go.mod and go.sum
 COPY go.mod go.sum ./
 
