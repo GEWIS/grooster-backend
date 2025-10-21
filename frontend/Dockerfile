@@ -11,7 +11,8 @@ COPY . ./
 
 RUN npm run build
 
-FROM nginx:alpine AS target
-WORKDIR /app
-COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY --from=build --chown=nginx /app/dist /app
+#Sever
+FROM caddy:2-alpine
+COPY --from=build /app/dist /srv
+EXPOSE 8080
+CMD ["caddy", "file-server", "--root", "/srv", "--listen", ":8080"]
