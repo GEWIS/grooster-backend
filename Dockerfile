@@ -13,7 +13,7 @@ RUN go mod download
 # Copy the rest of the code (cmd directory)
 COPY ./cmd ./cmd
 
-RUN go build -o app ./cmd/src
+RUN CGO_ENABLED=1 go build -o app ./cmd/src
 
 FROM alpine:3.22
 
