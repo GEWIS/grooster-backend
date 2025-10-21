@@ -63,6 +63,8 @@ class ApiService {
   }
 }
 
-const apiService = new ApiService(window.location.origin + '/api/v1');
+const location = window.location.origin.includes("grooster.gewis") ? window.location.origin : "http://localhost:8080";
+
+const apiService = new ApiService(location + '/api/v1');
 
 export default apiService;

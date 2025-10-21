@@ -14,7 +14,8 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     // We are not transpiling, so preserve our source code and do not emit files
-    "module": "preserve",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "noEmit": true,
     // Include the DOM types
     "lib": ["es2022", "dom", "dom.iterable"],

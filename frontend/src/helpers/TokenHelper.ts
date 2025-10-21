@@ -45,11 +45,11 @@ export function isAuthenticated(): boolean {
 }
 
 export function loginRedirect() {
-  // ApiService.auth.authRedirectGet().then((response) => {
-  //     window.location.href = response.data;
-  // }).catch((err) => {
-  //     console.error("Failed redirecting:", err);
-  // });
+  if (window.location.origin.includes('http://localhost')) {
+    window.location.href = 'http://localhost:8080/api/v1/auth/redirect';
+    return;
+  }
+
   window.location.href = window.location.origin + '/api/v1/auth/redirect';
 }
 
