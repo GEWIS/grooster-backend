@@ -63,6 +63,6 @@ class ApiService {
   }
 }
 
-const apiService = new ApiService('http://localhost:8080/api/v1');
+const apiService = new ApiService(window.location.origin + '/api/v1');
 
 export default apiService;
