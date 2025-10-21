@@ -50,7 +50,7 @@ export function loginRedirect() {
   // }).catch((err) => {
   //     console.error("Failed redirecting:", err);
   // });
-  window.location.href = 'http://localhost:8080/api/v1/auth/redirect';
+  window.location.href = window.location.origin + '/api/v1/auth/redirect';
 }
 
 export function getGEWISId(): number {
