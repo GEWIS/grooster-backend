@@ -2,6 +2,7 @@ package database
 
 import (
 	"GEWIS-Rooster/cmd/src/pkg/models"
+	"github.com/rs/zerolog/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -19,11 +20,10 @@ func ConnectDB(name string) *gorm.DB {
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	} else {
 		db, err = gorm.Open(sqlite.Open(name), &gorm.Config{})
-
 	}
 
 	if err != nil {
-		panic("failed to connect database")
+		log.Fatal().Msgf("Failed to connect database: %v", err)
 	}
 
 	if devType != "production" {
