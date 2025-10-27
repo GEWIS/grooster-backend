@@ -14,5 +14,5 @@ RUN npm run build
 #Sever
 FROM caddy:2-alpine
 COPY --from=build /app/dist /srv
+COPY ./caddy/Caddyfile /etc/caddy/Caddyfile
 EXPOSE 8080
-CMD ["caddy", "file-server", "--root", "/srv", "--listen", ":8080"]
