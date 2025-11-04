@@ -187,6 +187,26 @@ definitions:
           $ref: '#/definitions/User'
         type: array
     type: object
+  SavedShiftOrdering:
+    properties:
+      shiftName:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/User'
+        type: array
+    type: object
+  SavedShiftResponse:
+    properties:
+      savedShiftOrdering:
+        items:
+          $ref: '#/definitions/SavedShiftOrdering'
+        type: array
+      savedShifts:
+        items:
+          $ref: '#/definitions/SavedShift'
+        type: array
+    type: object
   SavedShiftUpdateRequest:
     properties:
       users:
@@ -231,26 +251,6 @@ definitions:
       valid:
         description: Valid is true if Time is not NULL
         type: boolean
-    type: object
-  models.SavedShiftOrdering:
-    properties:
-      shiftName:
-        type: string
-      users:
-        items:
-          $ref: '#/definitions/User'
-        type: array
-    type: object
-  models.SavedShiftResponse:
-    properties:
-      savedShiftOrdering:
-        items:
-          $ref: '#/definitions/models.SavedShiftOrdering'
-        type: array
-      savedShifts:
-        items:
-          $ref: '#/definitions/SavedShift'
-        type: array
     type: object
 info:
   contact: {}
@@ -586,7 +586,7 @@ paths:
         "200":
           description: Saved Shift Response
           schema:
-            $ref: '#/definitions/models.SavedShiftResponse'
+            $ref: '#/definitions/SavedShiftResponse'
         "400":
           description: Invalid request
           schema:

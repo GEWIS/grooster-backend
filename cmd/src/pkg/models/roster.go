@@ -63,7 +63,7 @@ type SavedShiftOrdering struct {
 	ShiftName string `json:"shiftName"`
 
 	Users []*User `json:"users"`
-}
+} // @name SavedShiftOrdering
 
 type RosterTemplate struct {
 	BaseModel
@@ -119,7 +119,7 @@ type SavedShiftResponse struct {
 	SavedShifts []*SavedShift `json:"savedShifts"`
 
 	SavedShiftOrdering []*SavedShiftOrdering `json:"savedShiftOrdering"`
-}
+} // @name SavedShiftResponse
 
 type RosterFilterParams struct {
 	ID      *uint      `form:"id"`
