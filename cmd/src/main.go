@@ -18,7 +18,7 @@ import (
 
 // @title						GRooster
 // @version					0.1
-// @description				A GEWIS Rooster maker
+// @description				A GEWIS Rooster maker for fun
 // @securityDefinitions.apikey	BearerAuth
 // @in							header
 // @name						Authorization
