@@ -6,6 +6,8 @@ common.ts
 configuration.ts
 docs/AuthApi.md
 docs/GormDeletedAt.md
+docs/ModelsSavedShiftOrdering.md
+docs/ModelsSavedShiftResponse.md
 docs/Organ.md
 docs/Roster.md
 docs/RosterAnswer.md

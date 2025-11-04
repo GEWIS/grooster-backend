@@ -232,6 +232,26 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  models.SavedShiftOrdering:
+    properties:
+      shiftName:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/User'
+        type: array
+    type: object
+  models.SavedShiftResponse:
+    properties:
+      savedShiftOrdering:
+        items:
+          $ref: '#/definitions/models.SavedShiftOrdering'
+        type: array
+      savedShifts:
+        items:
+          $ref: '#/definitions/SavedShift'
+        type: array
+    type: object
 info:
   contact: {}
   description: A GEWIS Rooster maker
@@ -564,11 +584,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: Saved Shifts
+          description: Saved Shift Response
           schema:
-            items:
-              $ref: '#/definitions/SavedShift'
-            type: array
+            $ref: '#/definitions/models.SavedShiftResponse'
         "400":
           description: Invalid request
           schema:

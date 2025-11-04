@@ -1,22 +1,23 @@
 # RosterTemplateCreateRequest
 
+
 ## Properties
 
-| Name        | Type                    | Description | Notes                             |
-| ----------- | ----------------------- | ----------- | --------------------------------- |
-| **name**    | **string**              |             | [optional] [default to undefined] |
-| **organId** | **number**              |             | [optional] [default to undefined] |
-| **shifts**  | **Array&lt;string&gt;** |             | [optional] [default to undefined] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**name** | **string** |  | [optional] [default to undefined]
+**organId** | **number** |  | [optional] [default to undefined]
+**shifts** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { RosterTemplateCreateRequest } from "./api";
+import { RosterTemplateCreateRequest } from './api';
 
 const instance: RosterTemplateCreateRequest = {
-  name,
-  organId,
-  shifts,
+    name,
+    organId,
+    shifts,
 };
 ```
 

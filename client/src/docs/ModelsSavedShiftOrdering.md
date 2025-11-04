@@ -1,21 +1,21 @@
-# GormDeletedAt
+# ModelsSavedShiftOrdering
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**time** | **string** |  | [optional] [default to undefined]
-**valid** | **boolean** | Valid is true if Time is not NULL | [optional] [default to undefined]
+**shiftName** | **string** |  | [optional] [default to undefined]
+**users** | [**Array&lt;User&gt;**](User.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { GormDeletedAt } from './api';
+import { ModelsSavedShiftOrdering } from './api';
 
-const instance: GormDeletedAt = {
-    time,
-    valid,
+const instance: ModelsSavedShiftOrdering = {
+    shiftName,
+    users,
 };
 ```
 
