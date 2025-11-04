@@ -342,7 +342,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Saved Shift Response",
                         "schema": {
-                            "$ref": "#/definitions/models.SavedShiftResponse"
+                            "$ref": "#/definitions/SavedShiftResponse"
                         }
                     },
                     "400": {
@@ -1429,6 +1429,37 @@ const docTemplate = `{
                 }
             }
         },
+        "SavedShiftOrdering": {
+            "type": "object",
+            "properties": {
+                "shiftName": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User"
+                    }
+                }
+            }
+        },
+        "SavedShiftResponse": {
+            "type": "object",
+            "properties": {
+                "savedShiftOrdering": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SavedShiftOrdering"
+                    }
+                },
+                "savedShifts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SavedShift"
+                    }
+                }
+            }
+        },
         "SavedShiftUpdateRequest": {
             "type": "object",
             "properties": {
@@ -1495,37 +1526,6 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
-                }
-            }
-        },
-        "models.SavedShiftOrdering": {
-            "type": "object",
-            "properties": {
-                "shiftName": {
-                    "type": "string"
-                },
-                "users": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/User"
-                    }
-                }
-            }
-        },
-        "models.SavedShiftResponse": {
-            "type": "object",
-            "properties": {
-                "savedShiftOrdering": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.SavedShiftOrdering"
-                    }
-                },
-                "savedShifts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/SavedShift"
-                    }
                 }
             }
         }

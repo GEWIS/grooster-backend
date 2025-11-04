@@ -9,7 +9,7 @@ All URIs are relative to *http://localhost*
 |[**updateSavedShift**](#updatesavedshift) | **PATCH** /roster/saved-shift/{id} | Update a specific saved shift|
 
 # **getSavedRoster**
-> ModelsSavedShiftResponse getSavedRoster()
+> SavedShiftResponse getSavedRoster()
 
 
 ### Example
@@ -39,7 +39,7 @@ const { status, data } = await apiInstance.getSavedRoster(
 
 ### Return type
 
-**ModelsSavedShiftResponse**
+**SavedShiftResponse**
 
 ### Authorization
 

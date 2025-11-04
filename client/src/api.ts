@@ -43,44 +43,6 @@ export interface GormDeletedAt {
     'valid'?: boolean;
 }
 /**
- * 
- * @export
- * @interface ModelsSavedShiftOrdering
- */
-export interface ModelsSavedShiftOrdering {
-    /**
-     * 
-     * @type {string}
-     * @memberof ModelsSavedShiftOrdering
-     */
-    'shiftName'?: string;
-    /**
-     * 
-     * @type {Array<User>}
-     * @memberof ModelsSavedShiftOrdering
-     */
-    'users'?: Array<User>;
-}
-/**
- * 
- * @export
- * @interface ModelsSavedShiftResponse
- */
-export interface ModelsSavedShiftResponse {
-    /**
-     * 
-     * @type {Array<ModelsSavedShiftOrdering>}
-     * @memberof ModelsSavedShiftResponse
-     */
-    'savedShiftOrdering'?: Array<ModelsSavedShiftOrdering>;
-    /**
-     * 
-     * @type {Array<SavedShift>}
-     * @memberof ModelsSavedShiftResponse
-     */
-    'savedShifts'?: Array<SavedShift>;
-}
-/**
  * An organ that users can be part of.
  * @export
  * @interface Organ
@@ -560,6 +522,44 @@ export interface SavedShift {
      * @memberof SavedShift
      */
     'users'?: Array<User>;
+}
+/**
+ * 
+ * @export
+ * @interface SavedShiftOrdering
+ */
+export interface SavedShiftOrdering {
+    /**
+     * 
+     * @type {string}
+     * @memberof SavedShiftOrdering
+     */
+    'shiftName'?: string;
+    /**
+     * 
+     * @type {Array<User>}
+     * @memberof SavedShiftOrdering
+     */
+    'users'?: Array<User>;
+}
+/**
+ * 
+ * @export
+ * @interface SavedShiftResponse
+ */
+export interface SavedShiftResponse {
+    /**
+     * 
+     * @type {Array<SavedShiftOrdering>}
+     * @memberof SavedShiftResponse
+     */
+    'savedShiftOrdering'?: Array<SavedShiftOrdering>;
+    /**
+     * 
+     * @type {Array<SavedShift>}
+     * @memberof SavedShiftResponse
+     */
+    'savedShifts'?: Array<SavedShift>;
 }
 /**
  * 
@@ -2148,7 +2148,7 @@ export const SavedShiftApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSavedRoster(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ModelsSavedShiftResponse>> {
+        async getSavedRoster(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SavedShiftResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSavedRoster(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SavedShiftApi.getSavedRoster']?.[localVarOperationServerIndex]?.url;
@@ -2198,7 +2198,7 @@ export const SavedShiftApiFactory = function (configuration?: Configuration, bas
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSavedRoster(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ModelsSavedShiftResponse> {
+        getSavedRoster(id: number, options?: RawAxiosRequestConfig): AxiosPromise<SavedShiftResponse> {
             return localVarFp.getSavedRoster(id, options).then((request) => request(axios, basePath));
         },
         /**
