@@ -59,6 +59,12 @@ type SavedShift struct {
 	Users []*User `json:"users" gorm:"many2many:user_shift_saved;"`
 } // @name SavedShift
 
+type SavedShiftOrdering struct {
+	ShiftName string `json:"shiftName"`
+
+	Users []*User `json:"users"`
+}
+
 type RosterTemplate struct {
 	BaseModel
 
@@ -108,6 +114,12 @@ type RosterAnswerUpdateRequest struct {
 type SavedShiftUpdateRequest struct {
 	UserIDs []uint `json:"users"`
 } // @name SavedShiftUpdateRequest
+
+type SavedShiftResponse struct {
+	SavedShifts []*SavedShift `json:"savedShifts"`
+
+	SavedShiftOrdering []*SavedShiftOrdering `json:"savedShiftOrdering"`
+}
 
 type RosterFilterParams struct {
 	ID      *uint      `form:"id"`

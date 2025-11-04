@@ -423,13 +423,18 @@ func (h *RosterHandler) GetSavedRoster(c *gin.Context) {
 		return
 	}
 
-	savedShifts, err := h.rosterService.GetSavedRoster(uint(id))
+	savedShifts, savedShiftOrdering, err := h.rosterService.GetSavedRoster(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, savedShifts)
+	response := models.SavedShiftResponse{
+		SavedShifts:        savedShifts,
+		SavedShiftOrdering: savedShiftOrdering,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // CreateRosterTemplate

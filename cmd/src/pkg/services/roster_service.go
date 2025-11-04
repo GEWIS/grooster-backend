@@ -24,7 +24,7 @@ type RosterServiceInterface interface {
 
 	SaveRoster(uint) error
 	UpdateSavedShift(uint, *models.SavedShiftUpdateRequest) (*models.SavedShift, error)
-	GetSavedRoster(uint) ([]*models.SavedShift, error)
+	GetSavedRoster(uint) ([]*models.SavedShift, []*models.SavedShiftOrdering, error)
 
 	CreateRosterTemplate(*models.RosterTemplateCreateRequest) (*models.RosterTemplate, error)
 	GetRosterTemplate(uint) (*models.RosterTemplate, error)
@@ -244,19 +244,24 @@ func (s *RosterService) SaveRoster(ID uint) error {
 	return nil
 }
 
-func (s *RosterService) GetSavedRoster(ID uint) ([]*models.SavedShift, error) {
+func (s *RosterService) GetSavedRoster(ID uint) ([]*models.SavedShift, []*models.SavedShiftOrdering, error) {
 	var savedShifts []*models.SavedShift
 	if err := s.db.Preload(clause.Associations).Where("roster_id = ?", ID).Find(&savedShifts).Error; err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return savedShifts, nil
+	savedShiftOrdering, err := s.getSavedShiftOrdering(savedShifts)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return savedShifts, savedShiftOrdering, nil
 }
 
 func (s *RosterService) UpdateSavedShift(ID uint, updateParams *models.SavedShiftUpdateRequest) (*models.SavedShift, error) {
 	var saved *models.SavedShift
 	if err := s.db.Preload("Users").First(&saved, ID).Error; err != nil {
-
 		return nil, err
 	}
 
@@ -369,6 +374,45 @@ func (s *RosterService) createSavedShift(rID uint, shift *models.RosterShift) er
 		return err
 	}
 	return nil
+}
+
+func (s *RosterService) getSavedShiftOrdering(savedShifts []*models.SavedShift) ([]*models.SavedShiftOrdering, error) {
+	var orderings []*models.SavedShiftOrdering
+
+	for _, savedShift := range savedShifts {
+		var users []*models.User
+
+		var organID uint
+		if err := s.db.Model(&models.Roster{}).
+			Select("organ_id").
+			Where("id = ?", savedShift.RosterID).
+			Scan(&organID).Error; err != nil {
+			return nil, err
+		}
+
+		err := s.db.
+			Table("users AS u").
+			Joins("JOIN user_organs AS uo ON u.id = uo.user_id").
+			Joins("JOIN rosters AS r ON r.organ_id = uo.organ_id").
+			Joins("JOIN roster_shifts AS rs ON rs.roster_id = r.id").
+			Joins("JOIN saved_shifts AS ss ON ss.roster_id = r.id AND ss.roster_shift_id = rs.id").
+			Joins("JOIN user_shift_saved AS uss ON uss.saved_shift_id = ss.id").
+			Where("uo.organ_id = ? AND rs.name = ?", organID, savedShift.RosterShift.Name).
+			Order("r.date DESC").
+			Distinct("u.id, u.*").
+			Find(&users).Error
+
+		if err != nil {
+			return nil, err
+		}
+
+		orderings = append(orderings, &models.SavedShiftOrdering{
+			ShiftName: savedShift.RosterShift.Name,
+			Users:     users,
+		})
+	}
+
+	return orderings, nil
 }
 
 func isAfterToday(date time.Time) bool {
