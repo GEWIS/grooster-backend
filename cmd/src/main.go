@@ -25,7 +25,8 @@ import (
 func main() {
 	log.Print("Starting server")
 
-	if _, err := os.Stat(".env"); os.IsExist(err) {
+	if _, err := os.Stat(".env"); err == nil {
+		log.Print("Loading .env file")
 		if err := godotenv.Load(); err != nil {
 			log.Fatal().Msgf("Error loading .env file: %v", err)
 		}
@@ -50,7 +51,7 @@ func main() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{os.Getenv("ALLOWED_ORIGINS")}, // Frontend URL
+		AllowAllOrigins:  true, // Frontend URL
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true, // If you need to support cookies or authentication

@@ -571,7 +571,7 @@ func (suite *TestRosterSuite) TestUpdateSavedShift_Success() {
 	err := suite.service.SaveRoster(1)
 	assert.NoError(suite.T(), err)
 
-	savedShifts, _ := suite.service.GetSavedRoster(1)
+	savedShifts, _, _ := suite.service.GetSavedRoster(1)
 
 	updateParams := &models.SavedShiftUpdateRequest{
 		UserIDs: []uint{user.ID},
@@ -592,7 +592,7 @@ func (suite *TestRosterSuite) TestUpdateSavedShift_UserLoadFailure() {
 	err := suite.service.SaveRoster(1)
 	assert.NoError(suite.T(), err)
 
-	savedShifts, _ := suite.service.GetSavedRoster(1)
+	savedShifts, _, _ := suite.service.GetSavedRoster(1)
 
 	updateParams := &models.SavedShiftUpdateRequest{
 		UserIDs: []uint{99999, 99998},
