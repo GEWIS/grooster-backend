@@ -410,7 +410,7 @@ func (h *RosterHandler) UpdateSavedShift(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int					true	"Roster ID"
-//	@Success	200	{array}		models.SavedShift	"Saved Shifts"
+//	@Success	200	{object}		models.SavedShiftResponse	"Saved Shift Response"
 //	@Failure	400	{string}	string				"Invalid request"
 //	@Failure	404	{string}	string				"SavedShift not found"
 //	@ID			getSavedRoster
