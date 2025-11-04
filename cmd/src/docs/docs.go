@@ -340,12 +340,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Saved Shifts",
+                        "description": "Saved Shift Response",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/SavedShift"
-                            }
+                            "$ref": "#/definitions/models.SavedShiftResponse"
                         }
                     },
                     "400": {
@@ -1498,6 +1495,37 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
+                }
+            }
+        },
+        "models.SavedShiftOrdering": {
+            "type": "object",
+            "properties": {
+                "shiftName": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User"
+                    }
+                }
+            }
+        },
+        "models.SavedShiftResponse": {
+            "type": "object",
+            "properties": {
+                "savedShiftOrdering": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.SavedShiftOrdering"
+                    }
+                },
+                "savedShifts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SavedShift"
+                    }
                 }
             }
         }
