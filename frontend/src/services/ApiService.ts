@@ -5,7 +5,8 @@ import {
   RosterAnswerApi,
   RosterShiftApi,
   SavedShiftApi,
- Configuration } from '@gewis/grooster-backend-ts';
+  Configuration,
+} from '@gewis/grooster-backend-ts';
 import { getTokenFromStorage } from '@/helpers/TokenHelper';
 
 class ApiService {
@@ -63,7 +64,7 @@ class ApiService {
   }
 }
 
-const location = window.location.origin.includes("grooster.gewis") ? window.location.origin : "http://localhost:8080";
+const location = window.location.origin.includes('grooster.gewis') ? window.location.origin : 'http://localhost:8080';
 
 const apiService = new ApiService(location + '/api/v1');
 

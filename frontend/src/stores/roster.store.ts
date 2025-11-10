@@ -5,7 +5,8 @@ import type {
   SavedShiftUpdateRequest,
   RosterCreateRequest,
   Roster,
-  RosterAnswerCreateRequest, SavedShiftResponse,
+  RosterAnswerCreateRequest,
+  SavedShiftResponse,
 } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 

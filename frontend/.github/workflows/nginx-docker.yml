@@ -2,11 +2,11 @@ name: NGINX - Dockerize
 on:
   workflow_dispatch:
     push:
-      branches: [ main, develop ]
+      branches: [main, develop]
       paths:
         - 'lib/nginx/**'
     pull_request:
-      branches: [ main, develop ]
+      branches: [main, develop]
       paths:
         - 'lib/nginx/**'
 
@@ -48,7 +48,7 @@ jobs:
           registry: ${{ vars.DOCKER_REGISTRY }}
           username: ${{ secrets.SVC_GH_ABCEOU_USERNAME }}
           password: ${{ secrets.SVC_GH_ABCEOU_PWD }}
-            
+
       # Build and push Docker image with Buildx
       - name: Build and push
         uses: docker/build-push-action@v3
@@ -60,5 +60,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-

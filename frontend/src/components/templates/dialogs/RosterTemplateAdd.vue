@@ -46,13 +46,13 @@ const resolver = ({ values }) => {
 };
 
 const onFormSubmit = async (e) => {
-    if (e.valid) {
-        shifts.value.push(e.values.shiftName);
-        e.reset();
+  if (e.valid) {
+    shifts.value.push(e.values.shiftName);
+    e.reset();
 
-        await nextTick();
-        shiftNameInput.value?.focus();
-    }
+    await nextTick();
+    shiftNameInput.value?.focus();
+  }
 };
 
 const removeShift = (index: number) => {

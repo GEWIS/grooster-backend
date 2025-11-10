@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {User, SavedShiftUpdateRequest, SavedShift} from '@gewis/grooster-backend-ts';
+import { User, SavedShiftUpdateRequest, SavedShift } from '@gewis/grooster-backend-ts';
 import { onMounted, reactive, computed, watch } from 'vue';
 import { useRosterStore } from '@/stores/roster.store';
 
@@ -10,7 +10,6 @@ const props = defineProps<{
 const rosterStore = useRosterStore();
 const savedRoster = computed(() => rosterStore.getSavedRoster(props.id)?.savedShifts ?? []);
 const savedRosterOrdering = computed(() => rosterStore.getSavedRoster(props.id)?.savedShiftOrdering ?? []);
-
 
 const shiftAssignedUsers = reactive<Record<number, User[]>>({});
 
@@ -39,9 +38,9 @@ watch(
 const addUser = async (userId: number, shiftId: number) => {
   if (!userId) return;
 
-  const shiftName = savedRoster.value.find(shift => shift.id === shiftId).rosterShift.name;
-    const users = savedRosterOrdering.value.find((ordering) => ordering.shiftName  === shiftName).users;
-    const user = users.find(user => user.id === userId);
+  const shiftName = savedRoster.value.find((shift) => shift.id === shiftId).rosterShift.name;
+  const users = savedRosterOrdering.value.find((ordering) => ordering.shiftName === shiftName).users;
+  const user = users.find((user) => user.id === userId);
 
   if (!user) return;
 
@@ -82,14 +81,11 @@ const removeUserFromShift = async (shiftId: number, index: number) => {
 };
 
 const availableUsersForShift = (shift: SavedShift) => {
-    const ordering = savedRosterOrdering.value.find(o => o.shiftName === shift.rosterShift.name);
-    if (!ordering) return [];
+  const ordering = savedRosterOrdering.value.find((o) => o.shiftName === shift.rosterShift.name);
+  if (!ordering) return [];
 
-    return ordering.users.filter(user =>
-        !shiftAssignedUsers[shift.id]?.some(u => u.id === user.id)
-    );
+  return ordering.users.filter((user) => !shiftAssignedUsers[shift.id]?.some((u) => u.id === user.id));
 };
-
 </script>
 
 <template>
@@ -104,14 +100,14 @@ const availableUsersForShift = (shift: SavedShift) => {
             :key="user.id + '-' + shift.id"
             class="flex items-center gap-2"
           >
-              <Select
-                  v-model="user.id"
-                  class="w-40"
-                  :disabled="true"
-                  option-label="name"
-                  option-value="id"
-                  :options="(savedRosterOrdering.find(o => o.shiftName === shift.rosterShift.name)?.users ?? [])"
-              />
+            <Select
+              v-model="user.id"
+              class="w-40"
+              :disabled="true"
+              option-label="name"
+              option-value="id"
+              :options="savedRosterOrdering.find((o) => o.shiftName === shift.rosterShift.name)?.users ?? []"
+            />
             <Button
               :aria-label="'Remove ' + user.name"
               class="p-button-rounded p-button-text p-button-danger"

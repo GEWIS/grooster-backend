@@ -40,7 +40,7 @@ const addRoster = async () => {
 
   await rosterStore.createRoster(createParams);
   emit('close');
-}
+};
 </script>
 
 <template>

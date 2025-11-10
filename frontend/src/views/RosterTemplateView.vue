@@ -26,11 +26,11 @@ onMounted(async () => {
       </template>
     </Card>
     <div class="grid grid-cols-3 gap-2">
-        <div v-if="templates.length > 0">
-            <div v-for="template in templates"  :key="template.id">
-                <RosterTemplate :template="template" />
-            </div>
+      <div v-if="templates.length > 0">
+        <div v-for="template in templates" :key="template.id">
+          <RosterTemplate :template="template" />
         </div>
+      </div>
     </div>
   </div>
   <RosterTemplateAdd :open="addDialog" @close="addDialog = false" />

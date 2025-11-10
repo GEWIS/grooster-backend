@@ -137,22 +137,22 @@ async function saveRoster() {
         <thead>
           <tr>
             <th class="user-column text-[10px] sm:text-sm lg:text-base px-1 py-0.5">Users</th>
-              <template v-if="roster.rosterShift">
-            <th
-              v-for="shift in roster.rosterShift"
-              :key="shift.id"
-              class="shift-column text-[10px] sm:text-sm lg:text-base px-1 py-0.5"
-            >
-              <div class="flex flex-row gap-1">
-                <span class="block mb-1 sm:mb-2">{{ shift.name }}</span>
-                <div v-if="!roster.saved">
-                  <Button class="sm:scale-50 lg:scale-60" @click="removeShift(shift.id)">
-                    <i class="pi pi-times ml-1 sm:ml-2 lg:ml-4 text-[10px] sm:text-sm"></i>
-                  </Button>
+            <template v-if="roster.rosterShift">
+              <th
+                v-for="shift in roster.rosterShift"
+                :key="shift.id"
+                class="shift-column text-[10px] sm:text-sm lg:text-base px-1 py-0.5"
+              >
+                <div class="flex flex-row gap-1">
+                  <span class="block mb-1 sm:mb-2">{{ shift.name }}</span>
+                  <div v-if="!roster.saved">
+                    <Button class="sm:scale-50 lg:scale-60" @click="removeShift(shift.id)">
+                      <i class="pi pi-times ml-1 sm:ml-2 lg:ml-4 text-[10px] sm:text-sm"></i>
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </th>
-          </template>
+              </th>
+            </template>
           </tr>
         </thead>
         <tbody>
@@ -160,22 +160,22 @@ async function saveRoster() {
             <td class="user-cell text-[10px] sm:text-sm lg:text-base px-1 py-0.5">
               {{ user.name }}
             </td>
-              <template v-if="roster.rosterShift">
-                  <td
-                      v-for="shift in roster.rosterShift"
-                      :key="user.id + '-' + shift.id"
-                      class="shift-cell px-1 sm:px-2 lg:px-4 py-1 sm:py-2"
-                  >
-                      <Select
-                          v-model="shiftAnswers[user.id][shift.id].value"
-                          class="w-full text-[10px] scale-90"
-                          :disabled="roster.saved || user.gewis_id != getGEWISId()"
-                          :options="rosterValues"
-                          placeholder="Answer"
-                          @update:model-value="value => onAnswerChange(user.id, shift.id, value)"
-                      />
-                  </td>
-              </template>
+            <template v-if="roster.rosterShift">
+              <td
+                v-for="shift in roster.rosterShift"
+                :key="user.id + '-' + shift.id"
+                class="shift-cell px-1 sm:px-2 lg:px-4 py-1 sm:py-2"
+              >
+                <Select
+                  v-model="shiftAnswers[user.id][shift.id].value"
+                  class="w-full text-[10px] scale-90"
+                  :disabled="roster.saved || user.gewis_id != getGEWISId()"
+                  :options="rosterValues"
+                  placeholder="Answer"
+                  @update:model-value="(value) => onAnswerChange(user.id, shift.id, value)"
+                />
+              </td>
+            </template>
           </tr>
         </tbody>
       </table>

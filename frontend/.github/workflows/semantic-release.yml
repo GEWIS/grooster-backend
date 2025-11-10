@@ -15,7 +15,7 @@ jobs:
     with:
       projects: "['.']"
       version: ${{ needs.versioning.outputs.next-version }}
-      docker-registry: "abc.docker-registry.gewis.nl"
+      docker-registry: 'abc.docker-registry.gewis.nl'
       docker-paths: "['eou/grooster-frontend']"
     secrets:
       REGISTRY_USERNAME: ${{ secrets.SVC_GH_ABCEOU_USERNAME }}
