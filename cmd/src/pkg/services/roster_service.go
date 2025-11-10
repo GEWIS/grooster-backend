@@ -7,6 +7,7 @@ import (
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"log"
 	"slices"
 	"time"
 )
@@ -390,20 +391,21 @@ func (s *RosterService) getSavedShiftOrdering(savedShifts []*models.SavedShift) 
 			return nil, err
 		}
 
-		err := s.db.
+		err := s.db.Debug().
 			Table("users AS u").
+			Select("u.*, MAX(r.date) AS last_date").
 			Joins("JOIN user_organs AS uo ON u.id = uo.user_id").
-			Joins("JOIN rosters AS r ON r.organ_id = uo.organ_id").
-			Joins("JOIN roster_shifts AS rs ON rs.roster_id = r.id").
-			Joins("JOIN saved_shifts AS ss ON ss.roster_id = r.id AND ss.roster_shift_id = rs.id").
-			Joins("JOIN user_shift_saved AS uss ON uss.saved_shift_id = ss.id").
-			Where("uo.organ_id = ? AND rs.name = ?", organID, savedShift.RosterShift.Name).
-			Order("r.date DESC").
-			Distinct("u.id, u.*").
-			Find(&users).Error
+			Joins("LEFT JOIN user_shift_saved AS uss ON uss.user_id = u.id").
+			Joins("LEFT JOIN roster_shifts AS rs ON rs.name = ? ", savedShift.RosterShift.Name).
+			Joins("LEFT JOIN saved_shifts AS ss ON ss.roster_shift_id = rs.id AND ss.id = uss.saved_shift_id").
+			Joins("LEFT JOIN rosters AS r ON r.id = ss.roster_id").
+			Where("uo.organ_id = ?", organID).
+			Group("u.id").
+			Order("last_date ASC NULLS FIRST").
+			Scan(&users).Error
 
 		if err != nil {
-			return nil, err
+			log.Println("Error:", err)
 		}
 
 		orderings = append(orderings, &models.SavedShiftOrdering{
