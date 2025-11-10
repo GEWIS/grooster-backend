@@ -36,6 +36,14 @@ func NewAuthMiddleware(auth *services.AuthService) *AuthMiddleware {
 func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if os.Getenv("DEV_TYPE") == "local" {
+			token, err := a.authService.HandleLocalAuthentication(c)
+
+			if err != nil {
+				return
+			}
+
+			c.Header("Authorization", "Bearer "+token)
+
 			c.Next()
 			return
 		}
