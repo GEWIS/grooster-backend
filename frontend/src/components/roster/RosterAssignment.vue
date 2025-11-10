@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import {User, SavedShiftUpdateRequest, RosterShift, SavedShift} from '@gewis/grooster-backend-ts';
-import { onMounted, reactive, computed, watch, ref } from 'vue';
+import {User, SavedShiftUpdateRequest, SavedShift} from '@gewis/grooster-backend-ts';
+import { onMounted, reactive, computed, watch } from 'vue';
 import { useRosterStore } from '@/stores/roster.store';
-import ApiService from '@/services/ApiService';
-import { useRoute } from 'vue-router';
-
-const route = useRoute();
 
 const props = defineProps<{
   id: number;
@@ -110,28 +106,28 @@ const availableUsersForShift = (shift: SavedShift) => {
           >
               <Select
                   v-model="user.id"
-                  :options="(savedRosterOrdering.find(o => o.shiftName === shift.rosterShift.name)?.users ?? [])"
-                  option-label="name"
-                  option-value="id"
                   class="w-40"
                   :disabled="true"
+                  option-label="name"
+                  option-value="id"
+                  :options="(savedRosterOrdering.find(o => o.shiftName === shift.rosterShift.name)?.users ?? [])"
               />
             <Button
-              icon="pi pi-times"
-              class="p-button-rounded p-button-text p-button-danger"
-              @click="removeUserFromShift(shift.id, index)"
               :aria-label="'Remove ' + user.name"
+              class="p-button-rounded p-button-text p-button-danger"
+              icon="pi pi-times"
+              @click="removeUserFromShift(shift.id, index)"
             />
           </div>
 
           <Select
             :key="'select-' + shift.id"
             v-model="selectedIds[shift.id]"
-            :options="availableUsersForShift(shift)"
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Add a user"
             class="w-40"
+            option-label="name"
+            option-value="id"
+            :options="availableUsersForShift(shift)"
+            placeholder="Add a user"
             @change="(userId) => addUser(userId.value, shift.id)"
           />
         </div>

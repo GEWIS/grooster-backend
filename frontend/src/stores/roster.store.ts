@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import type {
   RosterAnswerUpdateRequest,
   RosterShiftCreateRequest,
-  SavedShift,
   SavedShiftUpdateRequest,
   RosterCreateRequest,
   Roster,
@@ -128,7 +127,7 @@ export const useRosterStore = defineStore('roster', {
       });
     },
     async saveRoster(id: number) {
-      await ApiService.savedShiftApi.rosterSave(id).then(async () => {
+      await ApiService.savedShiftApi.rosterSave(id).then(() => {
         const roster: Roster = this.rosters[id];
         const updatedRoster = {
           ...roster,

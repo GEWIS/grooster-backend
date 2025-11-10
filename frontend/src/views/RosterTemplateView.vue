@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue';
 import RosterTemplate from '@/components/templates/RosterTemplate.vue';
 import { useOrganStore } from '@/stores/organ.store';
-import { computed, onMounted, ref } from 'vue';
 import RosterTemplateAdd from '@/components/templates/dialogs/RosterTemplateAdd.vue';
 import { useTemplateStore } from '@/stores/template.store';
 
@@ -26,9 +26,11 @@ onMounted(async () => {
       </template>
     </Card>
     <div class="grid grid-cols-3 gap-2">
-      <div v-if="templates.length > 0" v-for="template in templates" :key="template.id">
-        <RosterTemplate :template="template" />
-      </div>
+        <div v-if="templates.length > 0">
+            <div v-for="template in templates"  :key="template.id">
+                <RosterTemplate :template="template" />
+            </div>
+        </div>
     </div>
   </div>
   <RosterTemplateAdd :open="addDialog" @close="addDialog = false" />

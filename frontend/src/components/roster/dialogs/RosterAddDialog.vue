@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { AddRosterForm } from '@/types/roster.types';
 import { computed, ref } from 'vue';
 import { RosterCreateRequest } from '@gewis/grooster-backend-ts';
-import { useRosterStore } from '@/stores/roster.store';
 import { useRoute } from 'vue-router';
+import { useRosterStore } from '@/stores/roster.store';
+import { AddRosterForm } from '@/types/roster.types';
 
 const route = useRoute();
 
@@ -31,14 +31,14 @@ const formValues = ref<AddRosterForm>({
   date: new Date(),
 });
 
-function addRoster() {
+const addRoster = async () => {
   const createParams: RosterCreateRequest = {
     name: formValues.value.name,
     date: formValues.value.date.toISOString(),
     organId: parseInt(route.params.id as string),
   };
 
-  rosterStore.createRoster(createParams);
+  await rosterStore.createRoster(createParams);
   emit('close');
 }
 </script>
@@ -53,15 +53,15 @@ function addRoster() {
     <div class="flex flex-col gap-4 p-4">
       <div class="flex row gap-3">
         <label class="font-semibold">Roster Name</label>
-        <InputText type="text" v-model="formValues.name" class="w-full" autocomplete="off" />
+        <InputText v-model="formValues.name" autocomplete="off" class="w-full" type="text" />
       </div>
       <div class="flex row gap-3">
         <label class="font-semibold">Roster Date</label>
-        <DatePicker v-model="formValues.date" :minDate="new Date()" />
+        <DatePicker v-model="formValues.date" :min-date="new Date()" />
       </div>
       <div class="flex justify-center gap-3 pt-4">
-        <Button label="Cancel" severity="secondary" @click="emit('close')" class="px-6" />
-        <Button label="Add" @click="addRoster()" class="px-6" />
+        <Button class="px-6" label="Cancel" severity="secondary" @click="emit('close')" />
+        <Button class="px-6" label="Add" @click="addRoster()" />
       </div>
     </div>
   </Dialog>

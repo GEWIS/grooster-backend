@@ -2,13 +2,11 @@
 import { RosterTemplate as RosterTemplateModel } from '@gewis/grooster-backend-ts';
 import { ref } from 'vue';
 import RosterTemplateDelete from '@/components/templates/dialogs/RosterTemplateDelete.vue';
-import RosterTemplateEdit from '@/components/templates/dialogs/RosterTemplateEdit.vue';
 import RosterTemplateUseDialog from '@/components/templates/dialogs/RosterTemplateUseDialog.vue';
 
 const props = defineProps<{
   template: RosterTemplateModel;
 }>();
-const openEditDialog = ref(false);
 const openDeleteDialog = ref(false);
 const openRosterDialog = ref(false);
 
@@ -24,12 +22,12 @@ const showDetail = ref<boolean>(false);
           <div class="flex flex-row gap-2 justify-end">
             <!--                    <Button icon="pi pi-pencil" @click="openEditDialog=true" aria-label="Edit"/>-->
             <Button icon="pi pi-plus" @click="openRosterDialog = true" />
-            <Button icon="pi pi-trash" @click="openDeleteDialog = true" aria-label="Delete" />
+            <Button aria-label="Delete" icon="pi pi-trash" @click="openDeleteDialog = true" />
           </div>
           <div class="col-span-3 border-t border-gray-300 mx-auto my-4"></div>
           <div></div>
           <div>
-            <Button label="View details" @click="showDetail = !showDetail" variant="text" class="px-5" />
+            <Button class="px-5" label="View details" variant="text" @click="showDetail = !showDetail" />
           </div>
         </div>
 
@@ -47,8 +45,8 @@ const showDetail = ref<boolean>(false);
 
   <RosterTemplateDelete :open="openDeleteDialog" :template-id="props.template.id" @close="openDeleteDialog = false" />
   <RosterTemplateUseDialog
-    :open="openRosterDialog"
     :name="props.template.name"
+    :open="openRosterDialog"
     :shifts="props.template.shifts"
     @close="openRosterDialog = false"
   />

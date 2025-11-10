@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import type { Roster } from '@gewis/grooster-backend-ts';
+import { useRoute } from 'vue-router';
 import RosterTable from '@/components/roster/RosterTable.vue';
 import RosterAssignment from '@/components/roster/RosterAssignment.vue';
 import { useRosterStore } from '@/stores/roster.store.js';
-import type { Roster } from '@gewis/grooster-backend-ts';
 import RosterAddDialog from '@/components/roster/dialogs/RosterAddDialog.vue';
-import { useRoute } from 'vue-router';
 import ApiService from '@/services/ApiService';
 
 const route = useRoute();
@@ -61,11 +61,11 @@ async function fetchRosters() {
         <div class="flex items-center justify-center">
           <Select
             v-model="selectedRoster"
-            :options="rosters"
-            option-label="name"
-            placeholder="Select a roster"
             class="w-full md:w-56 mr-4"
+            option-label="name"
             :option-value="(roster) => roster"
+            :options="rosters"
+            placeholder="Select a roster"
           />
           <Button label="Add Roster" @click="addDialog = true" />
         </div>

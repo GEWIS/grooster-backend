@@ -45,15 +45,14 @@ const resolver = ({ values }) => {
   };
 };
 
-const onFormSubmit = (e) => {
-  if (e.valid) {
-    shifts.value.push(e.values.shiftName);
-    e.reset();
+const onFormSubmit = async (e) => {
+    if (e.valid) {
+        shifts.value.push(e.values.shiftName);
+        e.reset();
 
-    nextTick(() => {
-      shiftNameInput.value.focus;
-    });
-  }
+        await nextTick();
+        shiftNameInput.value?.focus();
+    }
 };
 
 const removeShift = (index: number) => {
@@ -81,34 +80,34 @@ const saveTemplate = async () => {
       </div>
     </template>
     <div>
-      <Form v-slot="$form" :resolver :initial-values @submit="onFormSubmit">
+      <Form v-slot="$form" :initial-values :resolver @submit="onFormSubmit">
         <div class="flex flex-row gap-1">
           <InputText
             ref="shiftNameInput"
             name="shiftName"
-            type="text"
             placeholder="Shift name"
             :pt="{
               root: {
                 ref: shiftNameInput,
               },
             }"
+            type="text"
           />
           <Message v-if="$form.shiftName?.invalid" severity="error" size="small" variant="simple">{{
             $form.shiftName.error?.message
           }}</Message>
-          <Button type="submit" severity="secondary" label="Add Shift" />
+          <Button label="Add Shift" severity="secondary" type="submit" />
         </div>
       </Form>
     </div>
-    <div v-for="(shift, index) in shifts">
+    <div v-for="(shift, index) in shifts" :key="index">
       {{ shift }}
-      <Button icon="pi pi-times" @click="removeShift(index)" style="font-size: 1rem" />
+      <Button icon="pi pi-times" style="font-size: 1rem" @click="removeShift(index)" />
     </div>
 
     <div class="flex flex-col justify-center gap-1">
-      <InputText v-model="templateName" type="text" placeholder="Template name" />
-      <Button @click="saveTemplate" severity="success" label="Save Template" />
+      <InputText v-model="templateName" placeholder="Template name" type="text" />
+      <Button label="Save Template" severity="success" @click="saveTemplate" />
     </div>
   </Dialog>
 </template>

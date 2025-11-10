@@ -49,11 +49,11 @@ const addRoster = async () => {
     </template>
     <div class="flex row gap-3">
       <label class="font-semibold">Roster Date</label>
-      <DatePicker v-model="date" :minDate="new Date()" />
+      <DatePicker v-model="date" :min-date="new Date()" />
     </div>
     <div class="flex justify-center gap-3 pt-4">
-      <Button label="Cancel" severity="secondary" @click="emit('close')" class="px-6" />
-      <Button label="Add" @click="addRoster()" class="px-6" />
+      <Button class="px-6" label="Cancel" severity="secondary" @click="emit('close')" />
+      <Button class="px-6" label="Add" @click="addRoster()" />
     </div>
   </Dialog>
 </template>

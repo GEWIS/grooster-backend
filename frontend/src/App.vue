@@ -1,5 +1,4 @@
-<script setup>
-import RosterView from '@/views/RosterView.vue';
+<script setup lang="ts">
 import TopNavbar from '@/components/TopNavbar.vue';
 </script>
 

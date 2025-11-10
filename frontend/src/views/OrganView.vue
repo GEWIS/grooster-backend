@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import ApiService from '@/services/ApiService';
-import { getGEWISId } from '@/helpers/TokenHelper';
 import { Select } from 'primevue';
 import type { Organ } from '@gewis/grooster-backend-ts';
 import { useRouter } from 'vue-router';
-import { useOrganStore } from '@/stores/organ.store';
+import { getGEWISId } from '@/helpers/TokenHelper';
+import ApiService from '@/services/ApiService';
 
 const router = useRouter();
-const organStore = useOrganStore();
 
 const user = ref();
 const organs = ref<Organ[]>();
 const selectedOrgan = ref<number>();
 
-onMounted(() => {
-  loadUser();
+onMounted(async () => {
+  await loadUser();
 });
 
 async function loadUser() {
@@ -26,8 +24,8 @@ async function loadUser() {
   organs.value = user.value.organs;
 }
 
-const onSelect = () => {
-  router.push({ name: 'rosters', params: { id: selectedOrgan.value } });
+const onSelect = async () => {
+  await router.push({ name: 'rosters', params: { id: selectedOrgan.value } });
 };
 </script>
 
@@ -35,9 +33,9 @@ const onSelect = () => {
   <div v-if="organs && user">
     <Select
       v-model="selectedOrgan"
-      :options="organs"
       option-label="name"
       option-value="id"
+      :options="organs"
       placeholder="Select an organ"
       @change="onSelect"
     />
