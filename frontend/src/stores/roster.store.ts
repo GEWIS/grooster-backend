@@ -6,14 +6,14 @@ import type {
   SavedShiftUpdateRequest,
   RosterCreateRequest,
   Roster,
-  RosterAnswerCreateRequest,
+  RosterAnswerCreateRequest, SavedShiftResponse,
 } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 
 export const useRosterStore = defineStore('roster', {
   state: () => ({
     rosters: {} as Record<number, Roster>,
-    savedRoster: {} as Record<number, SavedShift[]>,
+    savedRoster: {} as Record<number, SavedShiftResponse>,
   }),
   getters: {
     getRoster: (state) => {
@@ -150,12 +150,14 @@ export const useRosterStore = defineStore('roster', {
       await ApiService.savedShiftApi.updateSavedShift(shiftId, params).then((res) => {
         const updatedShift = res.data;
 
-        const shifts = this.savedRoster[updatedShift.rosterId];
-        if (!shifts) return;
+        const shiftResponses = this.savedRoster[updatedShift.rosterId];
+        if (!shiftResponses) return;
+
+        const shifts = shiftResponses.savedShifts;
 
         const index = shifts.findIndex((s) => s.id === shiftId);
         if (index !== -1) {
-          this.savedRoster[updatedShift.rosterId].splice(index, 1, updatedShift);
+          this.savedRoster[updatedShift.rosterId].savedShifts.splice(index, 1, updatedShift);
         }
       });
     },

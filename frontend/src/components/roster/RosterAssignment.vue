@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { User, SavedShiftUpdateRequest } from '@gewis/grooster-backend-ts';
+import {User, SavedShiftUpdateRequest, RosterShift, SavedShift} from '@gewis/grooster-backend-ts';
 import { onMounted, reactive, computed, watch, ref } from 'vue';
 import { useRosterStore } from '@/stores/roster.store';
 import ApiService from '@/services/ApiService';
@@ -12,15 +12,9 @@ const props = defineProps<{
 }>();
 
 const rosterStore = useRosterStore();
-const savedRoster = computed(() => rosterStore.getSavedRoster(props.id));
+const savedRoster = computed(() => rosterStore.getSavedRoster(props.id)?.savedShifts ?? []);
+const savedRosterOrdering = computed(() => rosterStore.getSavedRoster(props.id)?.savedShiftOrdering ?? []);
 
-const users = ref<User[]>([]);
-const loadUsers = async () => {
-  const response = await ApiService.user.userGet(parseInt(route.params.id as string));
-  users.value = response.data;
-};
-
-const selectedId = ref(null);
 
 const shiftAssignedUsers = reactive<Record<number, User[]>>({});
 
@@ -28,11 +22,10 @@ const selectedIds = reactive<Record<number, number | null>>({});
 
 onMounted(async () => {
   await rosterStore.fetchSavedShifts(props.id);
-  await loadUsers();
 });
 
 watch(
-  [savedRoster, users],
+  [savedRoster, savedRosterOrdering],
   ([newSaved, newUsers]) => {
     if (!newSaved || !newUsers) return;
 
@@ -47,10 +40,13 @@ watch(
   { immediate: true, deep: true },
 );
 
-const addUser = async (userId, shiftId: number) => {
+const addUser = async (userId: number, shiftId: number) => {
   if (!userId) return;
 
-  const user = users.value.find((user) => user.id === userId);
+  const shiftName = savedRoster.value.find(shift => shift.id === shiftId).rosterShift.name;
+    const users = savedRosterOrdering.value.find((ordering) => ordering.shiftName  === shiftName).users;
+    const user = users.find(user => user.id === userId);
+
   if (!user) return;
 
   const assignedIds = shiftAssignedUsers[shiftId].map((user) => user.id);
@@ -88,6 +84,16 @@ const removeUserFromShift = async (shiftId: number, index: number) => {
     shiftAssignedUsers[shiftId].splice(index, 0, removedUser);
   }
 };
+
+const availableUsersForShift = (shift: SavedShift) => {
+    const ordering = savedRosterOrdering.value.find(o => o.shiftName === shift.rosterShift.name);
+    if (!ordering) return [];
+
+    return ordering.users.filter(user =>
+        !shiftAssignedUsers[shift.id]?.some(u => u.id === user.id)
+    );
+};
+
 </script>
 
 <template>
@@ -102,14 +108,14 @@ const removeUserFromShift = async (shiftId: number, index: number) => {
             :key="user.id + '-' + shift.id"
             class="flex items-center gap-2"
           >
-            <Select
-              v-model="user.id"
-              :options="users"
-              option-label="name"
-              option-value="id"
-              class="w-40"
-              :disabled="true"
-            />
+              <Select
+                  v-model="user.id"
+                  :options="(savedRosterOrdering.find(o => o.shiftName === shift.rosterShift.name)?.users ?? [])"
+                  option-label="name"
+                  option-value="id"
+                  class="w-40"
+                  :disabled="true"
+              />
             <Button
               icon="pi pi-times"
               class="p-button-rounded p-button-text p-button-danger"
@@ -121,7 +127,7 @@ const removeUserFromShift = async (shiftId: number, index: number) => {
           <Select
             :key="'select-' + shift.id"
             v-model="selectedIds[shift.id]"
-            :options="users.filter((user) => !shiftAssignedUsers[shift.id].some((u) => u.id === user.id))"
+            :options="availableUsersForShift(shift)"
             optionLabel="name"
             optionValue="id"
             placeholder="Add a user"
