@@ -61,12 +61,16 @@ func main() {
 
 	userService := services.NewUserService(db)
 	rosterService := services.NewRosterService(db)
+
+	m := middleware.AuthMiddleware{}
+	provider, config := m.SetupOIDC()
+
 	authService := services.NewAuthService(userService, db)
 	authMiddle := middleware.NewAuthMiddleware(authService)
 
 	// Auth routes (no authentication required)
 	authGroup := api.Group("/auth")
-	handlers.NewAuthHandler(authGroup, authService, authMiddle)
+	handlers.NewAuthHandler(authGroup, authService, provider, config)
 
 	protectedGroup := api.Group("")
 	protectedGroup.Use(authMiddle.AuthMiddlewareCheck())

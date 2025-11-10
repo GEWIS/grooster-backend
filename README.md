@@ -15,3 +15,12 @@ To generate the docs go into the cmd/src folder and run the command: ```swag ini
 
 To generate the client which will be uploaded to npm, first go into the cmd/src/docs folder, then run the command: 
 ```openapi-generator-cli generate -i swagger.yaml -g typescript-axios -o ../../../client/src```
+
+## Running it locally for the backend
+First put your DEV_TYPE in the .env to "local" this ensures you do not need the actual keycloak authentication.
+
+Next generate some users, organs and roster by running the main in the seeder module.
+
+Now run the main module and enjoy this backend.
+
+

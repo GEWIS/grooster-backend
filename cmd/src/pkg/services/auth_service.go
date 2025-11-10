@@ -7,12 +7,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 	"io"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type AuthServiceInterface interface {
@@ -20,6 +23,7 @@ type AuthServiceInterface interface {
 	RandString(int) (string, error)
 	ProcessUserInfo(*oauth2.Token)
 	GetOrgans(claims map[string]interface{}) ([]models.Organ, error)
+	HandleLocalAuthentication(ctx *gin.Context) (string, error)
 }
 
 type AuthService struct {
@@ -51,6 +55,52 @@ func (s *AuthService) RandString(nByte int) (string, error) {
 		return "", err
 	}
 	return base64.RawURLEncoding.EncodeToString(b), nil
+}
+
+func (s *AuthService) HandleLocalAuthentication(ctx *gin.Context) (string, error) {
+	var user models.User
+	if err := s.db.First(&user).Error; err != nil {
+		ctx.JSON(500, gin.H{"error": "No user in local database found, try to seed it first"})
+	}
+
+	// Try to collect some "organs" to simulate Keycloak roles
+	var organs []models.Organ
+	_ = s.db.Model(&user).Association("Organs").Find(&organs)
+
+	roles := make([]string, 0, len(organs))
+	for _, o := range organs {
+		roles = append(roles, "PRIV - "+o.Name)
+	}
+
+	now := time.Now()
+	claims := jwt.MapClaims{
+		"iss":                "http://localhost/auth", // dev value
+		"sub":                fmt.Sprintf("%d", user.ID),
+		"aud":                "grooster-local",
+		"exp":                now.Add(8 * time.Hour).Unix(),
+		"iat":                now.Unix(),
+		"typ":                "Bearer",
+		"preferred_username": fmt.Sprintf("m%d", user.GEWISID),
+		"given_name":         user.Name,
+		"resource_access": map[string]interface{}{
+			"grooster-test": map[string]interface{}{
+				"roles": roles,
+			},
+		},
+		"user_id": user.ID, // explicit user id
+	}
+
+	secret := os.Getenv("DEV_JWT_SECRET")
+	if secret == "" {
+		secret = "42-secret"
+	}
+
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {

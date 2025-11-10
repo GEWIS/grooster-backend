@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"GEWIS-Rooster/cmd/src/pkg/middleware"
 	"GEWIS-Rooster/cmd/src/pkg/services"
 	"fmt"
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -13,15 +12,12 @@ import (
 )
 
 type AuthHandler struct {
-	config     *oauth2.Config
-	provider   *oidc.Provider
-	service    services.AuthServiceInterface
-	authMiddle *middleware.AuthMiddleware
+	config   *oauth2.Config
+	provider *oidc.Provider
+	service  services.AuthServiceInterface
 }
 
-func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface, authMiddle *middleware.AuthMiddleware) *AuthHandler {
-	provider, config := authMiddle.SetupOIDC()
-
+func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface, provider *oidc.Provider, config *oauth2.Config) *AuthHandler {
 	h := &AuthHandler{config: config, provider: provider, service: auth}
 
 	log.Printf("Path %s", rg.BasePath())
@@ -43,6 +39,18 @@ func NewAuthHandler(rg *gin.RouterGroup, auth services.AuthServiceInterface, aut
 //	@Failure		500		{object}	map[string]string	"pkg server error"
 //	@Router			/auth/redirect [get]
 func (h *AuthHandler) AuthRedirect(c *gin.Context) {
+	if os.Getenv("DEV_TYPE") == "local" {
+		token, err := h.service.HandleLocalAuthentication(c)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		redirectUrl := fmt.Sprintf(os.Getenv("FRONTEND_CALLBACK"), token)
+		c.Redirect(http.StatusTemporaryRedirect, redirectUrl)
+		return
+	}
+
 	state, err := h.service.RandString(32)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
