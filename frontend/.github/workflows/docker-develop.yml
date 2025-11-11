@@ -12,7 +12,7 @@ jobs:
       projects: "['.']"
       version: "develop"
       docker-registry: "abc.docker-registry.gewis.nl"
-      docker-paths: "['eou/grooster-backend']"
+      docker-paths: "['eou/grooster-frontend']"
     secrets:
       REGISTRY_USERNAME: ${{ secrets.SVC_GH_ABCEOU_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.SVC_GH_ABCEOU_PWD }}
