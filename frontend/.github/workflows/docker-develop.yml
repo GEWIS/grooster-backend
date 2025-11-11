@@ -1,0 +1,19 @@
+name: Develop Docker Build
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-develop:
+    uses: GEWIS/actions/.github/workflows/docker-release.yml@v1
+    with:
+      # No semantic versioning => use branch-based tag
+      projects: "['.']"
+      version: "develop-${{ github.sha }}"
+      docker-registry: "abc.docker-registry.gewis.nl"
+      docker-paths: "['eou/grooster-backend']"
+    secrets:
+      REGISTRY_USERNAME: ${{ secrets.SVC_GH_ABCEOU_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.SVC_GH_ABCEOU_PWD }}
