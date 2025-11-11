@@ -9,9 +9,8 @@ jobs:
   build-develop:
     uses: GEWIS/actions/.github/workflows/docker-release.yml@v1
     with:
-      # No semantic versioning => use branch-based tag
       projects: "['.']"
-      version: "develop-${{ github.sha }}"
+      version: "develop"
       docker-registry: "abc.docker-registry.gewis.nl"
       docker-paths: "['eou/grooster-backend']"
     secrets:
