@@ -64,7 +64,11 @@ class ApiService {
   }
 }
 
-const location = window.location.origin.includes('grooster.gewis') ? window.location.origin : 'http://localhost:8080';
+const isGrooster = /grooster(\.\w+)?\.gewis\.nl$/.test(window.location.hostname);
+
+const location = isGrooster
+    ? window.location.origin
+    : 'http://localhost:8080';
 
 const apiService = new ApiService(location + '/api/v1');
 
