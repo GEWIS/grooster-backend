@@ -17,6 +17,7 @@ import InputText from 'primevue/inputtext';
 import ListBox from 'primevue/listbox';
 import DatePicker from 'primevue/datepicker';
 import { Form } from '@primevue/forms';
+import Chip from 'primevue/chip';
 import App from './App.vue';
 import router from '@/router/router';
 
@@ -44,6 +45,7 @@ app.component('InputText', InputText);
 app.component('ListBox', ListBox);
 app.component('DatePicker', DatePicker);
 app.component('Form', Form);
+app.component('Chip', Chip);
 
 app.use(pinia);
 app.use(router);

@@ -10,8 +10,8 @@ jobs:
     uses: GEWIS/actions/.github/workflows/docker-release.yml@v1
     with:
       projects: "['.']"
-      version: "develop"
-      docker-registry: "abc.docker-registry.gewis.nl"
+      version: 'develop'
+      docker-registry: 'abc.docker-registry.gewis.nl'
       docker-paths: "['eou/grooster-frontend']"
     secrets:
       REGISTRY_USERNAME: ${{ secrets.SVC_GH_ABCEOU_USERNAME }}
