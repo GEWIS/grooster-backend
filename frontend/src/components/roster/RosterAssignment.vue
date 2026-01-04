@@ -134,8 +134,15 @@ const availableUsersForShift = (shift: SavedShift) => {
         <p>No shifts found for this roster or loading...</p>
         <pre style="font-size: 10px;">Debug: {{ savedRoster }}</pre>
     </div>
-    <div>
-        Test
+    <div style="border: 2px solid red; padding: 10px; background: white; color: black;">
+        <strong>ID Type Check:</strong>
+        <ul>
+            <li>Prop ID: {{ props.id }} (Type: {{ typeof props.id }})</li>
+            <li>Store Keys: {{ Object.keys(rosterStore.savedRoster) }}</li>
+            <li>Store Values: {{ rosterStore.savedRoster }}</li>
+            <li>Key Match Found? {{ Object.keys(rosterStore.savedRoster).includes(String(props.id)) }}</li>
+            <li>Raw Data: {{ !!rosterStore.getSavedRoster(props.id) ? 'Found' : 'Not Found' }}</li>
+        </ul>
     </div>
 </template>
 
