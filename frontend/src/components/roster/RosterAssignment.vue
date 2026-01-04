@@ -8,8 +8,8 @@ const props = defineProps<{
 }>();
 
 const rosterStore = useRosterStore();
-const savedRoster = computed(() => rosterStore.getSavedRoster(props.id)?.savedShifts ?? []);
-const savedRosterOrdering = computed(() => rosterStore.getSavedRoster(props.id)?.savedShiftOrdering ?? []);
+const savedRoster = computed(() => rosterStore.getSavedRoster(Number(props.id))?.savedShifts ?? []);
+const savedRosterOrdering = computed(() => rosterStore.getSavedRoster(Number(props.id))?.savedShiftOrdering ?? []);
 
 const shiftAssignedUsers = reactive<Record<number, User[]>>({});
 
@@ -140,11 +140,4 @@ const availableUsersForShift = (shift: SavedShift) => {
 </template>
 
 <style scoped>
-.mb-4 {
-  margin-bottom: 1rem;
-}
-
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
 </style>
