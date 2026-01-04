@@ -381,7 +381,7 @@ func (s *RosterService) getSavedShiftOrdering(savedShifts []*models.SavedShift) 
 	var orderings []*models.SavedShiftOrdering
 
 	for _, savedShift := range savedShifts {
-		var users []*models.User
+		users := []*models.User{}
 
 		var organID uint
 		if err := s.db.Model(&models.Roster{}).
@@ -391,8 +391,7 @@ func (s *RosterService) getSavedShiftOrdering(savedShifts []*models.SavedShift) 
 			return nil, err
 		}
 
-		err := s.db.Debug().
-			Table("users AS u").
+		err := s.db.Table("users AS u").
 			Select("u.*, MAX(r.date) AS last_date").
 			Joins("JOIN user_organs AS uo ON u.id = uo.user_id").
 			Joins("LEFT JOIN user_shift_saved AS uss ON uss.user_id = u.id").
@@ -401,7 +400,7 @@ func (s *RosterService) getSavedShiftOrdering(savedShifts []*models.SavedShift) 
 			Joins("LEFT JOIN rosters AS r ON r.id = ss.roster_id").
 			Where("uo.organ_id = ?", organID).
 			Group("u.id").
-			Order("last_date ASC NULLS FIRST").
+			Order("last_date ASC"). // Removed NULLS FIRST for MariaDB compatibility
 			Scan(&users).Error
 
 		if err != nil {
