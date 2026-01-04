@@ -183,6 +183,7 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]models.Organ, error) {
 	resourceAccess, ok := claims["resource_access"].(map[string]interface{})
 	if !ok {
+		log.Debug().Interface("available_claims", claims).Msg("resource_access missing")
 		return nil, fmt.Errorf("resource_access not found or wrong type")
 	}
 
