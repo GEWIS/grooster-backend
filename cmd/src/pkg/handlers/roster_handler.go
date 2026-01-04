@@ -5,6 +5,7 @@ import (
 	"GEWIS-Rooster/cmd/src/pkg/services"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
@@ -32,7 +33,7 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 
 	g.POST("/:id/save", h.SaveRoster)
 	g.PATCH("/saved-shift/:id", h.UpdateSavedShift)
-	//g.GET("/saved-shift/:id", h.GetSavedRoster)
+	g.GET("/saved-shift/:id", h.GetSavedRoster)
 
 	g.POST("/template", h.CreateRosterTemplate)
 	g.GET("/template", h.GetRosterTemplates)
@@ -415,29 +416,29 @@ func (h *RosterHandler) UpdateSavedShift(c *gin.Context) {
 //	@Failure	404	{string}	string				"SavedShift not found"
 //	@ID			getSavedRoster
 //	@Router		/roster/saved-shift/{id} [get]
-//func (h *RosterHandler) GetSavedRoster(c *gin.Context) {
-//	idParam := c.Param("id")
-//	id, err := strconv.ParseUint(idParam, 10, 64)
-//	if err != nil {
-//		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid roster ID"})
-//		return
-//	}
-//
-//	savedShifts, savedShiftOrdering, err := h.rosterService.GetSavedRoster(uint(id))
-//	if err != nil {
-//		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-//		return
-//	}
-//
-//	response := models.SavedShiftResponse{
-//		SavedShifts:        savedShifts,
-//		SavedShiftOrdering: savedShiftOrdering,
-//	}
-//	// Log the entire struct as a field called "response"
-//	log.Debug().Interface("response", response).Msg("Sending saved roster response")
-//
-//	c.JSON(http.StatusOK, response)
-//}
+func (h *RosterHandler) GetSavedRoster(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid roster ID"})
+		return
+	}
+
+	savedShifts, savedShiftOrdering, err := h.rosterService.GetSavedRoster(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	response := models.SavedShiftResponse{
+		SavedShifts:        savedShifts,
+		SavedShiftOrdering: savedShiftOrdering,
+	}
+	// Log the entire struct as a field called "response"
+	log.Debug().Interface("response", response).Msg("Sending saved roster response")
+
+	c.JSON(http.StatusOK, response)
+}
 
 // CreateRosterTemplate
 //
