@@ -130,6 +130,13 @@ const availableUsersForShift = (shift: SavedShift) => {
       </div>
     </div>
   </div>
+    <div v-else class="empty-state">
+        <p>No shifts found for this roster or loading...</p>
+        <pre style="font-size: 10px;">Debug: {{ savedRoster }}</pre>
+    </div>
+    <div>
+        Test
+    </div>
 </template>
 
 <style scoped>
