@@ -5,6 +5,7 @@ import (
 	"GEWIS-Rooster/cmd/src/pkg/services"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
@@ -433,7 +434,9 @@ func (h *RosterHandler) GetSavedRoster(c *gin.Context) {
 		SavedShifts:        savedShifts,
 		SavedShiftOrdering: savedShiftOrdering,
 	}
-
+	// Log the entire struct as a field called "response"
+	log.Debug().Interface("response", response).Msg("Sending saved roster response")
+	
 	c.JSON(http.StatusOK, response)
 }
 

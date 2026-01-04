@@ -1,4 +1,4 @@
-package main
+package mainTest
 
 import (
 	"GEWIS-Rooster/cmd/seeder/seeder"
