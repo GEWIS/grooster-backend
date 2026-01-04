@@ -8,9 +8,15 @@ const props = defineProps<{
 }>();
 
 const rosterStore = useRosterStore();
-const savedRoster = computed(() => rosterStore.getSavedRoster(Number(props.id))?.savedShifts ?? []);
-const savedRosterOrdering = computed(() => rosterStore.getSavedRoster(Number(props.id))?.savedShiftOrdering ?? []);
+const savedRoster = computed(() => {
+    const data = rosterStore.getSavedRoster(props.id);
+    return Array.isArray(data) ? data : (data?.savedShifts ?? []);
+});
 
+const savedRosterOrdering = computed(() => {
+    const data = rosterStore.getSavedRoster(props.id);
+    return Array.isArray(data) ? [] : (data?.savedShiftOrdering ?? []);
+});
 const shiftAssignedUsers = reactive<Record<number, User[]>>({});
 
 const selectedIds = reactive<Record<number, number | null>>({});
