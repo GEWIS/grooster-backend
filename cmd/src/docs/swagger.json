@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "A GEWIS Rooster maker",
+        "description": "A GEWIS Rooster maker for fun",
         "title": "GRooster",
         "contact": {},
         "version": "0.1"
@@ -1199,6 +1199,9 @@
                 "saved": {
                     "type": "boolean"
                 },
+                "templateId": {
+                    "type": "integer"
+                },
                 "updatedAt": {
                     "type": "string"
                 },
@@ -1339,7 +1342,7 @@
                 "shifts": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/RosterTemplateShift"
                     }
                 },
                 "updatedAt": {
@@ -1361,6 +1364,29 @@
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "RosterTemplateShift": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "shiftName": {
+                    "type": "string"
+                },
+                "templateId": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
                 }
             }
         },

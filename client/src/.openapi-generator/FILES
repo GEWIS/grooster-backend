@@ -19,6 +19,7 @@ docs/RosterShiftApi.md
 docs/RosterShiftCreateRequest.md
 docs/RosterTemplate.md
 docs/RosterTemplateCreateRequest.md
+docs/RosterTemplateShift.md
 docs/RosterTemplateUpdateParams.md
 docs/RosterUpdateRequest.md
 docs/SavedShift.md

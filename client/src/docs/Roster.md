@@ -15,6 +15,7 @@ Name | Type | Description | Notes
 **rosterAnswer** | [**Array&lt;RosterAnswer&gt;**](RosterAnswer.md) |  | [optional] [default to undefined]
 **rosterShift** | [**Array&lt;RosterShift&gt;**](RosterShift.md) |  | [optional] [default to undefined]
 **saved** | **boolean** |  | [optional] [default to undefined]
+**templateId** | **number** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
 **values** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 
@@ -34,6 +35,7 @@ const instance: Roster = {
     rosterAnswer,
     rosterShift,
     saved,
+    templateId,
     updatedAt,
     values,
 };

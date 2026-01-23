@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * GRooster
- * A GEWIS Rooster maker
+ * A GEWIS Rooster maker for fun
  *
  * The version of the OpenAPI document: 0.1
  * 
@@ -151,6 +151,12 @@ export interface Roster {
      * @memberof Roster
      */
     'saved'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof Roster
+     */
+    'templateId'?: number;
     /**
      * 
      * @type {string}
@@ -394,10 +400,10 @@ export interface RosterTemplate {
     'organId'?: number;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<RosterTemplateShift>}
      * @memberof RosterTemplate
      */
-    'shifts'?: Array<string>;
+    'shifts'?: Array<RosterTemplateShift>;
     /**
      * 
      * @type {string}
@@ -429,6 +435,49 @@ export interface RosterTemplateCreateRequest {
      * @memberof RosterTemplateCreateRequest
      */
     'shifts'?: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface RosterTemplateShift
+ */
+export interface RosterTemplateShift {
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterTemplateShift
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {GormDeletedAt}
+     * @memberof RosterTemplateShift
+     */
+    'deletedAt'?: GormDeletedAt;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterTemplateShift
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterTemplateShift
+     */
+    'shiftName'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterTemplateShift
+     */
+    'templateId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterTemplateShift
+     */
+    'updatedAt'?: string;
 }
 /**
  * 
