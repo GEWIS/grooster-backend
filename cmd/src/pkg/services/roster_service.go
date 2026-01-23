@@ -296,10 +296,17 @@ func (s *RosterService) CreateRosterTemplate(params *models.RosterTemplateCreate
 		return nil, errors.New("no shifts were given")
 	}
 
+	shifts := make([]models.RosterTemplateShift, len(params.Shifts))
+	for i, name := range params.Shifts {
+		shifts[i] = models.RosterTemplateShift{
+			ShiftName: name,
+		}
+	}
+
 	template := models.RosterTemplate{
 		OrganID: organ.ID,
 		Name:    params.Name,
-		Shifts:  params.Shifts,
+		Shifts:  shifts,
 	}
 
 	if err := s.db.Create(&template).Error; err != nil {

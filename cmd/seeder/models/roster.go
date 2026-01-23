@@ -105,19 +105,28 @@ func rosterAnswer(db *gorm.DB, roster []*models.Roster) {
 }
 
 func rosterTemplates(db *gorm.DB, count int) {
-	for i := range count {
-		shiftString := fmt.Sprintf("Shift %d", i)
-		shifts := []string{shiftString}
+	var organ models.Organ
+	if err := db.First(&organ).Error; err != nil {
+		log.Error().Err(err).Msg("No organ found for seeding")
+		return
+	}
 
-		var organ *models.Organ
-		db.First(&organ)
+	for i := 0; i < count; i++ {
+		shiftName := fmt.Sprintf("Shift %d", i)
 
-		shift := models.RosterTemplate{
-			OrganID: organ.ID,
-			Shifts:  shifts,
+		templateShifts := []models.RosterTemplateShift{
+			{
+				ShiftName: shiftName,
+			},
 		}
 
-		if err := db.Create(&shift).Error; err != nil {
+		template := models.RosterTemplate{
+			OrganID: organ.ID,
+			Name:    fmt.Sprintf("Template %d", i),
+			Shifts:  templateShifts,
+		}
+
+		if err := db.Create(&template).Error; err != nil {
 			log.Error().Err(err).Msg("Failed to create roster templates")
 		}
 	}
