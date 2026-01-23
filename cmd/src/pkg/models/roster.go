@@ -1,7 +1,6 @@
 package models
 
 import (
-	"gorm.io/datatypes"
 	"time"
 )
 
@@ -25,6 +24,8 @@ type Roster struct {
 	Date time.Time `json:"date"`
 
 	Saved bool `json:"saved" gorm:"default:false"`
+
+	TemplateID *uint `json:"templateId" gorm:"foreignKey:TemplateID"`
 } // @name Roster
 
 type RosterShift struct {
@@ -72,8 +73,16 @@ type RosterTemplate struct {
 
 	Name string `json:"name"`
 
-	Shifts datatypes.JSONSlice[string] `gorm:"serializer:json" json:"shifts"`
+	Shifts []RosterTemplateShift `json:"shifts" gorm:"foreignKey:TemplateID"`
 } // @name RosterTemplate
+
+type RosterTemplateShift struct {
+	BaseModel
+
+	TemplateID uint `json:"templateId"`
+
+	ShiftName string `json:"shiftName"`
+} // @name RosterTemplateShift
 
 type RosterCreateRequest struct {
 	Name string `json:"name"`
@@ -138,6 +147,8 @@ type RosterTemplateCreateRequest struct {
 type RosterTemplateFilterParams struct {
 	OrganID *uint `form:"organId"`
 } // @name RosterTemplateFilterParams
+
+// TODO updating roster templates does not yet work
 
 type RosterTemplateUpdateParams struct {
 	Name string `json:"name"`

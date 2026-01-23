@@ -30,7 +30,16 @@ func ConnectDB(name string) *gorm.DB {
 		db.Exec("PRAGMA foreign_keys = ON")
 	}
 
-	if err := db.AutoMigrate(&models.User{}, &models.Organ{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}, &models.RosterTemplate{}); err != nil {
+	if err := db.AutoMigrate(
+		&models.User{},
+		&models.Organ{},
+		&models.Roster{},
+		&models.RosterShift{},
+		&models.RosterAnswer{},
+		&models.SavedShift{},
+		&models.RosterTemplate{},
+		&models.RosterTemplateShift{},
+	); err != nil {
 		panic(err)
 	}
 
