@@ -187,7 +187,10 @@ func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]models.Organ, 
 		return nil, fmt.Errorf("resource_access not found or wrong type")
 	}
 
-	OICDName, ok := resourceAccess["grooster-test"].(map[string]interface{})
+	envType := os.Getenv("RESOURCE_ENV_TYPE")
+	key := fmt.Sprintf("grooster-%s", envType)
+
+	OICDName, ok := resourceAccess[key].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("grooster-test not found or wrong type")
 	}
@@ -199,17 +202,23 @@ func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]models.Organ, 
 
 	var organs []models.Organ
 
+	separator := envType + " "
+
 	for _, role := range roles {
 		if roleStr, ok := role.(string); ok {
-			if strings.HasPrefix(roleStr, "PRIV") {
-				var organString = strings.TrimPrefix(roleStr, "PRIV - ")
+			if strings.Contains(roleStr, separator) {
 
-				organ := models.Organ{
-					Name: organString,
+				parts := strings.SplitN(roleStr, separator, 2)
+
+				if len(parts) > 1 && parts[1] != "" {
+					organString := parts[1]
+
+					organ := models.Organ{
+						Name: organString,
+					}
+					s.db.FirstOrCreate(&organ, models.Organ{Name: organString})
+					organs = append(organs, organ)
 				}
-				s.db.FirstOrCreate(&organ, models.Organ{Name: organString})
-
-				organs = append(organs, organ)
 			}
 		}
 	}
