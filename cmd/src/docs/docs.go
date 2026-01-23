@@ -1207,6 +1207,9 @@ const docTemplate = `{
                 "saved": {
                     "type": "boolean"
                 },
+                "templateId": {
+                    "type": "integer"
+                },
                 "updatedAt": {
                     "type": "string"
                 },
@@ -1347,7 +1350,7 @@ const docTemplate = `{
                 "shifts": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/RosterTemplateShift"
                     }
                 },
                 "updatedAt": {
@@ -1369,6 +1372,29 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "RosterTemplateShift": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "shiftName": {
+                    "type": "string"
+                },
+                "templateId": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
                 }
             }
         },
@@ -1546,7 +1572,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "GRooster",
-	Description:      "A GEWIS Rooster maker",
+	Description:      "A GEWIS Rooster maker for fun",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

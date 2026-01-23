@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * GRooster
- * A GEWIS Rooster maker
+ * A GEWIS Rooster maker for fun
  *
  * The version of the OpenAPI document: 0.1
  * 
