@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { RosterCreateRequest } from '@gewis/grooster-backend-ts';
 import { useRoute } from 'vue-router';
 import ApiService from '@/services/ApiService';
@@ -18,6 +18,15 @@ const props = withDefaults(
 );
 const emit = defineEmits(['close']);
 
+const rosterName = ref(props.name);
+
+watch(
+  () => props.name,
+  (newVal) => {
+    rosterName.value = newVal;
+  },
+);
+
 const visible = computed({
   get: () => props.open,
   set: () => {
@@ -29,7 +38,7 @@ const date = ref(new Date());
 
 const addRoster = async () => {
   const createParams: RosterCreateRequest = {
-    name: props.name,
+    name: rosterName.value,
     date: date.value.toISOString(),
     organId: parseInt(route.params.id as string),
     shifts: props.shifts,
@@ -44,14 +53,23 @@ const addRoster = async () => {
   <Dialog v-model:visible="visible" modal :style="{ width: '25rem' }" @hide="emit('close')">
     <template #header>
       <div class="w-full text-center">
-        <span class="font- text-lg">Add Roster</span>
+        <span class="font-bold text-lg">Add Roster</span>
       </div>
     </template>
-    <div class="flex row gap-3">
-      <label class="font-semibold">Roster Date</label>
-      <DatePicker v-model="date" :min-date="new Date()" />
+
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
+        <label class="font-semibold" for="rosterName">Roster Name</label>
+        <InputText id="rosterName" v-model="rosterName" class="w-full" />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="font-semibold">Roster Date</label>
+        <DatePicker v-model="date" class="w-full" :min-date="new Date()" />
+      </div>
     </div>
-    <div class="flex justify-center gap-3 pt-4">
+
+    <div class="flex justify-center gap-3 pt-6">
       <Button class="px-6" label="Cancel" severity="secondary" @click="emit('close')" />
       <Button class="px-6" label="Add" @click="addRoster()" />
     </div>

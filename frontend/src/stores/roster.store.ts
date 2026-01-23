@@ -146,10 +146,10 @@ export const useRosterStore = defineStore('roster', {
         const res = await ApiService.savedShiftApi.getSavedRoster(id);
         this.savedRoster = {
           ...this.savedRoster,
-          [id]: res.data
+          [id]: res.data,
         };
       } catch (error) {
-        console.error("Fetch failed", error);
+        console.error('Fetch failed', error);
       }
     },
     async updateSavedShift(shiftId: number, params: SavedShiftUpdateRequest) {
