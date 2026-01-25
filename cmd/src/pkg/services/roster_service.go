@@ -44,7 +44,7 @@ func NewRosterService(db *gorm.DB) *RosterService {
 
 func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*models.Roster, error) {
 	var users []models.User
-	var values = models.Values{"Ja", "X", "L", "Nee"} //TODO Change this to input values
+	var values = models.Values{"J", "X", "L", "N"} //TODO Change this to input values
 
 	if err := s.db.Find(&users).Error; err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 	if err := s.db.Find(&models.Organ{}, params.OrganID).Error; err != nil {
 		return nil, err
 	}
-	if !isAfterToday(params.Date) {
+	if !isTodayOrLater(params.Date) {
 		return nil, errors.New("date must be after the current date")
 	}
 	if params.Name == "" {
@@ -125,7 +125,7 @@ func (s *RosterService) UpdateRoster(id uint, params *models.RosterUpdateRequest
 		return nil, err
 	}
 
-	if params.Date != nil && !isAfterToday(*params.Date) {
+	if params.Date != nil && !isTodayOrLater(*params.Date) {
 		return nil, errors.New("date must be after the current date")
 	}
 
@@ -134,6 +134,9 @@ func (s *RosterService) UpdateRoster(id uint, params *models.RosterUpdateRequest
 	}
 	if params.Name != nil {
 		roster.Name = *params.Name
+	}
+	if params.Saved != nil {
+		roster.Saved = *params.Saved
 	}
 
 	if err := s.db.Save(&roster).Error; err != nil {
@@ -423,9 +426,11 @@ func (s *RosterService) getSavedShiftOrdering(savedShifts []*models.SavedShift) 
 	return orderings, nil
 }
 
-func isAfterToday(date time.Time) bool {
-	today := time.Now().Truncate(24 * time.Hour)
-	inputDate := date.Truncate(24 * time.Hour)
+func isTodayOrLater(date time.Time) bool {
+	now := time.Now().In(date.Location())
 
-	return inputDate.After(today)
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, date.Location())
+	inputDate := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+
+	return !inputDate.Before(today)
 }

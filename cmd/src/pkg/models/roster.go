@@ -98,6 +98,8 @@ type RosterUpdateRequest struct {
 	Name *string `json:"name"`
 
 	Date *time.Time `json:"date"`
+
+	Saved *bool `json:"saved"`
 } // @name RosterUpdateRequest
 
 type RosterShiftCreateRequest struct {
