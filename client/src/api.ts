@@ -335,6 +335,12 @@ export interface RosterShift {
      * @type {number}
      * @memberof RosterShift
      */
+    'order'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterShift
+     */
     'rosterId'?: number;
     /**
      * 
@@ -361,6 +367,19 @@ export interface RosterShiftCreateRequest {
      * @memberof RosterShiftCreateRequest
      */
     'rosterId'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface RosterShiftUpdateRequest
+ */
+export interface RosterShiftUpdateRequest {
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterShiftUpdateRequest
+     */
+    'ordering'?: number;
 }
 /**
  * 
@@ -1960,6 +1979,49 @@ export const RosterShiftApiAxiosParamCreator = function (configuration?: Configu
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Update a roster shift
+         * @param {number} id Roster Shift ID
+         * @param {RosterShiftUpdateRequest} updateParams Update input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRosterShift: async (id: number, updateParams: RosterShiftUpdateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateRosterShift', 'id', id)
+            // verify required parameter 'updateParams' is not null or undefined
+            assertParamExists('updateRosterShift', 'updateParams', updateParams)
+            const localVarPath = `/roster/shift/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1996,6 +2058,20 @@ export const RosterShiftApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['RosterShiftApi.deleteRosterShift']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @summary Update a roster shift
+         * @param {number} id Roster Shift ID
+         * @param {RosterShiftUpdateRequest} updateParams Update input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateRosterShift(id: number, updateParams: RosterShiftUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterShift>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateRosterShift(id, updateParams, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterShiftApi.updateRosterShift']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -2025,6 +2101,17 @@ export const RosterShiftApiFactory = function (configuration?: Configuration, ba
          */
         deleteRosterShift(id: number, options?: RawAxiosRequestConfig): AxiosPromise<string> {
             return localVarFp.deleteRosterShift(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update a roster shift
+         * @param {number} id Roster Shift ID
+         * @param {RosterShiftUpdateRequest} updateParams Update input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRosterShift(id: number, updateParams: RosterShiftUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterShift> {
+            return localVarFp.updateRosterShift(id, updateParams, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2058,6 +2145,19 @@ export class RosterShiftApi extends BaseAPI {
      */
     public deleteRosterShift(id: number, options?: RawAxiosRequestConfig) {
         return RosterShiftApiFp(this.configuration).deleteRosterShift(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update a roster shift
+     * @param {number} id Roster Shift ID
+     * @param {RosterShiftUpdateRequest} updateParams Update input
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterShiftApi
+     */
+    public updateRosterShift(id: number, updateParams: RosterShiftUpdateRequest, options?: RawAxiosRequestConfig) {
+        return RosterShiftApiFp(this.configuration).updateRosterShift(id, updateParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

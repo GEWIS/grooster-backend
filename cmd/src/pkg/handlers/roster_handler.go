@@ -27,6 +27,7 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 	g.DELETE("/:id", h.DeleteRoster)
 
 	g.POST("/shift", h.CreateRosterShift)
+	g.PATCH("/shift", h.UpdateRosterShift)
 	g.DELETE("/shift/:id", h.DeleteRosterShift)
 	g.POST("/answer", h.CreateRosterAnswer)
 	g.PATCH("/answer/:id", h.UpdateRosterAnswer)
@@ -231,6 +232,48 @@ func (h *RosterHandler) CreateRosterShift(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, createdRosterShift)
+}
+
+// UpdateRosterShift
+//
+//		@Summary   Update a roster shift
+//		@Security  BearerAuth
+//		@Tags      Roster Shift
+//		@Accept    json
+//		@Produce   json
+//		@Param     id             path      int                               true   "Roster Shift ID"
+//		@Param     updateParams   body      models.RosterShiftUpdateRequest    true   "Update input"
+//		@Success   200            {object}  models.RosterShift
+//		@Failure   400            {string}  string
+//	 	@Failure 404 {string} string
+//		@ID        updateRosterShift
+//		@Router    /roster/shift/{id} [patch]
+func (h *RosterHandler) UpdateRosterShift(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid shift ID"})
+		return
+	}
+
+	var param models.RosterShiftUpdateRequest
+	if err := c.ShouldBindJSON(&param); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	updatedShift, err := h.rosterService.UpdateRosterShift(uint(id), &param)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Roster shift not found"})
+			return
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedShift)
 }
 
 // DeleteRosterShift

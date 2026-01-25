@@ -34,6 +34,8 @@ type RosterShift struct {
 	Name string `json:"name"`
 
 	RosterID uint `json:"rosterId"`
+
+	Order int `json:"order" gorm:"default:-1"`
 } // @name RosterShift
 
 type RosterAnswer struct {
@@ -107,6 +109,10 @@ type RosterShiftCreateRequest struct {
 
 	RosterID uint `json:"rosterId"`
 } // @name RosterShiftCreateRequest
+
+type RosterShiftUpdateRequest struct {
+	Ordering *int `json:"ordering"`
+} // @name RosterShiftUpdateRequest
 
 type RosterAnswerCreateRequest struct {
 	UserID uint `json:"userId"`

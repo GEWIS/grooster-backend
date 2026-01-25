@@ -19,6 +19,7 @@ type RosterServiceInterface interface {
 	DeleteRoster(ID uint) error
 
 	CreateRosterShift(*models.RosterShiftCreateRequest) (*models.RosterShift, error)
+	UpdateRosterShift(uint, *models.RosterShiftUpdateRequest) (*models.RosterShift, error)
 	DeleteRosterShift(ID uint) error
 	CreateRosterAnswer(*models.RosterAnswerCreateRequest) (*models.RosterAnswer, error)
 	UpdateRosterAnswer(uint, *models.RosterAnswerUpdateRequest) (*models.RosterAnswer, error)
@@ -167,6 +168,26 @@ func (s *RosterService) CreateRosterShift(createParams *models.RosterShiftCreate
 	}
 
 	if err := s.db.Create(&rosterShift).Error; err != nil {
+		return nil, err
+	}
+
+	return &rosterShift, nil
+}
+
+func (s *RosterService) UpdateRosterShift(ID uint, updateParams *models.RosterShiftUpdateRequest) (*models.RosterShift, error) {
+	var rosterShift models.RosterShift
+
+	if err := s.db.First(&rosterShift, ID).Error; err != nil {
+		return nil, err
+	}
+
+	updates := make(map[string]interface{})
+
+	if updateParams.Ordering != nil {
+		updates["ordering"] = updateParams.Ordering
+	}
+
+	if err := s.db.Model(&rosterShift).Updates(updates).Error; err != nil {
 		return nil, err
 	}
 
