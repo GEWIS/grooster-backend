@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **deletedAt** | [**GormDeletedAt**](GormDeletedAt.md) |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
+**order** | **number** |  | [optional] [default to undefined]
 **rosterId** | **number** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
 
@@ -22,6 +23,7 @@ const instance: RosterShift = {
     deletedAt,
     id,
     name,
+    order,
     rosterId,
     updatedAt,
 };

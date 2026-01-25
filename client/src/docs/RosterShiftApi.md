@@ -6,6 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**createRosterShift**](#createrostershift) | **POST** /roster/shift | Create a new roster shift|
 |[**deleteRosterShift**](#deleterostershift) | **DELETE** /roster/shift/{id} | Deletes a roster shift|
+|[**updateRosterShift**](#updaterostershift) | **PATCH** /roster/shift/{id} | Update a roster shift|
 
 # **createRosterShift**
 > RosterShift createRosterShift(createParams)
@@ -107,6 +108,62 @@ const { status, data } = await apiInstance.deleteRosterShift(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**400** | Bad Request |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateRosterShift**
+> RosterShift updateRosterShift(updateParams)
+
+
+### Example
+
+```typescript
+import {
+    RosterShiftApi,
+    Configuration,
+    RosterShiftUpdateRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterShiftApi(configuration);
+
+let id: number; //Roster Shift ID (default to undefined)
+let updateParams: RosterShiftUpdateRequest; //Update input
+
+const { status, data } = await apiInstance.updateRosterShift(
+    id,
+    updateParams
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **updateParams** | **RosterShiftUpdateRequest**| Update input | |
+| **id** | [**number**] | Roster Shift ID | defaults to undefined|
+
+
+### Return type
+
+**RosterShift**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
