@@ -1420,6 +1420,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "saved": {
+                    "type": "boolean"
                 }
             }
         },

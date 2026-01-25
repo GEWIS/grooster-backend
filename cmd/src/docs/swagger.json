@@ -1412,6 +1412,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "saved": {
+                    "type": "boolean"
                 }
             }
         },

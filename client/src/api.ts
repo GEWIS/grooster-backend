@@ -516,6 +516,12 @@ export interface RosterUpdateRequest {
      * @memberof RosterUpdateRequest
      */
     'name'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RosterUpdateRequest
+     */
+    'saved'?: boolean;
 }
 /**
  * 
