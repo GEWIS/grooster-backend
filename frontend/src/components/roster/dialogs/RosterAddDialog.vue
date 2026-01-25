@@ -32,9 +32,15 @@ const formValues = ref<AddRosterForm>({
 });
 
 const addRoster = async () => {
+  const d = formValues.value.date;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const dateString = `${year}-${month}-${day}T00:00:00Z`;
+
   const createParams: RosterCreateRequest = {
     name: formValues.value.name,
-    date: formValues.value.date.toISOString(),
+    date: dateString,
     organId: parseInt(route.params.id as string),
   };
 
