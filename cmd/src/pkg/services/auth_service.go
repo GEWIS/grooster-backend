@@ -21,9 +21,10 @@ import (
 type AuthServiceInterface interface {
 	SetCallBackCookie(*gin.Context, string)
 	RandString(int) (string, error)
-	ProcessUserInfo(*oauth2.Token)
+	ProcessUserInfo(*oauth2.Token) (string, error)
 	GetOrgans(claims map[string]interface{}) ([]models.Organ, error)
 	HandleLocalAuthentication(ctx *gin.Context) (string, error)
+	CreateInternalToken(user *models.User) (string, error)
 }
 
 type AuthService struct {
@@ -61,49 +62,29 @@ func (s *AuthService) HandleLocalAuthentication(ctx *gin.Context) (string, error
 	var user models.User
 	if err := s.db.First(&user).Error; err != nil {
 		ctx.JSON(500, gin.H{"error": "No user in local database found, try to seed it first"})
-	}
-
-	// Try to collect some "organs" to simulate Keycloak roles
-	var organs []models.Organ
-	_ = s.db.Model(&user).Association("Organs").Find(&organs)
-
-	roles := make([]string, 0, len(organs))
-	for _, o := range organs {
-		roles = append(roles, "PRIV - "+o.Name)
+		return "", err
 	}
 
 	now := time.Now()
 	claims := jwt.MapClaims{
-		"iss":                "http://localhost/auth", // dev value
-		"sub":                fmt.Sprintf("%d", user.ID),
-		"aud":                "grooster-local",
-		"exp":                now.Add(8 * time.Hour).Unix(),
-		"iat":                now.Unix(),
-		"typ":                "Bearer",
-		"preferred_username": fmt.Sprintf("m%d", user.GEWISID),
-		"given_name":         user.Name,
-		"resource_access": map[string]interface{}{
-			"grooster-test": map[string]interface{}{
-				"roles": roles,
-			},
-		},
-		"user_id": user.ID, // explicit user id
+		"sub":  user.GEWISID,
+		"name": user.Name,
+		"iat":  now.Unix(),
+		"exp":  now.Add(7 * 24 * time.Hour).Unix(), // 7 days expiry
 	}
 
-	secret := os.Getenv("DEV_JWT_SECRET")
-	if secret == "" {
-		secret = "42-secret"
-	}
-
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(secret))
-	if err != nil {
+	secret := os.Getenv("JWT_SECRET")
+	if strings.TrimSpace(secret) == "" {
+		err := fmt.Errorf("JWT_SECRET environment variable is not set or is empty")
+		log.Error().Err(err).Msg("failed to create internal token due to missing JWT secret")
 		return "", err
 	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token, nil
+	return token.SignedString([]byte(secret))
 }
 
-func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
+func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error) {
 	token := OAuth2Token.AccessToken
 	infoString := strings.Split(token, ".")[1]
 
@@ -111,7 +92,7 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 	payloadBytes, err := base64.RawURLEncoding.DecodeString(infoString)
 	if err != nil {
 		log.Error().Msg(err.Error())
-		return
+		return "", err
 	}
 
 	// Unmarshal JSON into a map
@@ -119,7 +100,7 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 	err = json.Unmarshal(payloadBytes, &claims)
 	if err != nil {
 		log.Error().Msg(err.Error())
-		return
+		return "", err
 	}
 
 	// Extract the id
@@ -140,7 +121,7 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 
 	if err != nil {
 		log.Error().Msg("Failed to get users: " + err.Error())
-		return
+		return "", err
 	}
 
 	if len(users) > 0 {
@@ -153,7 +134,7 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 		organs, organErr := s.GetOrgans(claims)
 		if organErr != nil {
 			log.Error().Msg("Failed to get organs: " + organErr.Error())
-			return
+			return "", organErr
 		}
 
 		params := models.UserCreateRequest{
@@ -165,19 +146,28 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) {
 		user, err = s.u.Create(&params)
 		if err != nil {
 			log.Error().Msg(err.Error())
-			return
+			return "", err
 		}
 	} else {
 		organs, organErr := s.GetOrgans(claims)
 		if organErr != nil {
 			log.Error().Msg("Failed to get organs: " + organErr.Error())
-			return
+			return "", organErr
 		}
 
 		if err := s.db.Model(user).Association("Organs").Replace(organs); err != nil {
 			log.Error().Msg("Failed to update user organs: " + err.Error())
 		}
 	}
+
+	jwtToken, err := s.CreateInternalToken(user)
+
+	if err != nil {
+		log.Error().Msg(err.Error())
+		return "", err
+	}
+
+	return jwtToken, nil
 }
 
 func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]models.Organ, error) {
@@ -224,4 +214,23 @@ func (s *AuthService) GetOrgans(claims map[string]interface{}) ([]models.Organ, 
 	}
 
 	return organs, nil
+}
+
+func (s *AuthService) CreateInternalToken(user *models.User) (string, error) {
+	now := time.Now()
+	claims := jwt.MapClaims{
+		"sub":  user.GEWISID,
+		"name": user.Name,
+		"iat":  now.Unix(),
+		"exp":  now.Add(7 * 24 * time.Hour).Unix(), // 7 days expiry
+	}
+
+	secret := os.Getenv("JWT_SECRET")
+	if strings.TrimSpace(secret) == "" {
+		log.Error().Msg("JWT_SECRET environment variable is not set or empty")
+		return "", fmt.Errorf("JWT_SECRET environment variable is not set or empty")
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(secret))
 }

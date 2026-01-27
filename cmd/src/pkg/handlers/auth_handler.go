@@ -93,8 +93,13 @@ func (h *AuthHandler) AuthCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not exchange token"})
 	}
 
-	h.service.ProcessUserInfo(oauth2Token)
+	jwtToken, err := h.service.ProcessUserInfo(oauth2Token)
 
-	redirectUrl := fmt.Sprintf(os.Getenv("FRONTEND_CALLBACK"), oauth2Token.AccessToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not process user info"})
+		return
+	}
+
+	redirectUrl := fmt.Sprintf(os.Getenv("FRONTEND_CALLBACK"), jwtToken)
 	c.Redirect(http.StatusTemporaryRedirect, redirectUrl)
 }
