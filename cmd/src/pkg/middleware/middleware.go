@@ -3,11 +3,10 @@ package middleware
 import (
 	"GEWIS-Rooster/cmd/src/pkg/services"
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"net/http"
@@ -50,68 +49,42 @@ func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Authorization header required",
-			})
-			c.Abort()
+			c.AbortWithStatusJSON(401, gin.H{"error": "Missing Authorization header"})
 			return
 		}
 
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == authHeader {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Invalid authorization header format",
-			})
-			c.Abort()
+		const bearerPrefix = "Bearer "
+		if !strings.HasPrefix(authHeader, bearerPrefix) {
+			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid Authorization header format"})
 			return
 		}
 
-		if verifier == nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "OIDC verifier not initialized",
-			})
-			c.Abort()
+		tokenString := strings.TrimSpace(authHeader[len(bearerPrefix):])
+		if tokenString == "" {
+			c.AbortWithStatusJSON(401, gin.H{"error": "Empty bearer token"})
 			return
 		}
 
-		ctx := context.Background()
-		_, err := verifier.Verify(ctx, tokenString)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": fmt.Sprintf("Invalid token: %v", err),
-			})
-			c.Abort()
+		secret := os.Getenv("JWT_SECRET")
+		if strings.TrimSpace(secret) == "" {
+			log.Error().Msg("INTERNAL_JWT_SECRET is not set or empty")
+			c.AbortWithStatusJSON(500, gin.H{"error": "Internal server error"})
 			return
 		}
 
-		parts := strings.Split(tokenString, ".")
-		if len(parts) != 3 {
-			log.Error().Msg("invalid token format")
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Ensure the token's signing method is HS256
+			if token.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return []byte(secret), nil
+		})
+
+		if err != nil || !token.Valid {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
 
-		// parts[1] is the payload
-		payloadBytes, err := base64.RawURLEncoding.DecodeString(parts[1])
-		if err != nil {
-			log.Error().Msg(err.Error())
-			return
-		}
-
-		// Unmarshal JSON into a map
-		var claims map[string]interface{}
-		err = json.Unmarshal(payloadBytes, &claims)
-		if err != nil {
-			log.Error().Msg(err.Error())
-			return
-		}
-
-		organs, err := a.authService.GetOrgans(claims)
-		if err != nil {
-			log.Error().Msg(err.Error())
-			return
-		}
-
-		c.Set("organs", organs)
 		c.Next()
 	}
 }
