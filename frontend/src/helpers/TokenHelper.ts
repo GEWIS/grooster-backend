@@ -53,16 +53,28 @@ export function loginRedirect() {
   window.location.href = window.location.origin + '/api/v1/auth/redirect';
 }
 
+interface CustomJwtPayload extends Omit<JwtPayload, 'sub'> {
+  preferred_username?: string;
+  name?: string;
+  sub?: number | string;
+}
+
 export function getGEWISId(): number {
   const rawToken = localStorage.getItem('access_token');
-  const decoded = jwtDecode<JwtPayload & { preferred_username?: string }>(rawToken);
+  if (!rawToken) return;
+
+  const decoded = jwtDecode<CustomJwtPayload>(rawToken);
 
   let userId: number | undefined = undefined;
+
   if (decoded.preferred_username) {
+    // @deprecated 2026-05-31 As this will then become old
     const match = decoded.preferred_username.match(/m(\d+)/);
     if (match) {
       userId = parseInt(match[1], 10);
     }
+  } else if (decoded.sub) {
+    userId = typeof decoded.sub === 'number' ? decoded.sub : parseInt(decoded.sub, 10);
   }
 
   return userId;
