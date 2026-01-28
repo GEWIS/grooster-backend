@@ -52,9 +52,9 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 func rosterShift(db *gorm.DB, roster []*models.Roster) {
 	for _, roster := range roster {
 		shifts := []models.RosterShift{
-			{Name: "Shift A", RosterID: roster.ID},
-			{Name: "Shift B", RosterID: roster.ID},
-			{Name: "Shift C", RosterID: roster.ID},
+			{Name: "Shift A", RosterID: roster.ID, Order: 0},
+			{Name: "Shift B", RosterID: roster.ID, Order: 1},
+			{Name: "Shift C", RosterID: roster.ID, Order: 2},
 		}
 
 		if err := db.Create(&shifts).Error; err != nil {
