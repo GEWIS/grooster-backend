@@ -1,4 +1,4 @@
-package mainTest
+package main
 
 import (
 	"GEWIS-Rooster/cmd/seeder/seeder"
@@ -26,7 +26,7 @@ func main() {
 		}
 	}(sqlDB)
 
-	err = db.AutoMigrate(&models.User{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}, &models.Organ{}, &models.RosterTemplate{})
+	err = db.AutoMigrate(&models.User{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}, &models.Organ{}, &models.RosterTemplate{}, &models.RosterTemplateShift{})
 	if err != nil {
 		return
 	}
