@@ -183,8 +183,8 @@ func (s *RosterService) UpdateRosterShift(ID uint, updateParams *models.RosterSh
 
 	updates := make(map[string]interface{})
 
-	if updateParams.Ordering != nil {
-		updates["ordering"] = updateParams.Ordering
+	if updateParams.Order != nil {
+		updates["order"] = updateParams.Order
 	}
 
 	if err := s.db.Model(&rosterShift).Updates(updates).Error; err != nil {
@@ -350,7 +350,7 @@ func (s *RosterService) CreateRosterTemplate(params *models.RosterTemplateCreate
 
 func (s *RosterService) GetRosterTemplate(ID uint) (*models.RosterTemplate, error) {
 	var template models.RosterTemplate
-	if err := s.db.First(&template, ID).Error; err != nil {
+	if err := s.db.Preload("Shifts").First(&template, ID).Error; err != nil {
 		return nil, err
 	}
 
@@ -359,7 +359,7 @@ func (s *RosterService) GetRosterTemplate(ID uint) (*models.RosterTemplate, erro
 
 func (s *RosterService) GetRosterTemplates(params *models.RosterTemplateFilterParams) ([]*models.RosterTemplate, error) {
 	var templates []*models.RosterTemplate
-	db := s.db.Model(&models.RosterTemplate{})
+	db := s.db.Model(&models.RosterTemplate{}).Preload("Shifts")
 
 	if params != nil {
 		if params.OrganID != nil {

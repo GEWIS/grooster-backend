@@ -111,7 +111,7 @@ type RosterShiftCreateRequest struct {
 } // @name RosterShiftCreateRequest
 
 type RosterShiftUpdateRequest struct {
-	Ordering *int `json:"ordering"`
+	Order *int `json:"order"`
 } // @name RosterShiftUpdateRequest
 
 type RosterAnswerCreateRequest struct {
