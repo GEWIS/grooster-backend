@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { RosterTemplate } from '@gewis/grooster-backend-ts';
+import { RosterTemplate, RosterTemplateCreateRequest } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 
 export const useTemplateStore = defineStore('rosterTemplate', {
@@ -29,7 +29,7 @@ export const useTemplateStore = defineStore('rosterTemplate', {
         console.error('Failed to fetch templates', error);
       }
     },
-    async createTemplate(params: RosterTemplate) {
+    async createTemplate(params: RosterTemplateCreateRequest) {
       try {
         const response = await ApiService.roster.createRosterTemplate(params);
         const template = response.data as RosterTemplate;

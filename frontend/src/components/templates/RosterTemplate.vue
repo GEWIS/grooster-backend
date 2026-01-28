@@ -34,8 +34,8 @@ const showDetail = ref<boolean>(false);
         <!-- Detail section of card -->
         <div v-if="showDetail">
           <ul>
-            <li v-for="shift in props.template.shifts" :key="shift" class="flex justify-between items-center">
-              <span>{{ shift }}</span>
+            <li v-for="shift in props.template.shifts" :key="shift.id" class="flex justify-between items-center">
+              <span>{{ shift.shiftName }}</span>
             </li>
           </ul>
         </div>
@@ -47,7 +47,7 @@ const showDetail = ref<boolean>(false);
   <RosterTemplateUseDialog
     :name="props.template.name"
     :open="openRosterDialog"
-    :shifts="props.template.shifts"
+    :shifts="props.template.shifts.map((s) => s.shiftName)"
     @close="openRosterDialog = false"
   />
   <!--    <RosterTemplateEdit :open="openEditDialog" :template="props.template" @close="openEditDialog=false"/>-->
