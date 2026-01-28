@@ -128,46 +128,65 @@ async function saveRoster() {
     console.error(error);
   }
 }
+
+async function unSaveRoster() {
+  await rosterStore.updateRoster(props.id, { saved: false });
+}
 </script>
 
 <template>
-  <div v-if="roster && Object.keys(shiftAnswers).length" class="flex flex-row gap-2 w-full">
-    <div class="max-w-5xl overflow-x-auto">
-      <table class="table-auto w-full min-w-full text-xs">
+  <div
+    v-if="roster && Object.keys(shiftAnswers).length"
+    class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+  >
+    <div class="overflow-x-auto custom-scrollbar">
+      <table class="w-full border-collapse">
         <thead>
-          <tr>
-            <th class="user-column text-xs px-1 py-0.5">Users</th>
+          <tr class="bg-gray-50 border-b border-gray-200">
+            <th
+              class="sticky left-0 z-10 bg-gray-50 text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 min-w-[150px]"
+            >
+              Users
+            </th>
+
             <template v-if="roster.rosterShift">
-              <th v-for="shift in roster.rosterShift" :key="shift.id" class="shift-column text-xs px-1 py-0.5">
-                <div class="flex flex-row items-center justify-center gap-1">
-                  <span class="text-xs font-semibold leading-none">{{ shift.name }}</span>
-                  <div v-if="!roster.saved" class="flex items-center">
-                    <Button class="!p-0 !w-4 !h-4 flex items-center justify-center" @click="removeShift(shift.id)">
-                      <i class="pi pi-times text-[10px]"></i>
-                    </Button>
-                  </div>
+              <th
+                v-for="shift in roster.rosterShift"
+                :key="shift.id"
+                class="px-3 py-3 text-center min-w-[120px] border-l border-gray-100"
+              >
+                <div class="flex flex-col items-center gap-1.5">
+                  <span class="text-sm font-semibold text-gray-700 leading-tight">{{ shift.name }}</span>
+
+                  <Button
+                    v-if="!roster.saved"
+                    class="!p-0 !w-6 !h-6"
+                    icon="pi pi-trash"
+                    rounded
+                    severity="danger"
+                    text
+                    @click="removeShift(shift.id)"
+                  />
                 </div>
               </th>
             </template>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td class="user-cell text-xs px-1 py-0.5">
+
+        <tbody class="divide-y divide-gray-100">
+          <tr v-for="user in users" :key="user.id" class="hover:bg-blue-50/30 transition-colors">
+            <td class="sticky left-0 z-10 bg-white px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-50">
               {{ user.name }}
             </td>
+
             <template v-if="roster.rosterShift">
-              <td
-                v-for="shift in roster.rosterShift"
-                :key="user.id + '-' + shift.id"
-                class="p-0 w-[50px] h-[26px] border border-gray-100"
-              >
+              <td v-for="shift in roster.rosterShift" :key="user.id + '-' + shift.id" class="p-1">
                 <Select
                   v-model="shiftAnswers[user.id][shift.id].value"
-                  class="w-full text-[10px] scale-65"
+                  class="w-full !text-xs !border-transparent hover:!border-gray-300 focus:!ring-1 focus:!ring-primary transition-all shadow-none"
                   :disabled="roster.saved || user.gewis_id != getGEWISId()"
                   :options="rosterValues"
-                  placeholder="Answer"
+                  placeholder="Select..."
                   @update:model-value="(value) => onAnswerChange(user.id, shift.id, value)"
                 />
               </td>
@@ -176,66 +195,72 @@ async function saveRoster() {
         </tbody>
       </table>
     </div>
-    <div class="flex flex-col gap-2 justify-center">
+
+    <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between">
       <Button
-        class="text-xs sm:text-sm lg:text-base px-2 sm:px-4 py-1 sm:py-2"
         :disabled="roster.saved"
-        label="Add Shift"
+        icon="pi pi-plus"
+        label="Add New Shift"
+        severity="secondary"
+        size="small"
+        text
         @click="visible = true"
-      >
-        Add Shift
-      </Button>
-      <Button
-        class="text-xs sm:text-sm lg:text-base px-2 sm:px-4 py-1 sm:py-2"
-        :disabled="roster.saved"
-        label="Save Roster"
-        @click="saveRoster"
-      >
-        Save Roster
-      </Button>
+      />
+
+      <div class="flex gap-2">
+        <Button
+          v-if="roster.saved"
+          icon="pi pi-lock-open"
+          label="Unlock Roster"
+          outlined
+          severity="warning"
+          size="small"
+          @click="unSaveRoster"
+        />
+
+        <Button v-else icon="pi pi-save" label="Save Roster" severity="success" size="small" @click="saveRoster" />
+      </div>
     </div>
-    <Dialog v-model:visible="visible" class="p-4" :style="{ width: '25rem' }">
-      <template #header>
-        <div class="w-full text-center">
-          <span class="font- text-lg">Add Shift</span>
-        </div>
-      </template>
-      <div class="flex flex-col gap-4 p-4">
-        <div class="flex row gap-3">
-          <label class="font-semibold">Shift Name</label>
-          <InputText v-model="shiftName" autocomplete="off" class="w-full" type="text" />
-        </div>
-        <div class="flex justify-center gap-3 pt-4">
-          <Button class="px-6" label="Cancel" severity="secondary" @click="visible = false" />
-          <Button class="px-6" label="Add" @click="addShift(shiftName)" />
+
+    <Dialog v-model:visible="visible" class="p-fluid" header="Add New Shift" modal :style="{ width: '24rem' }">
+      <div class="flex flex-col gap-4 py-2">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700" for="shiftName">Shift Name</label>
+          <InputText id="shiftName" v-model="shiftName" autofocus placeholder="e.g. Evening Standby" />
         </div>
       </div>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <Button label="Cancel" severity="secondary" text @click="visible = false" />
+          <Button icon="pi pi-check" label="Add Shift" @click="addShift(shiftName)" />
+        </div>
+      </template>
     </Dialog>
   </div>
 </template>
 
 <style scoped>
-th,
-td {
-  border: 1px solid #ddd;
-  text-align: center;
+/* Optional: Make the horizontal scrollbar look a bit cleaner */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-thead {
-  background-color: #f2f2f2;
+/* Ensure Select components don't look too bulky in the table */
+:deep(.p-select) {
+  background: transparent;
 }
-
-.shift-column {
-  min-width: 120px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.user-cell {
-  font-weight: 500;
-}
-
-.shift-cell {
-  text-align: center;
+:deep(.p-select-label) {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
 }
 </style>

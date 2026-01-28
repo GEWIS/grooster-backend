@@ -7,6 +7,7 @@ import type {
   Roster,
   RosterAnswerCreateRequest,
   SavedShiftResponse,
+  RosterUpdateRequest,
 } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 
@@ -44,6 +45,25 @@ export const useRosterStore = defineStore('roster', {
           this.rosters[roster.id] = roster;
         }
       });
+    },
+    async updateRoster(id: number, params: RosterUpdateRequest) {
+      try {
+        await ApiService.roster.updateRoster(id, params);
+        const currentRoster = this.rosters[id];
+
+        // TODO Make sure backend also returns preloaded relations
+        if (currentRoster) {
+          this.rosters = {
+            ...this.rosters,
+            [id]: {
+              ...currentRoster,
+              ...params,
+            },
+          };
+        }
+      } catch (error) {
+        console.error('Failed to update an roster:', error);
+      }
     },
     async createAnswer(params: RosterAnswerCreateRequest) {
       try {
