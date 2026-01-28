@@ -1391,7 +1391,7 @@ const docTemplate = `{
         "RosterShiftUpdateRequest": {
             "type": "object",
             "properties": {
-                "ordering": {
+                "order": {
                     "type": "integer"
                 }
             }

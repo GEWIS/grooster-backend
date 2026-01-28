@@ -379,7 +379,7 @@ export interface RosterShiftUpdateRequest {
      * @type {number}
      * @memberof RosterShiftUpdateRequest
      */
-    'ordering'?: number;
+    'order'?: number;
 }
 /**
  * 

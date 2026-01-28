@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ordering** | **number** |  | [optional] [default to undefined]
+**order** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 import { RosterShiftUpdateRequest } from './api';
 
 const instance: RosterShiftUpdateRequest = {
-    ordering,
+    order,
 };
 ```
 
