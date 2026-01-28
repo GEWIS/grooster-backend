@@ -95,43 +95,56 @@ const availableUsersForShift = (shift: SavedShift) => {
 </script>
 
 <template>
-  <div v-if="savedRoster && savedRoster.length > 0">
+  <div v-if="savedRoster && savedRoster.length > 0" class="space-y-6 max-w-6xl mx-auto p-4">
+    <div class="border-b border-slate-200 pb-4">
+      <h2 class="text-xl font-bold text-slate-800">Shift Assignments</h2>
+      <p class="text-sm text-slate-500">Assign and manage team members for each active shift.</p>
+    </div>
+
     <div class="grid grid-cols-1 gap-4">
-      <div v-for="shift in savedRoster" :key="shift.id">
-        <div class="flex gap-4">
-          <strong>{{ shift.rosterShift.name }}</strong>
-          <!-- Render select for each selected user -->
-          <div
-            v-for="(user, index) in shiftAssignedUsers[shift.id]"
-            :key="user.id + '-' + shift.id"
-            class="flex items-center gap-2"
-          >
-            <Select
-              v-model="user.id"
-              class="w-40"
-              :disabled="true"
-              option-label="name"
-              option-value="id"
-              :options="savedRosterOrdering.find((o) => o.shiftName === shift.rosterShift.name)?.users ?? []"
-            />
-            <Button
-              :aria-label="'Remove ' + user.name"
-              class="p-button-rounded p-button-text p-button-danger"
-              icon="pi pi-times"
-              @click="removeUserFromShift(shift.id, index)"
-            />
+      <div
+        v-for="shift in savedRoster"
+        :key="shift.id"
+        class="bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-5"
+      >
+        <div class="flex flex-col md:flex-row md:items-center gap-6">
+          <div class="min-w-[160px]">
+            <span
+              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100"
+            >
+              {{ shift.rosterShift.name }}
+            </span>
           </div>
 
-          <Select
-            :key="'select-' + shift.id"
-            v-model="selectedIds[shift.id]"
-            class="w-40"
-            option-label="name"
-            option-value="id"
-            :options="availableUsersForShift(shift)"
-            placeholder="Add a user"
-            @change="(userId) => addUser(userId.value, shift.id)"
-          />
+          <div class="flex flex-wrap items-center gap-3 flex-grow">
+            <div
+              v-for="(user, index) in shiftAssignedUsers[shift.id]"
+              :key="user.id + '-' + shift.id"
+              class="group flex items-center bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-1 py-1 transition-colors hover:bg-slate-100"
+            >
+              <span class="text-sm font-medium text-slate-700">{{ user.name }}</span>
+              <Button
+                class="!p-0 !w-7 !h-7 !text-slate-400 group-hover:!text-red-500"
+                icon="pi pi-times"
+                rounded
+                text
+                @click="removeUserFromShift(shift.id, index)"
+              />
+            </div>
+
+            <div class="relative min-w-[180px]">
+              <Select
+                :key="'select-' + shift.id"
+                v-model="selectedIds[shift.id]"
+                class="!w-full !rounded-lg !border-dashed !border-slate-300 !bg-transparent hover:!border-indigo-400 transition-all !text-sm"
+                option-label="name"
+                option-value="id"
+                :options="availableUsersForShift(shift)"
+                placeholder="+ Add Team Member"
+                @change="(userId) => addUser(userId.value, shift.id)"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
