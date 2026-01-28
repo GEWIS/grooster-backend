@@ -256,8 +256,16 @@ func (s *RosterService) SaveRoster(ID uint) error {
 	}
 
 	for _, shift := range roster.RosterShift {
-		if err := s.createSavedShift(roster.ID, &shift); err != nil {
-			return err
+		var existing models.SavedShift
+		err := s.db.Where("roster_id = ? AND roster_shift_id = ?", roster.ID, shift.ID).First(&existing).Error
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				if err := s.createSavedShift(roster.ID, &shift); err != nil {
+					return err
+				}
+			} else {
+				return err
+			}
 		}
 	}
 
