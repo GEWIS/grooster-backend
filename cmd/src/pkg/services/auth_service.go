@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -103,11 +104,23 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error)
 		return "", err
 	}
 
+	log.Debug().
+		Interface("preferred_username", claims["preferred_username"]).
+		Interface("given_name", claims["given_name"]).
+		Msg("Processing user claims")
+
 	// Extract the id
-	idStr := strings.Split(claims["preferred_username"].(string), "m")[1]
+	idParts := strings.Split(claims["preferred_username"].(string), "m")
+	if len(idParts) < 2 {
+		log.Error().Msg("Failed to parse preferred_username: missing 'm' prefix")
+		return "", errors.New("invalid username format")
+	}
+
+	idStr := idParts[1]
 	idInt, err := strconv.Atoi(idStr)
 	if err != nil {
-		log.Error().Msg(err.Error())
+		log.Error().Err(err).Str("idStr", idStr).Msg("Failed to convert ID to int")
+		return "", err // Added return to prevent nil pointer later
 	}
 	username := claims["given_name"].(string)
 
@@ -116,24 +129,28 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error)
 		ID: &id,
 	}
 
+	// 2. Log the search attempt
+	log.Info().Uint("search_id", id).Msg("Searching for existing user")
+
 	users, err := s.u.GetUsers(filters)
 	var user *models.User
 
 	if err != nil {
-		log.Error().Msg("Failed to get users: " + err.Error())
+		log.Error().Err(err).Uint("id", id).Msg("Database error during GetUsers")
 		return "", err
 	}
 
 	if len(users) > 0 {
 		user = users[0]
+		log.Info().Uint("user_id", user.ID).Str("name", user.Name).Msg("Existing user found")
 	}
 
 	if user == nil {
-		id := uint(idInt)
+		log.Info().Uint("gewis_id", id).Msg("User not found, attempting to create new record")
 
 		organs, organErr := s.GetOrgans(claims)
 		if organErr != nil {
-			log.Error().Msg("Failed to get organs: " + organErr.Error())
+			log.Error().Err(organErr).Msg("Failed to get organs for new user")
 			return "", organErr
 		}
 
@@ -143,11 +160,15 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error)
 			Organs:  organs,
 		}
 
+		// 3. Log the creation parameters to see exactly what is being sent to GORM
+		log.Debug().Interface("create_params", params).Msg("Sending Create request to user service")
+
 		user, err = s.u.Create(&params)
 		if err != nil {
-			log.Error().Msg(err.Error())
+			log.Error().Err(err).Uint("attempted_id", id).Msg("User creation failed")
 			return "", err
 		}
+		log.Info().Uint("new_user_id", user.ID).Msg("Successfully created new user")
 	} else {
 		organs, organErr := s.GetOrgans(claims)
 		if organErr != nil {
