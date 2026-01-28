@@ -91,6 +91,7 @@ func (h *AuthHandler) AuthCallback(c *gin.Context) {
 	oauth2Token, err := h.config.Exchange(c.Request.Context(), c.Query("code"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not exchange token"})
+		return
 	}
 
 	jwtToken, err := h.service.ProcessUserInfo(oauth2Token)
