@@ -126,7 +126,7 @@ definitions:
     type: object
   RosterShiftUpdateRequest:
     properties:
-      ordering:
+      order:
         type: integer
     type: object
   RosterTemplate:
