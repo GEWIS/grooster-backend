@@ -132,6 +132,29 @@ async function saveRoster() {
 async function unSaveRoster() {
   await rosterStore.updateRoster(props.id, { saved: false });
 }
+
+async function moveShift(shiftId: number, direction: 'left' | 'right') {
+  if (!roster.value?.rosterShift) return;
+
+  const sortedShifts = [...roster.value.rosterShift].sort((a, b) => a.order - b.order);
+
+  const currentIndex = sortedShifts.findIndex((s) => s.id === shiftId);
+  const targetIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= sortedShifts.length) return;
+
+  const currentShift = sortedShifts[currentIndex];
+  const targetShift = sortedShifts[targetIndex];
+
+  try {
+    await Promise.all([
+      rosterStore.updateShift(currentShift.id, { order: targetShift.order }),
+      rosterStore.updateShift(targetShift.id, { order: currentShift.order }),
+    ]);
+  } catch (error) {
+    console.error('Failed to reorder shifts:', error);
+  }
+}
 </script>
 
 <template>
@@ -151,22 +174,43 @@ async function unSaveRoster() {
 
             <template v-if="roster.rosterShift">
               <th
-                v-for="shift in roster.rosterShift"
+                v-for="(shift, index) in roster.rosterShift.sort((a, b) => a.order - b.order)"
                 :key="shift.id"
-                class="px-3 py-3 text-center min-w-[120px] border-l border-gray-100"
+                class="px-3 py-3 text-center min-w-[140px] border-l border-gray-100"
               >
                 <div class="flex flex-col items-center gap-1.5">
                   <span class="text-sm font-semibold text-gray-700 leading-tight">{{ shift.name }}</span>
 
-                  <Button
-                    v-if="!roster.saved"
-                    class="!p-0 !w-6 !h-6"
-                    icon="pi pi-trash"
-                    rounded
-                    severity="danger"
-                    text
-                    @click="removeShift(shift.id)"
-                  />
+                  <div v-if="!roster.saved" class="flex items-center gap-1">
+                    <Button
+                      class="!p-0 !w-6 !h-6"
+                      :disabled="index === 0"
+                      icon="pi pi-angle-left"
+                      rounded
+                      size="small"
+                      text
+                      @click="moveShift(shift.id, 'left')"
+                    />
+
+                    <Button
+                      class="!p-0 !w-6 !h-6"
+                      icon="pi pi-trash"
+                      rounded
+                      severity="danger"
+                      text
+                      @click="removeShift(shift.id)"
+                    />
+
+                    <Button
+                      class="!p-0 !w-6 !h-6"
+                      :disabled="index === roster.rosterShift.length - 1"
+                      icon="pi pi-angle-right"
+                      rounded
+                      size="small"
+                      text
+                      @click="moveShift(shift.id, 'right')"
+                    />
+                  </div>
                 </div>
               </th>
             </template>

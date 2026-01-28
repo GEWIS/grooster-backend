@@ -8,6 +8,7 @@ import type {
   RosterAnswerCreateRequest,
   SavedShiftResponse,
   RosterUpdateRequest,
+  RosterShiftUpdateRequest,
 } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 
@@ -126,6 +127,31 @@ export const useRosterStore = defineStore('roster', {
           [roster.id]: updatedRoster,
         };
       });
+    },
+    async updateShift(shiftId: number, params: RosterShiftUpdateRequest) {
+      try {
+        await ApiService.rosterShift.updateRosterShift(shiftId, params);
+
+        const rosters: Roster[] = Object.values(this.rosters);
+        const roster = rosters.find((r) => r.rosterShift?.some((s) => s.id === shiftId));
+
+        if (roster && roster.rosterShift) {
+          const shiftIndex = roster.rosterShift.findIndex((s) => s.id === shiftId);
+          if (shiftIndex !== -1) {
+            roster.rosterShift[shiftIndex] = {
+              ...roster.rosterShift[shiftIndex],
+              ...params,
+            };
+
+            roster.rosterShift.sort((a, b) => {
+              if (a.order !== b.order) return a.order - b.order;
+              return a.id - b.id;
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to update shift in store:', error);
+      }
     },
     async deleteShift(shiftId: number, rosterId: number) {
       await ApiService.rosterShift.deleteRosterShift(shiftId).then(() => {
