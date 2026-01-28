@@ -35,7 +35,7 @@ type RosterShift struct {
 
 	RosterID uint `json:"rosterId"`
 
-	Order int `json:"order" gorm:"default:-1"`
+	Order uint `json:"order"`
 } // @name RosterShift
 
 type RosterAnswer struct {

@@ -72,10 +72,11 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 	}
 
 	if params.Shifts != nil && len(params.Shifts) > 0 {
-		for _, shift := range params.Shifts {
+		for index, shift := range params.Shifts {
 			rosterShift := &models.RosterShift{
 				Name:     shift,
 				RosterID: roster.ID,
+				Order:    uint(index),
 			}
 
 			if err := s.db.Create(&rosterShift).Error; err != nil {
@@ -162,9 +163,20 @@ func (s *RosterService) CreateRosterShift(createParams *models.RosterShiftCreate
 		return nil, fmt.Errorf("roster not found: %w", err)
 	}
 
+	var maxOrdering int
+	err := s.db.Model(&models.RosterShift{}).
+		Where("roster_id = ?", createParams.RosterID).
+		Select("COALESCE(max(ordering), -1)").
+		Row().Scan(&maxOrdering)
+
+	if err != nil {
+		return nil, err
+	}
+
 	rosterShift := models.RosterShift{
 		Name:     createParams.Name,
 		RosterID: createParams.RosterID,
+		Order:    uint(maxOrdering + 1),
 	}
 
 	if err := s.db.Create(&rosterShift).Error; err != nil {
