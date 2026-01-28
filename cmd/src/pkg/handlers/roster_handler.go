@@ -27,7 +27,7 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 	g.DELETE("/:id", h.DeleteRoster)
 
 	g.POST("/shift", h.CreateRosterShift)
-	g.PATCH("/shift", h.UpdateRosterShift)
+	g.PATCH("/shift/:id", h.UpdateRosterShift)
 	g.DELETE("/shift/:id", h.DeleteRosterShift)
 	g.POST("/answer", h.CreateRosterAnswer)
 	g.PATCH("/answer/:id", h.UpdateRosterAnswer)
