@@ -166,7 +166,7 @@ func (s *RosterService) CreateRosterShift(createParams *models.RosterShiftCreate
 	var maxOrdering int
 	err := s.db.Model(&models.RosterShift{}).
 		Where("roster_id = ?", createParams.RosterID).
-		Select("COALESCE(max(order), -1)").
+		Select("COALESCE(MAX(`order`), -1)").
 		Row().Scan(&maxOrdering)
 
 	if err != nil {
