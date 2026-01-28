@@ -120,29 +120,23 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error)
 	idInt, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Error().Err(err).Str("idStr", idStr).Msg("Failed to convert ID to int")
-		return "", err // Added return to prevent nil pointer later
+		return "", err
 	}
 	username := claims["given_name"].(string)
 
 	id := uint(idInt)
-	filters := &models.UserFilterParams{
-		ID: &id,
-	}
 
-	// 2. Log the search attempt
-	log.Info().Uint("search_id", id).Msg("Searching for existing user")
-
-	users, err := s.u.GetUsers(filters)
 	var user *models.User
+	err = s.db.Where("gewis_id = ?", id).First(&user).Error
 
 	if err != nil {
-		log.Error().Err(err).Uint("id", id).Msg("Database error during GetUsers")
-		return "", err
-	}
-
-	if len(users) > 0 {
-		user = users[0]
-		log.Info().Uint("user_id", user.ID).Str("name", user.Name).Msg("Existing user found")
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Info().Uint("gewis_id", id).Msg("User definitely not in DB, proceeding to create")
+			user = nil
+		} else {
+			log.Error().Err(err).Uint("id", id).Msg("Database error during direct lookup")
+			return "", err
+		}
 	}
 
 	if user == nil {
