@@ -107,6 +107,8 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error)
 	log.Debug().
 		Interface("preferred_username", claims["preferred_username"]).
 		Interface("given_name", claims["given_name"]).
+		Interface("famile_name", claims["family_name"]).
+		Interface("claims", claims).
 		Msg("Processing user claims")
 
 	// Extract the id
