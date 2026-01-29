@@ -45,7 +45,9 @@ type RosterAnswer struct {
 
 	RosterID uint `json:"rosterId" gorm:"uniqueIndex:user_answer_idx"`
 
-	RosterShiftID uint `json:"rosterShiftId" gorm:"uniqueIndex:user_answer_idx;constraint:OnDelete:CASCADE;"`
+	RosterShiftID uint `json:"rosterShiftId" gorm:"uniqueIndex:user_answer_idx;"`
+
+	RosterShift *RosterShift `json:"-" gorm:"foreignKey:RosterShiftID;constraint:OnDelete:CASCADE;"`
 
 	Value string `json:"value"`
 } // @name RosterAnswer
@@ -55,9 +57,9 @@ type SavedShift struct {
 
 	RosterID uint `json:"rosterId"`
 
-	RosterShiftID uint `json:"rosterShiftId"`
+	RosterShiftID uint `json:"rosterShiftId" gorm:"constraint:OnDelete:CASCADE;"`
 
-	RosterShift *RosterShift `json:"rosterShift"`
+	RosterShift *RosterShift `json:"rosterShift" gorm:"foreignKey:RosterShiftID;constraint:OnDelete:CASCADE;"`
 
 	Users []*User `json:"users" gorm:"many2many:user_shift_saved;"`
 } // @name SavedShift
