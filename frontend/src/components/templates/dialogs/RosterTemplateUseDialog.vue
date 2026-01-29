@@ -49,6 +49,8 @@ const addRoster = async () => {
   if (created?.id != null) {
     rosterStore.setSelectedRoster(created.id);
   }
+  rosterName.value = '';
+  date.value = new Date();
   emit('close');
 };
 </script>
