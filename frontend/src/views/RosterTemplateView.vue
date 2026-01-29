@@ -17,22 +17,25 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
-    <Card>
-      <template #content>
-        <div class="flex flex-row gap-2 justify-center">
-          <Button label="Create Template" @click="addDialog = true" />
-        </div>
-      </template>
-    </Card>
-    <div class="grid grid-cols-3 gap-2">
-      <div v-if="templates.length > 0">
-        <div v-for="template in templates" :key="template.id">
-          <RosterTemplate :template="template" />
-        </div>
+  <div class="p-4 max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Roster Templates</h1>
+        <p class="text-gray-500">Manage and deploy your recurring shift schedules.</p>
       </div>
+      <Button class="p-button-raised shadow-md" icon="pi pi-plus" label="Create Template" @click="addDialog = true" />
+    </div>
+
+    <div v-if="templates.length === 0" class="text-center py-20 border-2 border-dashed border-gray-200 rounded-xl">
+      <i class="pi pi-calendar-plus text-5xl text-gray-300 mb-4"></i>
+      <p class="text-gray-500 text-lg">No templates found. Create your first one to get started!</p>
+    </div>
+
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <RosterTemplate v-for="template in templates" :key="template.id" :template="template" />
     </div>
   </div>
+
   <RosterTemplateAdd :open="addDialog" @close="addDialog = false" />
 </template>
 

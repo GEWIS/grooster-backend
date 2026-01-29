@@ -14,31 +14,64 @@ const showDetail = ref<boolean>(false);
 </script>
 
 <template>
-  <div>
-    <Card>
+  <div class="p-2">
+    <Card class="overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
       <template #content>
-        <div class="grid grid-cols-3 gap-4">
-          <div class="col-span-2 flex items-center font-bold">{{ props.template.name }}</div>
-          <div class="flex flex-row gap-2 justify-end">
-            <!--                    <Button icon="pi pi-pencil" @click="openEditDialog=true" aria-label="Edit"/>-->
-            <Button icon="pi pi-plus" @click="openRosterDialog = true" />
-            <Button aria-label="Delete" icon="pi pi-trash" @click="openDeleteDialog = true" />
-          </div>
-          <div class="col-span-3 border-t border-gray-300 mx-auto my-4"></div>
-          <div></div>
-          <div>
-            <Button class="px-5" label="View details" variant="text" @click="showDetail = !showDetail" />
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-800 truncate">
+            {{ props.template.name }}
+          </h3>
+          <div class="flex gap-2">
+            <Button
+              v-tooltip.top="'Use Template'"
+              icon="pi pi-plus"
+              rounded
+              severity="secondary"
+              text
+              @click="openRosterDialog = true"
+            />
+            <Button
+              v-tooltip.top="'Delete'"
+              icon="pi pi-trash"
+              rounded
+              severity="danger"
+              text
+              @click="openDeleteDialog = true"
+            />
           </div>
         </div>
 
-        <!-- Detail section of card -->
-        <div v-if="showDetail">
-          <ul>
-            <li v-for="shift in props.template.shifts" :key="shift.id" class="flex justify-between items-center">
-              <span>{{ shift.shiftName }}</span>
-            </li>
-          </ul>
+        <Divider class="my-0" />
+
+        <div class="flex justify-between items-center mt-3">
+          <div class="flex items-center text-sm text-gray-500">
+            <i class="pi pi-calendar mr-2"></i>
+            {{ props.template.shifts?.length || 0 }} Shifts
+          </div>
+          <Button
+            class="p-button-sm"
+            :icon="showDetail ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+            icon-pos="right"
+            :label="showDetail ? 'Hide details' : 'View details'"
+            variant="text"
+            @click="showDetail = !showDetail"
+          />
         </div>
+
+        <transition name="p-toggleable-content">
+          <div v-if="showDetail" class="mt-4 pt-4 border-t border-dashed border-gray-200">
+            <ul class="space-y-2">
+              <li
+                v-for="shift in props.template.shifts"
+                :key="shift.id"
+                class="flex items-center p-2 bg-gray-50 rounded-md border border-gray-100"
+              >
+                <i class="pi pi-clock mr-3 text-blue-500"></i>
+                <span class="text-sm font-medium text-gray-700">{{ shift.shiftName }}</span>
+              </li>
+            </ul>
+          </div>
+        </transition>
       </template>
     </Card>
   </div>
@@ -50,7 +83,6 @@ const showDetail = ref<boolean>(false);
     :shifts="props.template.shifts.map((s) => s.shiftName)"
     @close="openRosterDialog = false"
   />
-  <!--    <RosterTemplateEdit :open="openEditDialog" :template="props.template" @close="openEditDialog=false"/>-->
 </template>
 
 <style scoped></style>
