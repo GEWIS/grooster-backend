@@ -7,7 +7,6 @@ An organ that users can be part of.
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **createdAt** | **string** |  | [optional] [default to undefined]
-**deletedAt** | [**GormDeletedAt**](GormDeletedAt.md) |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
@@ -20,7 +19,6 @@ import { Organ } from './api';
 
 const instance: Organ = {
     createdAt,
-    deletedAt,
     id,
     name,
     updatedAt,
