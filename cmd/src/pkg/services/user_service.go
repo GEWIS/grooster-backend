@@ -64,8 +64,7 @@ func (s *UserService) GetUsers(filters *models.UserFilterParams) ([]*models.User
 }
 
 func (s *UserService) Delete(ID uint) error {
-	var user models.User
-	result := s.db.Delete(&user, ID)
+	result := s.db.Unscoped().Delete(&models.User{}, ID)
 
 	if result.Error != nil {
 		return result.Error
