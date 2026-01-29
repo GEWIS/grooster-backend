@@ -61,7 +61,7 @@ type SavedShift struct {
 
 	RosterShift *RosterShift `json:"rosterShift" gorm:"foreignKey:RosterShiftID;constraint:OnDelete:CASCADE;"`
 
-	Users []*User `json:"users" gorm:"many2many:user_shift_saved;"`
+	Users []*User `json:"users" gorm:"many2many:user_shift_saved;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 } // @name SavedShift
 
 type SavedShiftOrdering struct {
@@ -77,13 +77,15 @@ type RosterTemplate struct {
 
 	Name string `json:"name"`
 
-	Shifts []RosterTemplateShift `json:"shifts" gorm:"foreignKey:TemplateID"`
+	Shifts []RosterTemplateShift `json:"shifts" gorm:"foreignKey:TemplateID;constraint:OnDelete:CASCADE;"`
 } // @name RosterTemplate
 
 type RosterTemplateShift struct {
 	BaseModel
 
 	TemplateID uint `json:"templateId"`
+
+	Template *RosterTemplate `json:"-" gorm:"foreignKey:TemplateID;constraint:OnDelete:CASCADE;"`
 
 	ShiftName string `json:"shiftName"`
 } // @name RosterTemplateShift
