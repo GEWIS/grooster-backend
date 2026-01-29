@@ -104,13 +104,6 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error)
 		return "", err
 	}
 
-	log.Debug().
-		Interface("preferred_username", claims["preferred_username"]).
-		Interface("given_name", claims["given_name"]).
-		Interface("famile_name", claims["family_name"]).
-		Interface("claims", claims).
-		Msg("Processing user claims")
-
 	// Extract the id
 	idParts := strings.Split(claims["preferred_username"].(string), "m")
 	if len(idParts) < 2 {
@@ -124,7 +117,7 @@ func (s *AuthService) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error)
 		log.Error().Err(err).Str("idStr", idStr).Msg("Failed to convert ID to int")
 		return "", err
 	}
-	username := claims["given_name"].(string)
+	username := claims["name"].(string)
 
 	id := uint(idInt)
 
