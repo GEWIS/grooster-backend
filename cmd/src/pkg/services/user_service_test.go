@@ -197,7 +197,6 @@ func (suite *TestUserSuite) TestDeleteUser_ValidInput() {
 
 	var deletedUser models.User
 	result := suite.db.First(&deletedUser, user.ID)
-	assert.Error(suite.T(), result.Error)
 	assert.Equal(suite.T(), gorm.ErrRecordNotFound, result.Error)
 }
 
