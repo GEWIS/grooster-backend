@@ -6,7 +6,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **createdAt** | **string** |  | [optional] [default to undefined]
-**deletedAt** | [**GormDeletedAt**](GormDeletedAt.md) |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
 **shiftName** | **string** |  | [optional] [default to undefined]
 **templateId** | **number** |  | [optional] [default to undefined]
@@ -19,7 +18,6 @@ import { RosterTemplateShift } from './api';
 
 const instance: RosterTemplateShift = {
     createdAt,
-    deletedAt,
     id,
     shiftName,
     templateId,

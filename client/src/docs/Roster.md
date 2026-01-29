@@ -7,7 +7,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **createdAt** | **string** |  | [optional] [default to undefined]
 **date** | **string** |  | [optional] [default to undefined]
-**deletedAt** | [**GormDeletedAt**](GormDeletedAt.md) |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
 **organ** | [**Organ**](Organ.md) |  | [optional] [default to undefined]
@@ -27,7 +26,6 @@ import { Roster } from './api';
 const instance: Roster = {
     createdAt,
     date,
-    deletedAt,
     id,
     name,
     organ,

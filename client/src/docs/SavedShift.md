@@ -6,7 +6,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **createdAt** | **string** |  | [optional] [default to undefined]
-**deletedAt** | [**GormDeletedAt**](GormDeletedAt.md) |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
 **rosterId** | **number** |  | [optional] [default to undefined]
 **rosterShift** | [**RosterShift**](RosterShift.md) |  | [optional] [default to undefined]
@@ -21,7 +20,6 @@ import { SavedShift } from './api';
 
 const instance: SavedShift = {
     createdAt,
-    deletedAt,
     id,
     rosterId,
     rosterShift,

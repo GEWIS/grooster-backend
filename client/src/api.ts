@@ -24,25 +24,6 @@ import type { RequestArgs } from './base';
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
 /**
- * 
- * @export
- * @interface GormDeletedAt
- */
-export interface GormDeletedAt {
-    /**
-     * 
-     * @type {string}
-     * @memberof GormDeletedAt
-     */
-    'time'?: string;
-    /**
-     * Valid is true if Time is not NULL
-     * @type {boolean}
-     * @memberof GormDeletedAt
-     */
-    'valid'?: boolean;
-}
-/**
  * An organ that users can be part of.
  * @export
  * @interface Organ
@@ -54,12 +35,6 @@ export interface Organ {
      * @memberof Organ
      */
     'createdAt'?: string;
-    /**
-     * 
-     * @type {GormDeletedAt}
-     * @memberof Organ
-     */
-    'deletedAt'?: GormDeletedAt;
     /**
      * 
      * @type {number}
@@ -103,12 +78,6 @@ export interface Roster {
      * @memberof Roster
      */
     'date'?: string;
-    /**
-     * 
-     * @type {GormDeletedAt}
-     * @memberof Roster
-     */
-    'deletedAt'?: GormDeletedAt;
     /**
      * 
      * @type {number}
@@ -182,12 +151,6 @@ export interface RosterAnswer {
      * @memberof RosterAnswer
      */
     'createdAt'?: string;
-    /**
-     * 
-     * @type {GormDeletedAt}
-     * @memberof RosterAnswer
-     */
-    'deletedAt'?: GormDeletedAt;
     /**
      * 
      * @type {number}
@@ -314,12 +277,6 @@ export interface RosterShift {
     'createdAt'?: string;
     /**
      * 
-     * @type {GormDeletedAt}
-     * @memberof RosterShift
-     */
-    'deletedAt'?: GormDeletedAt;
-    /**
-     * 
      * @type {number}
      * @memberof RosterShift
      */
@@ -395,12 +352,6 @@ export interface RosterTemplate {
     'createdAt'?: string;
     /**
      * 
-     * @type {GormDeletedAt}
-     * @memberof RosterTemplate
-     */
-    'deletedAt'?: GormDeletedAt;
-    /**
-     * 
      * @type {number}
      * @memberof RosterTemplate
      */
@@ -467,12 +418,6 @@ export interface RosterTemplateShift {
      * @memberof RosterTemplateShift
      */
     'createdAt'?: string;
-    /**
-     * 
-     * @type {GormDeletedAt}
-     * @memberof RosterTemplateShift
-     */
-    'deletedAt'?: GormDeletedAt;
     /**
      * 
      * @type {number}
@@ -554,12 +499,6 @@ export interface SavedShift {
      * @memberof SavedShift
      */
     'createdAt'?: string;
-    /**
-     * 
-     * @type {GormDeletedAt}
-     * @memberof SavedShift
-     */
-    'deletedAt'?: GormDeletedAt;
     /**
      * 
      * @type {number}
@@ -660,12 +599,6 @@ export interface User {
      * @memberof User
      */
     'createdAt'?: string;
-    /**
-     * 
-     * @type {GormDeletedAt}
-     * @memberof User
-     */
-    'deletedAt'?: GormDeletedAt;
     /**
      * 
      * @type {number}

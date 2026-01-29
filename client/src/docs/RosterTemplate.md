@@ -6,7 +6,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **createdAt** | **string** |  | [optional] [default to undefined]
-**deletedAt** | [**GormDeletedAt**](GormDeletedAt.md) |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
 **organId** | **number** |  | [optional] [default to undefined]
@@ -20,7 +19,6 @@ import { RosterTemplate } from './api';
 
 const instance: RosterTemplate = {
     createdAt,
-    deletedAt,
     id,
     name,
     organId,

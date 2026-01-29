@@ -5,7 +5,6 @@ base.ts
 common.ts
 configuration.ts
 docs/AuthApi.md
-docs/GormDeletedAt.md
 docs/Organ.md
 docs/Roster.md
 docs/RosterAnswer.md
