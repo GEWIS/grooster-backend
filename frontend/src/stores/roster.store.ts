@@ -36,6 +36,11 @@ export const useRosterStore = defineStore('roster', {
     setSelectedRoster(id: number | null) {
       this.selectedRosterId = id ?? null;
     },
+    clearRosters() {
+      this.rosters = {};
+      this.savedRoster = {};
+      this.selectedRosterId = null;
+    },
     async fetchRosters(organId: number) {
       await ApiService.roster.getRosters(undefined, organId).then((res) => {
         res.data.forEach((roster: Roster) => {

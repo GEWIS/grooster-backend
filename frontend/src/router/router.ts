@@ -6,6 +6,7 @@ import { getGEWISId, isAuthenticated, loginRedirect } from '@/helpers/TokenHelpe
 import ApiService from '@/services/ApiService';
 import RosterTemplateView from '@/views/RosterTemplateView.vue';
 import { useOrganStore } from '@/stores/organ.store';
+import { useRosterStore } from '@/stores/roster.store';
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: OrganView },
@@ -52,6 +53,12 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  const rosterStore = useRosterStore();
+
+  if (to.params.id !== from.params.id) {
+    rosterStore.clearRosters();
+  }
+
   if (to.path === '/callback') {
     const token = to.query.token;
     if (typeof token === 'string') {
