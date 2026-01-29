@@ -9,29 +9,55 @@ const isActive = (path) => route.path === path;
 </script>
 
 <template>
-  <nav class="bg-green-800 shadow-md p-4 flex justify-between items-center">
-    <div class="space-x-4">
-      <RouterLink class="px-4 py-2 rounded-lg hover:bg-gray-400" :class="{ 'bg-gray-400': isActive('/') }" to="/">
-        Home
-      </RouterLink>
-      <RouterLink
-        v-if="route.path !== '/' && store.organ"
-        class="px-4 py-2 rounded-lg hover:bg-gray-400"
-        :class="{ 'bg-gray-400': isActive('/rosters/' + store.organ) }"
-        :to="`/rosters/${store.organ}`"
-      >
-        Rosters
-      </RouterLink>
-      <RouterLink
-        v-if="route.path !== '/' && store.organ"
-        class="px-4 py-2 rounded-lg hover:bg-gray-400"
-        :class="{ 'bg-gray-400': isActive('/templates/' + store.organ) }"
-        :to="`/templates/${store.organ}`"
-      >
-        Templates
-      </RouterLink>
-    </div>
-  </nav>
-</template>
+    <nav class="sticky top-0 z-50 flex gap-2 items-center border-b border-emerald-800 bg-emerald-950 px-6 py-2.5 shadow-md">
 
-<style scoped></style>
+        <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-emerald-50 p-1.5 shadow-sm">
+                <img src="@/assets/grooster-logo.png" alt="GRooster Logo" class="h-full w-full object-contain" />
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1">
+            <RouterLink
+                to="/"
+                :class="[
+          'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200',
+          isActive('/')
+            ? 'bg-emerald-800 text-white shadow-sm'
+            : 'text-emerald-100 hover:bg-emerald-900 hover:text-white'
+        ]"
+            >
+                <i class="pi pi-home text-xs" />
+                <span>Home</span>
+            </RouterLink>
+
+            <template v-if="route.path !== '/' && store.organ">
+                <RouterLink
+                    :to="`/rosters/${store.organ}`"
+                    :class="[
+            'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200',
+            isActive('/rosters/' + store.organ)
+              ? 'bg-emerald-800 text-white shadow-sm'
+              : 'text-emerald-100 hover:bg-emerald-900 hover:text-white'
+          ]"
+                >
+                    <i class="pi pi-table text-xs" />
+                    <span>Rosters</span>
+                </RouterLink>
+
+                <RouterLink
+                    :to="`/templates/${store.organ}`"
+                    :class="[
+            'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200',
+            isActive('/templates/' + store.organ)
+              ? 'bg-emerald-800 text-white shadow-sm'
+              : 'text-emerald-100 hover:bg-emerald-900 hover:text-white'
+          ]"
+                >
+                    <i class="pi pi-clone text-xs" />
+                    <span>Templates</span>
+                </RouterLink>
+            </template>
+        </div>
+    </nav>
+</template>

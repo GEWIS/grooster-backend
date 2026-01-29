@@ -58,7 +58,7 @@ async function fetchRosters() {
           <RosterTable :id="selectedRoster.id" />
           <RosterAssignment v-if="selectedRoster.saved" :id="selectedRoster.id" />
         </div>
-        <div class="flex items-center justify-center">
+        <div class="flex items-center justify-center gap-2">
           <Select
             v-model="selectedRoster"
             class="w-full md:w-56 mr-4"
