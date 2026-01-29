@@ -13,6 +13,7 @@ const route = useRoute();
 const rosterStore = useRosterStore();
 const rosters = computed(() => Object.values(rosterStore.rosters));
 const users = ref();
+const selectedRosterId = computed(() => rosterStore.selectedRosterId);
 
 const selectedRoster = ref<Roster | null>(null);
 const addDialog = ref(false);
@@ -24,18 +25,53 @@ onMounted(async () => {
 watch(
   () => rosters.value,
   (newRosters: Roster[]) => {
-    if (newRosters) {
-      if (!selectedRoster.value) return;
+    if (!newRosters || newRosters.length === 0) {
+      selectedRoster.value = null;
+      rosterStore.setSelectedRoster(null);
+      return;
+    }
 
-      const updated = newRosters.find((response) => response.id === selectedRoster.value?.id);
-
-      // Check if the object deeply changed or not
-      if (updated && JSON.stringify(updated) !== JSON.stringify(selectedRoster.value)) {
+    const storeSelectedId = rosterStore.selectedRosterId;
+    if (storeSelectedId != null) {
+      const updated = newRosters.find((response) => response.id === storeSelectedId);
+      if (updated) {
         selectedRoster.value = updated;
+        return;
+      }
+    }
+
+    if (!selectedRoster.value) {
+      const first = newRosters[0];
+      if (first?.id != null) {
+        selectedRoster.value = first;
+        rosterStore.setSelectedRoster(first.id);
       }
     }
   },
   { immediate: true, deep: true },
+);
+
+watch(
+  () => selectedRoster.value?.id ?? null,
+  (newId) => {
+    if (newId !== rosterStore.selectedRosterId) {
+      rosterStore.setSelectedRoster(newId);
+    }
+  },
+);
+
+watch(
+  () => selectedRosterId.value,
+  (newId) => {
+    if (newId == null) {
+      selectedRoster.value = null;
+      return;
+    }
+    const updated = rosters.value.find((response) => response.id === newId);
+    if (updated) {
+      selectedRoster.value = updated;
+    }
+  },
 );
 
 async function fetchRosters() {

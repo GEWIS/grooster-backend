@@ -44,7 +44,12 @@ const addRoster = async () => {
     organId: parseInt(route.params.id as string),
   };
 
-  await rosterStore.createRoster(createParams);
+  const created = await rosterStore.createRoster(createParams);
+  if (created?.id != null) {
+    rosterStore.setSelectedRoster(created.id);
+  }
+
+  formValues.value = { name: '', date: new Date() };
   emit('close');
 };
 </script>

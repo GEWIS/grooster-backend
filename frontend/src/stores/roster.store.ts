@@ -16,6 +16,7 @@ export const useRosterStore = defineStore('roster', {
   state: () => ({
     rosters: {} as Record<number, Roster>,
     savedRoster: {} as Record<number, SavedShiftResponse>,
+    selectedRosterId: null as number | null,
   }),
   getters: {
     getRoster: (state) => {
@@ -27,8 +28,14 @@ export const useRosterStore = defineStore('roster', {
     getSavedRoster: (state) => {
       return (rosterId: number) => state.savedRoster[rosterId];
     },
+    selectedRoster: (state) => {
+      return state.selectedRosterId ? state.rosters[state.selectedRosterId] : null;
+    },
   },
   actions: {
+    setSelectedRoster(id: number | null) {
+      this.selectedRosterId = id ?? null;
+    },
     async fetchRosters(organId: number) {
       await ApiService.roster.getRosters(undefined, organId).then((res) => {
         res.data.forEach((roster: Roster) => {
@@ -40,12 +47,12 @@ export const useRosterStore = defineStore('roster', {
       });
     },
     async createRoster(params: RosterCreateRequest) {
-      await ApiService.roster.createRoster(params).then((res) => {
-        const roster = res.data;
-        if (roster.id != null) {
-          this.rosters[roster.id] = roster;
-        }
-      });
+      const res = await ApiService.roster.createRoster(params);
+      const roster = res.data;
+      if (roster.id != null) {
+        this.rosters[roster.id] = roster;
+      }
+      return roster;
     },
     async updateRoster(id: number, params: RosterUpdateRequest) {
       try {

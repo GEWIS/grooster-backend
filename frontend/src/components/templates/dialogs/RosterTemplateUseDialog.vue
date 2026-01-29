@@ -2,9 +2,10 @@
 import { computed, ref, watch } from 'vue';
 import { RosterCreateRequest } from '@gewis/grooster-backend-ts';
 import { useRoute } from 'vue-router';
-import ApiService from '@/services/ApiService';
+import { useRosterStore } from '@/stores/roster.store';
 
 const route = useRoute();
+const rosterStore = useRosterStore();
 
 const props = withDefaults(
   defineProps<{
@@ -44,7 +45,10 @@ const addRoster = async () => {
     shifts: props.shifts,
   };
 
-  await ApiService.roster.createRoster(createParams);
+  const created = await rosterStore.createRoster(createParams);
+  if (created?.id != null) {
+    rosterStore.setSelectedRoster(created.id);
+  }
   emit('close');
 };
 </script>
