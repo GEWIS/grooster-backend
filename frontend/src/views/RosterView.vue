@@ -8,6 +8,7 @@ import { useRosterStore } from '@/stores/roster.store.js';
 import AddDialog from '@/components/roster/dialogs/AddDialog.vue';
 import ApiService from '@/services/ApiService';
 import DeleteDialog from '@/components/roster/dialogs/DeleteDialog.vue';
+import EditDialog from '@/components/roster/dialogs/EditDialog.vue';
 
 type DialogType = 'add' | 'edit' | 'delete';
 
@@ -115,15 +116,22 @@ const closeDialog = () => {
             :options="rosters"
             placeholder="Select a roster"
           />
-          <div class="flex gap-2 p-4 bg-gray-50 rounded-lg shadow-sm">
-            <Button label="Add Roster" icon="pi pi-plus" class="p-button-success" @click="openDialog('add')" />
-
-            <Button label="Edit" icon="pi pi-pencil" class="p-button-outlined" @click="openDialog('edit')" />
+          <div class="flex gap-2 p-4">
+            <Button class="p-button-success" icon="pi pi-plus" label="Add Roster" @click="openDialog('add')" />
 
             <Button
-              label="Delete"
+              v-if="selectedRoster"
+              class="p-button-outlined"
+              icon="pi pi-pencil"
+              label="Edit"
+              @click="openDialog('edit')"
+            />
+
+            <Button
+              v-if="selectedRoster"
+              class="p-button-danger p-button-outlined"
               icon="pi pi-trash"
-              class="p-button-danger p-button-text"
+              label="Delete"
               @click="openDialog('delete')"
             />
           </div>
@@ -133,6 +141,7 @@ const closeDialog = () => {
   </Card>
   <AddDialog :open="activeDialog === 'add'" @close="closeDialog" />
   <DeleteDialog :open="activeDialog === 'delete'" @close="closeDialog" />
+  <EditDialog :open="activeDialog === 'edit'" @close="closeDialog" />
 </template>
 
 <style scoped></style>

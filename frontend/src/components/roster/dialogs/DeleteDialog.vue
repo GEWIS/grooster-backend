@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useRosterStore } from '@/stores/roster.store';
 
 const props = withDefaults(
@@ -31,16 +31,16 @@ const deleteRoster = async () => {
 <template>
   <Dialog
     v-model:visible="visible"
-    modal
-    :draggable="false"
-    :dismissableMask="true"
     class="mx-4"
-    :style="{ width: '28rem' }"
+    :dismissable-mask="true"
+    :draggable="false"
+    modal
     :pt="{
       root: 'border-none shadow-xl rounded-xl overflow-hidden',
       header: 'bg-white border-b border-gray-100 p-5',
       content: 'p-0', // We'll handle padding inside
     }"
+    :style="{ width: '28rem' }"
   >
     <template #header>
       <div class="flex items-center gap-3">
@@ -61,13 +61,13 @@ const deleteRoster = async () => {
     <template #footer>
       <div class="flex gap-3 justify-end w-full p-4 bg-gray-50 border-t border-gray-100">
         <Button
-          label="Cancel"
-          text
-          severity="secondary"
           class="hover:bg-gray-200 transition-colors"
+          label="Cancel"
+          severity="secondary"
+          text
           @click="emit('close')"
         />
-        <Button label="Yes, Delete" severity="danger" class="px-6 shadow-md shadow-red-100" @click="deleteRoster" />
+        <Button class="px-6 shadow-md shadow-red-100" label="Yes, Delete" severity="danger" @click="deleteRoster" />
       </div>
     </template>
   </Dialog>
