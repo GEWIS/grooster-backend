@@ -10,7 +10,19 @@ const props = defineProps<{
 const rosterStore = useRosterStore();
 const savedRoster = computed(() => {
   const data = rosterStore.getSavedRoster(props.id);
-  return Array.isArray(data) ? data : (data?.savedShifts ?? []);
+
+  if (!data) return [];
+
+  const shifts = data.savedShifts;
+
+  return [
+    ...shifts.sort((a, b) => {
+      const orderA = a.rosterShift.order ?? 0;
+      const orderB = b.rosterShift.order ?? 0;
+
+      return orderA - orderB;
+    }),
+  ];
 });
 
 const savedRosterOrdering = computed(() => {
