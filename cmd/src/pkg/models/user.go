@@ -10,6 +10,8 @@ type User struct {
 	GEWISID uint `json:"gewis_id" gorm:"uniqueIndex:idx_name"`
 
 	Organs []Organ `json:"organs" gorm:"many2many:user_organs;"`
+
+	Shifts []*SavedShift `gorm:"many2many:user_shift_saved;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 } // @name User
 
 type UserCreateRequest struct {
