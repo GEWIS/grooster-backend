@@ -78,6 +78,17 @@ export const useRosterStore = defineStore('roster', {
         console.error('Failed to update an roster:', error);
       }
     },
+    async deleteRoster(id: number) {
+      try {
+        await ApiService.roster.deleteRoster(id);
+
+        delete this.rosters[id];
+
+        this.selectedRosterId = null;
+      } catch (error) {
+        console.error('Failed to delete an roster:', error);
+      }
+    },
     async createAnswer(params: RosterAnswerCreateRequest) {
       try {
         const response = await ApiService.rosterAnswer.createRosterAnswer(params);

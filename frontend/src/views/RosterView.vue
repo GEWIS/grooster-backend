@@ -5,8 +5,11 @@ import { useRoute } from 'vue-router';
 import RosterTable from '@/components/roster/RosterTable.vue';
 import RosterAssignment from '@/components/roster/RosterAssignment.vue';
 import { useRosterStore } from '@/stores/roster.store.js';
-import RosterAddDialog from '@/components/roster/dialogs/RosterAddDialog.vue';
+import AddDialog from '@/components/roster/dialogs/AddDialog.vue';
 import ApiService from '@/services/ApiService';
+import DeleteDialog from '@/components/roster/dialogs/DeleteDialog.vue';
+
+type DialogType = 'add' | 'edit' | 'delete';
 
 const route = useRoute();
 
@@ -16,7 +19,8 @@ const users = ref();
 const selectedRosterId = computed(() => rosterStore.selectedRosterId);
 
 const selectedRoster = ref<Roster | null>(null);
-const addDialog = ref(false);
+
+const activeDialog = ref<DialogType>(null);
 
 onMounted(async () => {
   await fetchRosters();
@@ -84,6 +88,14 @@ async function fetchRosters() {
     console.error(e);
   }
 }
+
+const openDialog = (action: DialogType) => {
+  activeDialog.value = action;
+};
+
+const closeDialog = () => {
+  activeDialog.value = null;
+};
 </script>
 
 <template>
@@ -103,12 +115,24 @@ async function fetchRosters() {
             :options="rosters"
             placeholder="Select a roster"
           />
-          <Button label="Add Roster" @click="addDialog = true" />
+          <div class="flex gap-2 p-4 bg-gray-50 rounded-lg shadow-sm">
+            <Button label="Add Roster" icon="pi pi-plus" class="p-button-success" @click="openDialog('add')" />
+
+            <Button label="Edit" icon="pi pi-pencil" class="p-button-outlined" @click="openDialog('edit')" />
+
+            <Button
+              label="Delete"
+              icon="pi pi-trash"
+              class="p-button-danger p-button-text"
+              @click="openDialog('delete')"
+            />
+          </div>
         </div>
       </div>
     </template>
   </Card>
-  <RosterAddDialog :open="addDialog" @close="addDialog = false" />
+  <AddDialog :open="activeDialog === 'add'" @close="closeDialog" />
+  <DeleteDialog :open="activeDialog === 'delete'" @close="closeDialog" />
 </template>
 
 <style scoped></style>
