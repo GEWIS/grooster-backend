@@ -111,11 +111,18 @@ const closeDialog = () => {
           <Select
             v-model="selectedRoster"
             class="w-full md:w-56 mr-4"
-            option-label="name"
             :option-value="(roster) => roster"
             :options="rosters"
             placeholder="Select a roster"
-          />
+          >
+            <template #value="slotProps">
+              <div v-if="slotProps.value">{{ slotProps.value.name }} - {{ slotProps.value.date.split('T')[0] }}</div>
+              <span v-else>{{ slotProps.placeholder }}</span>
+            </template>
+            <template #option="slotProps">
+              {{ slotProps.option.name }} ({{ slotProps.option.date.split('T')[0] }})
+            </template>
+          </Select>
           <div class="flex gap-2 p-4">
             <Button class="p-button-success" icon="pi pi-plus" label="Add Roster" @click="openDialog('add')" />
 
