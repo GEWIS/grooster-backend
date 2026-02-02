@@ -155,6 +155,16 @@ async function moveShift(shiftId: number, direction: 'left' | 'right') {
     console.error('Failed to reorder shifts:', error);
   }
 }
+
+const sortedUsers = computed(() => {
+  if (!users.value) return [];
+
+  return [...users.value].sort((a, b) => {
+    if (a.id === getGEWISId()) return -1;
+    if (b.id === getGEWISId()) return 1;
+    return 0;
+  });
+});
 </script>
 
 <template>
@@ -218,7 +228,7 @@ async function moveShift(shiftId: number, direction: 'left' | 'right') {
         </thead>
 
         <tbody class="divide-y divide-gray-100">
-          <tr v-for="user in users" :key="user.id" class="hover:bg-blue-50/30 transition-colors">
+          <tr v-for="user in sortedUsers" :key="user.id" class="hover:bg-blue-50/30 transition-colors">
             <td class="sticky left-0 z-10 bg-white px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-50">
               {{ user.name }}
             </td>
