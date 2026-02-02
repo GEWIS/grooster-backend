@@ -123,12 +123,17 @@ const closeDialog = () => {
               {{ slotProps.option.name }} ({{ slotProps.option.date.split('T')[0] }})
             </template>
           </Select>
-          <div class="flex gap-2 p-4">
-            <Button class="p-button-success" icon="pi pi-plus" label="Add Roster" @click="openDialog('add')" />
+          <div class="flex flex-col sm:flex-row gap-3 p-4">
+            <Button
+              class="p-button-success w-full sm:w-auto !justify-center"
+              icon="pi pi-plus"
+              label="Add Roster"
+              @click="openDialog('add')"
+            />
 
             <Button
               v-if="selectedRoster"
-              class="p-button-outlined"
+              class="p-button-outlined w-full sm:w-auto !justify-center"
               icon="pi pi-pencil"
               label="Edit"
               @click="openDialog('edit')"
@@ -136,7 +141,7 @@ const closeDialog = () => {
 
             <Button
               v-if="selectedRoster"
-              class="p-button-danger p-button-outlined"
+              class="p-button-danger p-button-outlined w-full sm:w-auto !justify-center"
               icon="pi pi-trash"
               label="Delete"
               @click="openDialog('delete')"

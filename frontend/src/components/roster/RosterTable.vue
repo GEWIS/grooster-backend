@@ -176,9 +176,7 @@ const sortedUsers = computed(() => {
       <table class="w-full border-collapse">
         <thead>
           <tr class="bg-gray-50 border-b border-gray-200">
-            <th
-              class="sticky left-0 z-10 bg-gray-50 text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 min-w-[150px]"
-            >
+            <th class="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 min-w-[150px]">
               Users
             </th>
 
@@ -229,7 +227,7 @@ const sortedUsers = computed(() => {
 
         <tbody class="divide-y divide-gray-100">
           <tr v-for="user in sortedUsers" :key="user.id" class="hover:bg-blue-50/30 transition-colors">
-            <td class="sticky left-0 z-10 bg-white px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-50">
+            <td class="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-50">
               {{ user.name }}
             </td>
 
@@ -250,8 +248,11 @@ const sortedUsers = computed(() => {
       </table>
     </div>
 
-    <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between">
+    <div
+      class="bg-gray-50 px-4 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4"
+    >
       <Button
+        class="w-full sm:w-auto !justify-center"
         :disabled="roster.saved"
         icon="pi pi-plus"
         label="Add New Shift"
@@ -261,9 +262,10 @@ const sortedUsers = computed(() => {
         @click="visible = true"
       />
 
-      <div class="flex gap-2">
+      <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
         <Button
           v-if="roster.saved"
+          class="w-full sm:w-auto !justify-center"
           icon="pi pi-lock-open"
           label="Unlock Roster"
           outlined
@@ -272,7 +274,15 @@ const sortedUsers = computed(() => {
           @click="unSaveRoster"
         />
 
-        <Button v-else icon="pi pi-save" label="Lock Roster" severity="success" size="small" @click="saveRoster" />
+        <Button
+          v-else
+          class="w-full sm:w-auto !justify-center"
+          icon="pi pi-save"
+          label="Lock Roster"
+          severity="success"
+          size="small"
+          @click="saveRoster"
+        />
       </div>
     </div>
 
@@ -307,6 +317,32 @@ const sortedUsers = computed(() => {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.overflow-x-auto {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Momentum scrolling for iOS */
+}
+
+@media (max-width: 640px) {
+  /* 1. Make the Select components easier to tap on mobile */
+  :deep(.p-select) {
+    height: 44px; /* Apple/Google recommended touch target size */
+  }
+
+  /* 2. Prevent text wrapping in the user column */
+  td:first-child {
+    white-space: nowrap;
+    padding-right: 2rem;
+  }
+
+  /* 3. Make the shift buttons (arrows/trash) larger or spaced out */
+  .flex.items-center.gap-1 {
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+  }
 }
 
 /* Ensure Select components don't look too bulky in the table */
