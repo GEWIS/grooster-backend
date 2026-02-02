@@ -262,7 +262,7 @@ async function moveShift(shiftId: number, direction: 'left' | 'right') {
           @click="unSaveRoster"
         />
 
-        <Button v-else icon="pi pi-save" label="Save Roster" severity="success" size="small" @click="saveRoster" />
+        <Button v-else icon="pi pi-save" label="Lock Roster" severity="success" size="small" @click="saveRoster" />
       </div>
     </div>
 
