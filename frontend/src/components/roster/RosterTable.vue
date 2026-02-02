@@ -165,6 +165,25 @@ const sortedUsers = computed(() => {
     return 0;
   });
 });
+
+const getStatusColorClass = (value: string) => {
+  switch (value) {
+    // Emerald/Green -> Soft Mint
+    case 'J':
+      return 'bg-emerald-300 text-emerald-900 font-semibold';
+    // Yellow -> Soft Cream/Amber
+    case 'X':
+      return 'bg-amber-300 text-amber-900 font-semibold';
+    // Red -> Soft Rose
+    case 'N':
+      return 'bg-rose-300 text-rose-900 font-semibold';
+    // Purple -> Soft Lavender
+    case 'L':
+      return 'bg-purple-300 text-purple-900 font-semibold';
+    default:
+      return 'bg-transparent text-gray-400';
+  }
+};
 </script>
 
 <template>
@@ -232,10 +251,15 @@ const sortedUsers = computed(() => {
             </td>
 
             <template v-if="roster.rosterShift">
-              <td v-for="shift in roster.rosterShift" :key="user.id + '-' + shift.id" class="p-1">
+              <td
+                v-for="shift in roster.rosterShift"
+                :key="user.id + '-' + shift.id"
+                class="p-1 transition-colors duration-200"
+                :class="getStatusColorClass(shiftAnswers[user.id][shift.id].value)"
+              >
                 <Select
                   v-model="shiftAnswers[user.id][shift.id].value"
-                  class="w-full !text-xs !border-transparent hover:!border-gray-300 focus:!ring-1 focus:!ring-primary transition-all shadow-none"
+                  class="w-full !text-xs !border-none !ring-0 !shadow-none !bg-transparent"
                   :disabled="roster.saved || user.gewis_id != getGEWISId()"
                   :options="rosterValues"
                   placeholder="Select..."
@@ -352,5 +376,22 @@ const sortedUsers = computed(() => {
 :deep(.p-select-label) {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
+}
+
+:deep(.bg-green-500 .p-select-label),
+:deep(.bg-red-500 .p-select-label),
+:deep(.bg-purple-500 .p-select-label) {
+  color: white !important;
+}
+
+/* Ensure the dropdown icon also adapts */
+:deep(.text-white .p-select-dropdown) {
+  color: white !important;
+}
+
+/* Remove default PrimeVue background-color on the inner input */
+:deep(.p-select) {
+  background-color: transparent !important;
+  border: none !important;
 }
 </style>
