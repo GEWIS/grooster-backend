@@ -59,9 +59,9 @@ interface CustomJwtPayload extends Omit<JwtPayload, 'sub'> {
   sub?: number | string;
 }
 
-export function getGEWISId(): number {
+export function getGEWISId(): number | undefined {
   const rawToken = localStorage.getItem('access_token');
-  if (!rawToken) return;
+  if (!rawToken) return undefined;
 
   const decoded = jwtDecode<CustomJwtPayload>(rawToken);
 

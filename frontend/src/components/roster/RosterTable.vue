@@ -160,8 +160,8 @@ const sortedUsers = computed(() => {
   if (!users.value) return [];
 
   return [...users.value].sort((a, b) => {
-    if (a.id === getGEWISId()) return -1;
-    if (b.id === getGEWISId()) return 1;
+    if (a.gewis_id === getGEWISId()) return -1;
+    if (b.gewis_id === getGEWISId()) return 1;
     return 0;
   });
 });
@@ -246,7 +246,10 @@ const getStatusColorClass = (value: string) => {
 
         <tbody class="divide-y divide-gray-100">
           <tr v-for="user in sortedUsers" :key="user.id" class="hover:bg-blue-50/30 transition-colors">
-            <td class="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-50">
+            <td
+              class="px-4 py-3 text-sm border-r border-gray-50"
+              :class="user.gewis_id === getGEWISId() ? 'font-bold text-gray-900' : 'font-medium text-gray-900'"
+            >
               {{ user.name }}
             </td>
 
@@ -332,13 +335,16 @@ const getStatusColorClass = (value: string) => {
 .custom-scrollbar::-webkit-scrollbar {
   height: 8px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
@@ -373,6 +379,7 @@ const getStatusColorClass = (value: string) => {
 :deep(.p-select) {
   background: transparent;
 }
+
 :deep(.p-select-label) {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
