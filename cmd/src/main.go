@@ -61,6 +61,7 @@ func main() {
 
 	userService := services.NewUserService(db)
 	rosterService := services.NewRosterService(db)
+	exportService := services.NewExportService(rosterService, db)
 
 	m := middleware.AuthMiddleware{}
 	provider, config := m.SetupOIDC()
@@ -77,6 +78,7 @@ func main() {
 	{
 		handlers.NewUserHandler(protectedGroup, userService)
 		handlers.NewRosterHandler(rosterService, protectedGroup)
+		handlers.NewExportHandler(exportService, protectedGroup)
 	}
 
 	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
