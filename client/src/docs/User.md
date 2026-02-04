@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **id** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
 **organs** | [**Array&lt;Organ&gt;**](Organ.md) |  | [optional] [default to undefined]
+**shifts** | [**Array&lt;SavedShift&gt;**](SavedShift.md) |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
 
 ## Example
@@ -23,6 +24,7 @@ const instance: User = {
     id,
     name,
     organs,
+    shifts,
     updatedAt,
 };
 ```

@@ -240,6 +240,10 @@ definitions:
         items:
           $ref: '#/definitions/Organ'
         type: array
+      shifts:
+        items:
+          $ref: '#/definitions/SavedShift'
+        type: array
       updatedAt:
         type: string
     type: object
@@ -323,6 +327,40 @@ paths:
       summary: Redirect to OIDC provider
       tags:
       - Auth
+  /export/roster/{id}:
+    get:
+      description: Generates and downloads a PNG image containing the shift assignments
+        for a specific roster.
+      parameters:
+      - description: Roster ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Invalid ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Export roster assignments as PNG
+      tags:
+      - Export
   /roster:
     get:
       consumes:

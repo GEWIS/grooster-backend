@@ -625,6 +625,12 @@ export interface User {
     'organs'?: Array<Organ>;
     /**
      * 
+     * @type {Array<SavedShift>}
+     * @memberof User
+     */
+    'shifts'?: Array<SavedShift>;
+    /**
+     * 
      * @type {string}
      * @memberof User
      */
@@ -844,6 +850,117 @@ export class AuthApi extends BaseAPI {
      */
     public authRedirectGet(state: string, options?: RawAxiosRequestConfig) {
         return AuthApiFp(this.configuration).authRedirectGet(state, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * ExportApi - axios parameter creator
+ * @export
+ */
+export const ExportApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Generates and downloads a PNG image containing the shift assignments for a specific roster.
+         * @summary Export roster assignments as PNG
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        exportRosterIdGet: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('exportRosterIdGet', 'id', id)
+            const localVarPath = `/export/roster/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ExportApi - functional programming interface
+ * @export
+ */
+export const ExportApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ExportApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Generates and downloads a PNG image containing the shift assignments for a specific roster.
+         * @summary Export roster assignments as PNG
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async exportRosterIdGet(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.exportRosterIdGet(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ExportApi.exportRosterIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * ExportApi - factory interface
+ * @export
+ */
+export const ExportApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ExportApiFp(configuration)
+    return {
+        /**
+         * Generates and downloads a PNG image containing the shift assignments for a specific roster.
+         * @summary Export roster assignments as PNG
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        exportRosterIdGet(id: number, options?: RawAxiosRequestConfig): AxiosPromise<File> {
+            return localVarFp.exportRosterIdGet(id, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ExportApi - object-oriented interface
+ * @export
+ * @class ExportApi
+ * @extends {BaseAPI}
+ */
+export class ExportApi extends BaseAPI {
+    /**
+     * Generates and downloads a PNG image containing the shift assignments for a specific roster.
+     * @summary Export roster assignments as PNG
+     * @param {number} id Roster ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ExportApi
+     */
+    public exportRosterIdGet(id: number, options?: RawAxiosRequestConfig) {
+        return ExportApiFp(this.configuration).exportRosterIdGet(id, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
