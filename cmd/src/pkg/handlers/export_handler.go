@@ -17,7 +17,7 @@ func NewExportHandler(exportService services.ExportServiceInterface, rg *gin.Rou
 
 	g := rg.Group("/export")
 
-	g.GET("png/assignment/:id", h.AssignmentToPng)
+	g.GET("/roster/:id", h.AssignmentToPng)
 
 	return h
 }
