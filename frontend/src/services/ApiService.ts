@@ -6,6 +6,7 @@ import {
   RosterShiftApi,
   SavedShiftApi,
   Configuration,
+  ExportApi,
 } from '@gewis/grooster-backend-ts';
 import { getTokenFromStorage } from '@/helpers/TokenHelper';
 
@@ -17,6 +18,8 @@ class ApiService {
   private readonly _rosterShiftApi: RosterShiftApi;
 
   private readonly _savedShiftApi: SavedShiftApi;
+
+  private readonly _exportApi: ExportApi;
 
   private readonly _userApi: UserApi;
 
@@ -35,6 +38,7 @@ class ApiService {
     this._rosterAnswerApi = new RosterAnswerApi(config);
     this._rosterShiftApi = new RosterShiftApi(config);
     this._savedShiftApi = new SavedShiftApi(config);
+    this._exportApi = new ExportApi(config);
     this._userApi = new UserApi(config);
     this._authApi = new AuthApi(config);
   }
@@ -53,6 +57,10 @@ class ApiService {
 
   get savedShiftApi(): SavedShiftApi {
     return this._savedShiftApi;
+  }
+
+  get exportApi(): ExportApi {
+    return this._exportApi;
   }
 
   get user(): UserApi {

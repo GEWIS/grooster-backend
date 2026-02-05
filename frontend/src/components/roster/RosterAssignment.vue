@@ -2,6 +2,7 @@
 import { User, SavedShiftUpdateRequest, SavedShift } from '@gewis/grooster-backend-ts';
 import { onMounted, reactive, computed, watch } from 'vue';
 import { useRosterStore } from '@/stores/roster.store';
+import ApiService from '@/services/ApiService';
 
 const props = defineProps<{
   id: number;
@@ -104,13 +105,41 @@ const availableUsersForShift = (shift: SavedShift) => {
 
   return ordering.users.filter((user) => !shiftAssignedUsers[shift.id]?.some((u) => u.id === user.id));
 };
+
+const exportRoster = async () => {
+  try {
+    const response = await ApiService.exportApi.exportRosterIdGet(props.id, {
+      responseType: 'blob',
+    });
+
+    const blob = response.data instanceof Blob ? response.data : new Blob([response.data], { type: 'image/png' });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `roster-${props.id}.png`);
+    document.body.appendChild(link);
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+    link.remove();
+  } catch (error) {
+    console.error('Export failed', error);
+  }
+};
 </script>
 
 <template>
   <div v-if="savedRoster && savedRoster.length > 0" class="space-y-6 max-w-6xl mx-auto p-4">
-    <div class="border-b border-slate-200 pb-4">
-      <h2 class="text-xl font-bold text-slate-800">Shift Assignments</h2>
-      <p class="text-sm text-slate-500">Assign and manage team members for each active shift.</p>
+    <div class="flex flex-row justify-between items-center border-b border-slate-200 pb-4">
+      <div>
+        <h2 class="text-xl font-bold text-slate-800">Shift Assignments</h2>
+        <p class="text-sm text-slate-500">Assign and manage team members for each active shift.</p>
+      </div>
+
+      <div class="flex">
+        <Button class="rounded" @click="exportRoster"> Export Roster </Button>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 gap-4">
