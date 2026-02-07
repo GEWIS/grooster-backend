@@ -112,6 +112,8 @@ type RosterCreateRequest struct {
 	OrganID uint `json:"organId"`
 
 	Shifts []string `json:"shifts"`
+
+	TemplateID *uint `json:"templateId"`
 } // @name RosterCreateRequest
 
 type RosterUpdateRequest struct {
