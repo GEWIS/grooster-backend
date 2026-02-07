@@ -88,6 +88,10 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 		}
 	}
 
+	if params.TemplateID != nil {
+		
+	}
+
 	if err := s.db.Preload("Organ").Preload("RosterShift").First(&roster, roster.ID).Error; err != nil {
 		return nil, err
 	}
