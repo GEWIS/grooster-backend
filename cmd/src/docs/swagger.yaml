@@ -93,6 +93,8 @@ definitions:
         items:
           type: string
         type: array
+      templateId:
+        type: integer
     type: object
   RosterShift:
     properties:
@@ -257,6 +259,35 @@ definitions:
         items:
           $ref: '#/definitions/Organ'
         type: array
+    type: object
+  models.RosterTemplateShiftPreference:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      rosterTemplateShiftID:
+        type: integer
+      updatedAt:
+        type: string
+      userId:
+        type: integer
+      value:
+        type: string
+    type: object
+  models.TemplateShiftPreferenceCreateRequest:
+    properties:
+      preference:
+        type: string
+      rosterTemplateShiftID:
+        type: integer
+      userId:
+        type: integer
+    type: object
+  models.TemplateShiftPreferenceUpdateRequest:
+    properties:
+      preference:
+        type: string
     type: object
 info:
   contact: {}
@@ -916,6 +947,71 @@ paths:
       security:
       - BearerAuth: []
       summary: Updates a roster template by ID
+      tags:
+      - Roster
+  /roster/template/shift-preference:
+    post:
+      consumes:
+      - application/json
+      operationId: createRosterTemplateShiftPreference
+      parameters:
+      - description: Creation params
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/models.TemplateShiftPreferenceCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.RosterTemplateShiftPreference'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Creates a roster template shift preference
+      tags:
+      - Roster
+  /roster/template/shift-preference/{id}:
+    patch:
+      consumes:
+      - application/json
+      operationId: updateRosterTemplateShiftPreference
+      parameters:
+      - description: Preference ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update params
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/models.TemplateShiftPreferenceUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RosterTemplateShiftPreference'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Updates a roster template shift preference by ID
       tags:
       - Roster
   /user/:

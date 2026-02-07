@@ -6,6 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**createRoster**](#createroster) | **POST** /roster | CreateRoster a new roster|
 |[**createRosterTemplate**](#createrostertemplate) | **POST** /roster/template | Creates a template of a roster by defining the name of the shifts|
+|[**createRosterTemplateShiftPreference**](#createrostertemplateshiftpreference) | **POST** /roster/template/shift-preference | Creates a roster template shift preference|
 |[**deleteRoster**](#deleteroster) | **DELETE** /roster/{id} | DeleteRoster a roster|
 |[**deleteRosterTemplate**](#deleterostertemplate) | **DELETE** /roster/template/{id} | Deletes a roster template by ID|
 |[**getRoster**](#getroster) | **GET** /roster/{id} | Get a specific roster by id|
@@ -14,6 +15,7 @@ All URIs are relative to *http://localhost*
 |[**getRosters**](#getrosters) | **GET** /roster | Get all rosters or query by date and organ|
 |[**updateRoster**](#updateroster) | **PATCH** /roster/{id} | Update a roster|
 |[**updateRosterTemplate**](#updaterostertemplate) | **PUT** /roster/template/{id} | Updates a roster template by ID|
+|[**updateRosterTemplateShiftPreference**](#updaterostertemplateshiftpreference) | **PATCH** /roster/template/shift-preference/{id} | Updates a roster template shift preference by ID|
 
 # **createRoster**
 > Roster createRoster(createParams)
@@ -116,6 +118,58 @@ const { status, data } = await apiInstance.createRosterTemplate(
 |-------------|-------------|------------------|
 |**200** | Created Template |  -  |
 |**400** | Invalid request |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createRosterTemplateShiftPreference**
+> ModelsRosterTemplateShiftPreference createRosterTemplateShiftPreference(params)
+
+
+### Example
+
+```typescript
+import {
+    RosterApi,
+    Configuration,
+    ModelsTemplateShiftPreferenceCreateRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterApi(configuration);
+
+let params: ModelsTemplateShiftPreferenceCreateRequest; //Creation params
+
+const { status, data } = await apiInstance.createRosterTemplateShiftPreference(
+    params
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **params** | **ModelsTemplateShiftPreferenceCreateRequest**| Creation params | |
+
+
+### Return type
+
+**ModelsRosterTemplateShiftPreference**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**201** | Created |  -  |
+|**400** | Bad Request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -523,6 +577,62 @@ const { status, data } = await apiInstance.updateRosterTemplate(
 ### Return type
 
 **RosterTemplate**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateRosterTemplateShiftPreference**
+> ModelsRosterTemplateShiftPreference updateRosterTemplateShiftPreference(params)
+
+
+### Example
+
+```typescript
+import {
+    RosterApi,
+    Configuration,
+    ModelsTemplateShiftPreferenceUpdateRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterApi(configuration);
+
+let id: number; //Preference ID (default to undefined)
+let params: ModelsTemplateShiftPreferenceUpdateRequest; //Update params
+
+const { status, data } = await apiInstance.updateRosterTemplateShiftPreference(
+    id,
+    params
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **params** | **ModelsTemplateShiftPreferenceUpdateRequest**| Update params | |
+| **id** | [**number**] | Preference ID | defaults to undefined|
+
+
+### Return type
+
+**ModelsRosterTemplateShiftPreference**
 
 ### Authorization
 

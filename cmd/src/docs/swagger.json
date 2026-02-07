@@ -693,6 +693,109 @@
                 }
             }
         },
+        "/roster/template/shift-preference": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roster"
+                ],
+                "summary": "Creates a roster template shift preference",
+                "operationId": "createRosterTemplateShiftPreference",
+                "parameters": [
+                    {
+                        "description": "Creation params",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TemplateShiftPreferenceCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.RosterTemplateShiftPreference"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/roster/template/shift-preference/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roster"
+                ],
+                "summary": "Updates a roster template shift preference by ID",
+                "operationId": "updateRosterTemplateShiftPreference",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Preference ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TemplateShiftPreferenceUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RosterTemplateShiftPreference"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/roster/template/{id}": {
             "get": {
                 "security": [
@@ -1383,6 +1486,9 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "templateId": {
+                    "type": "integer"
                 }
             }
         },
@@ -1636,6 +1742,51 @@
                     "items": {
                         "$ref": "#/definitions/Organ"
                     }
+                }
+            }
+        },
+        "models.RosterTemplateShiftPreference": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "rosterTemplateShiftID": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TemplateShiftPreferenceCreateRequest": {
+            "type": "object",
+            "properties": {
+                "preference": {
+                    "type": "string"
+                },
+                "rosterTemplateShiftID": {
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TemplateShiftPreferenceUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "preference": {
+                    "type": "string"
                 }
             }
         }

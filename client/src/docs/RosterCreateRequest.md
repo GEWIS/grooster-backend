@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **name** | **string** |  | [optional] [default to undefined]
 **organId** | **number** |  | [optional] [default to undefined]
 **shifts** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
+**templateId** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -20,6 +21,7 @@ const instance: RosterCreateRequest = {
     name,
     organId,
     shifts,
+    templateId,
 };
 ```
 

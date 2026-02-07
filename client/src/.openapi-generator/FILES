@@ -6,6 +6,9 @@ common.ts
 configuration.ts
 docs/AuthApi.md
 docs/ExportApi.md
+docs/ModelsRosterTemplateShiftPreference.md
+docs/ModelsTemplateShiftPreferenceCreateRequest.md
+docs/ModelsTemplateShiftPreferenceUpdateRequest.md
 docs/Organ.md
 docs/Roster.md
 docs/RosterAnswer.md
