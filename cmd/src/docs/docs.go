@@ -702,6 +702,57 @@ const docTemplate = `{
             }
         },
         "/roster/template/shift-preference": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roster"
+                ],
+                "summary": "Gets shift preferences filtered by user and template",
+                "operationId": "getRosterTemplateShiftPreferences",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Template ID",
+                        "name": "templateId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.RosterTemplateShiftPreference"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -726,7 +777,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TemplateShiftPreferenceCreateRequest"
+                            "$ref": "#/definitions/TemplateShiftPreferenceCreateRequest"
                         }
                     }
                 ],
@@ -778,7 +829,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TemplateShiftPreferenceUpdateRequest"
+                            "$ref": "#/definitions/TemplateShiftPreferenceUpdateRequest"
                         }
                     }
                 ],
@@ -1704,6 +1755,28 @@ const docTemplate = `{
                 }
             }
         },
+        "TemplateShiftPreferenceCreateRequest": {
+            "type": "object",
+            "properties": {
+                "preference": {
+                    "type": "string"
+                },
+                "rosterTemplateShiftID": {
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "TemplateShiftPreferenceUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "preference": {
+                    "type": "string"
+                }
+            }
+        },
         "User": {
             "type": "object",
             "properties": {
@@ -1772,28 +1845,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "value": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.TemplateShiftPreferenceCreateRequest": {
-            "type": "object",
-            "properties": {
-                "preference": {
-                    "type": "string"
-                },
-                "rosterTemplateShiftID": {
-                    "type": "integer"
-                },
-                "userId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.TemplateShiftPreferenceUpdateRequest": {
-            "type": "object",
-            "properties": {
-                "preference": {
                     "type": "string"
                 }
             }

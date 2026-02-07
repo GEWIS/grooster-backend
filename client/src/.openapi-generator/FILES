@@ -7,8 +7,6 @@ configuration.ts
 docs/AuthApi.md
 docs/ExportApi.md
 docs/ModelsRosterTemplateShiftPreference.md
-docs/ModelsTemplateShiftPreferenceCreateRequest.md
-docs/ModelsTemplateShiftPreferenceUpdateRequest.md
 docs/Organ.md
 docs/Roster.md
 docs/RosterAnswer.md
@@ -31,6 +29,8 @@ docs/SavedShiftApi.md
 docs/SavedShiftOrdering.md
 docs/SavedShiftResponse.md
 docs/SavedShiftUpdateRequest.md
+docs/TemplateShiftPreferenceCreateRequest.md
+docs/TemplateShiftPreferenceUpdateRequest.md
 docs/User.md
 docs/UserApi.md
 docs/UserCreateRequest.md

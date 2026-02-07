@@ -228,6 +228,20 @@ definitions:
           type: integer
         type: array
     type: object
+  TemplateShiftPreferenceCreateRequest:
+    properties:
+      preference:
+        type: string
+      rosterTemplateShiftID:
+        type: integer
+      userId:
+        type: integer
+    type: object
+  TemplateShiftPreferenceUpdateRequest:
+    properties:
+      preference:
+        type: string
+    type: object
   User:
     properties:
       createdAt:
@@ -273,20 +287,6 @@ definitions:
       userId:
         type: integer
       value:
-        type: string
-    type: object
-  models.TemplateShiftPreferenceCreateRequest:
-    properties:
-      preference:
-        type: string
-      rosterTemplateShiftID:
-        type: integer
-      userId:
-        type: integer
-    type: object
-  models.TemplateShiftPreferenceUpdateRequest:
-    properties:
-      preference:
         type: string
     type: object
 info:
@@ -950,6 +950,39 @@ paths:
       tags:
       - Roster
   /roster/template/shift-preference:
+    get:
+      consumes:
+      - application/json
+      operationId: getRosterTemplateShiftPreferences
+      parameters:
+      - description: User ID
+        in: query
+        name: userId
+        required: true
+        type: integer
+      - description: Template ID
+        in: query
+        name: templateId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RosterTemplateShiftPreference'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Gets shift preferences filtered by user and template
+      tags:
+      - Roster
     post:
       consumes:
       - application/json
@@ -960,7 +993,7 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/models.TemplateShiftPreferenceCreateRequest'
+          $ref: '#/definitions/TemplateShiftPreferenceCreateRequest'
       produces:
       - application/json
       responses:
@@ -993,7 +1026,7 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/models.TemplateShiftPreferenceUpdateRequest'
+          $ref: '#/definitions/TemplateShiftPreferenceUpdateRequest'
       produces:
       - application/json
       responses:
