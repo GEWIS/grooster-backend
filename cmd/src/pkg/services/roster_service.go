@@ -50,12 +50,14 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 	var users []models.User
 	var values = models.Values{"J", "X", "L", "N"} //TODO Change this to input values
 
-	if err := s.db.Find(&users).Error; err != nil {
-		return nil, err
-	}
 	if err := s.db.Find(&models.Organ{}, params.OrganID).Error; err != nil {
 		return nil, err
 	}
+
+	if err := s.db.Where("organ_id = ?", params.OrganID).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
 	if !isTodayOrLater(params.Date) {
 		return nil, errors.New("date must be after the current date")
 	}
@@ -74,6 +76,8 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 		return nil, err
 	}
 
+	nameToShiftID := make(map[string]uint)
+
 	if params.Shifts != nil && len(params.Shifts) > 0 {
 		for index, shift := range params.Shifts {
 			rosterShift := &models.RosterShift{
@@ -85,11 +89,38 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 			if err := s.db.Create(&rosterShift).Error; err != nil {
 				return nil, err
 			}
+
+			nameToShiftID[rosterShift.Name] = rosterShift.ID
 		}
 	}
 
 	if params.TemplateID != nil {
-		
+		userIDs := make([]uint, len(users))
+		for i, user := range users {
+			userIDs[i] = user.ID
+		}
+
+		var preferences []models.RosterTemplateShiftPreference
+		err := s.db.Where("user_id IN ? AND roster_template_id = ?", userIDs, *params.TemplateID).
+			Find(&preferences).Error
+		if err != nil {
+			return nil, err
+		}
+
+		for _, pref := range preferences {
+			if newShiftID, exists := nameToShiftID[pref.RosterTemplateShift.ShiftName]; exists {
+				answer := models.RosterAnswer{
+					UserID:        pref.UserID,
+					RosterID:      roster.ID,
+					RosterShiftID: newShiftID,
+					Value:         pref.Preference,
+				}
+
+				if err := s.db.Create(&answer).Error; err != nil {
+					return nil, err
+				}
+			}
+		}
 	}
 
 	if err := s.db.Preload("Organ").Preload("RosterShift").First(&roster, roster.ID).Error; err != nil {
