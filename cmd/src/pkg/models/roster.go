@@ -90,6 +90,20 @@ type RosterTemplateShift struct {
 	ShiftName string `json:"shiftName"`
 } // @name RosterTemplateShift
 
+type RosterTemplateShiftPreference struct {
+	BaseModel
+
+	RosterTemplateShiftID uint `json:"rosterTemplateShiftID"`
+
+	RosterTemplateShift *RosterTemplateShift `json:"-" gorm:"foreignKey:RosterTemplateShiftID;constraint:OnDelete:CASCADE;"`
+
+	UserID uint `json:"userId"`
+
+	User *User `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+
+	Preference string `json:"value"`
+}
+
 type RosterCreateRequest struct {
 	Name string `json:"name"`
 
@@ -167,3 +181,15 @@ type RosterTemplateUpdateParams struct {
 
 	Shifts []string `json:"shifts"`
 } // @name RosterTemplateUpdateParams
+
+type TemplateShiftPreferenceCreateRequest struct {
+	UserID uint `json:"userId"`
+
+	RosterTemplateShiftID uint `json:"rosterTemplateShiftID"`
+
+	Preference string `json:"preference"`
+}
+
+type TemplateShiftPreferenceUpdateRequest struct {
+	Preference string `json:"preference"`
+}

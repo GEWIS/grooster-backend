@@ -644,3 +644,74 @@ func (h *RosterHandler) DeleteRosterTemplate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Deleted successfully"})
 }
+
+// CreateRosterTemplateShiftPreference
+//
+//	@Summary   Creates a roster template shift preference
+//	@Security  BearerAuth
+//	@Tags      Roster
+//	@Accept    json
+//	@Produce   json
+//	@Param     params body      models.TemplateShiftPreferenceCreateRequest  true "Creation params"
+//	@Success   201       {object}      models.RosterTemplateShiftPreference
+//	@Failure   400       {string}   string
+//	@ID        createRosterTemplateShiftPreference
+//	@Router    /roster/template/shift-preference [post]
+func (h *RosterHandler) CreateRosterTemplateShiftPreference(c *gin.Context) {
+	var params models.TemplateShiftPreferenceCreateRequest
+	if err := c.ShouldBindJSON(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON: " + err.Error()})
+		return
+	}
+
+	preference, err := h.rosterService.CreateRosterTemplateShiftPreference(params)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, preference)
+}
+
+// UpdateRosterTemplateShiftPreference
+//
+//	@Summary   Updates a roster template shift preference by ID
+//	@Security  BearerAuth
+//	@Tags      Roster
+//	@Accept    json
+//	@Produce   json
+//	@Param     id     path      int    true   "Preference ID"
+//	@Param     params body      models.TemplateShiftPreferenceUpdateRequest  true "Update params"
+//	@Success   200       {object}      models.RosterTemplateShiftPreference
+//	@Failure   400       {string}   string
+//	@Failure   404       {string}   string
+//	@ID        updateRosterTemplateShiftPreference
+//	@Router    /roster/template/shift-preference/{id} [patch]
+func (h *RosterHandler) UpdateRosterTemplateShiftPreference(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	id := uint(id64)
+
+	var params models.TemplateShiftPreferenceUpdateRequest
+	if err := c.ShouldBindJSON(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON: " + err.Error()})
+		return
+	}
+
+	updatedPreference, err := h.rosterService.UpdateRosterTemplateShiftPreference(id, params)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Shift preference not found"})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedPreference)
+}
