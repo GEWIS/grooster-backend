@@ -33,6 +33,9 @@ type RosterServiceInterface interface {
 	GetRosterTemplates(*models.RosterTemplateFilterParams) ([]*models.RosterTemplate, error)
 	UpdateRosterTemplate(uint, *models.RosterTemplateUpdateParams) (*models.RosterTemplate, error)
 	DeleteRosterTemplate(ID uint) error
+
+	CreateRosterTemplateShiftPreference(models.TemplateShiftPreferenceCreateRequest) (*models.RosterTemplateShiftPreference, error)
+	UpdateRosterTemplateShiftPreference(uint, models.TemplateShiftPreferenceUpdateRequest) (*models.RosterTemplateShiftPreference, error)
 }
 
 type RosterService struct {
@@ -413,6 +416,37 @@ func (s *RosterService) DeleteRosterTemplate(ID uint) error {
 		return fmt.Errorf("roster template with ID %d not found", ID)
 	}
 	return nil
+}
+
+func (s *RosterService) CreateRosterTemplateShiftPreference(params models.TemplateShiftPreferenceCreateRequest) (*models.RosterTemplateShiftPreference, error) {
+	templateShiftPreference := models.RosterTemplateShiftPreference{
+		UserID:                params.UserID,
+		RosterTemplateShiftID: params.RosterTemplateShiftID,
+		Preference:            params.Preference,
+	}
+
+	if err := s.db.Create(&templateShiftPreference).Error; err != nil {
+		return nil, err
+	}
+
+	return &templateShiftPreference, nil
+}
+
+func (s *RosterService) UpdateRosterTemplateShiftPreference(id uint, params models.TemplateShiftPreferenceUpdateRequest) (*models.RosterTemplateShiftPreference, error) {
+	var templateShiftPreference models.RosterTemplateShiftPreference
+	if err := s.db.First(&templateShiftPreference, id).Error; err != nil {
+		return nil, err
+	}
+
+	updates := map[string]interface{}{
+		"preference": params.Preference,
+	}
+
+	if err := s.db.Model(&templateShiftPreference).Updates(updates).Error; err != nil {
+		return nil, err
+	}
+
+	return &templateShiftPreference, nil
 }
 
 func (s *RosterService) createSavedShift(rID uint, shift *models.RosterShift) error {
