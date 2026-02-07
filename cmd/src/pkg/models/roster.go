@@ -190,8 +190,14 @@ type TemplateShiftPreferenceCreateRequest struct {
 	RosterTemplateShiftID uint `json:"rosterTemplateShiftID"`
 
 	Preference string `json:"preference"`
-}
+} // @name TemplateShiftPreferenceCreateRequest
+
+type TemplateShiftPreferenceFilterParams struct {
+	UserID *uint `json:"userId"`
+
+	TemplateID *uint `json:"templateId"`
+} // @name TemplateShiftPreferenceFilterParams
 
 type TemplateShiftPreferenceUpdateRequest struct {
 	Preference string `json:"preference"`
-}
+} // @name TemplateShiftPreferenceUpdateRequest

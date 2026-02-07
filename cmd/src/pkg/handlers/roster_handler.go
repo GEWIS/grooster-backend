@@ -43,6 +43,7 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 	g.DELETE("/template/:id", h.DeleteRosterTemplate)
 
 	g.POST("/roster/template/shift-preference", h.CreateRosterTemplateShiftPreference)
+	g.GET(" /roster/template/shift-preference", h.GetRosterTemplateShiftPreferences)
 	g.PATCH("/roster/template/shift-preference/{id}", h.UpdateRosterTemplateShiftPreference)
 
 	return h
@@ -674,6 +675,36 @@ func (h *RosterHandler) CreateRosterTemplateShiftPreference(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, preference)
+}
+
+// GetRosterTemplateShiftPreferences
+//
+//	@Summary   Gets shift preferences filtered by user and template
+//	@Security  BearerAuth
+//	@Tags      Roster
+//	@Accept    json
+//	@Produce   json
+//	@Param     userId      query    int     true  "User ID"
+//	@Param     templateId  query    int     true  "Template ID"
+//	@Success   200         {array}  models.RosterTemplateShiftPreference
+//	@Failure   400         {string} string
+//	@ID        getRosterTemplateShiftPreferences
+//	@Router    /roster/template/shift-preference [get]
+func (h *RosterHandler) GetRosterTemplateShiftPreferences(c *gin.Context) {
+	var params models.TemplateShiftPreferenceFilterParams
+
+	if err := c.ShouldBindQuery(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters: " + err.Error()})
+		return
+	}
+
+	preferences, err := h.rosterService.GetRosterTemplateShiftPreferences(params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch preferences: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, preferences)
 }
 
 // UpdateRosterTemplateShiftPreference
