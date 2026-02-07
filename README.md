@@ -22,6 +22,8 @@ cp .env-example .env
 
 Ensure `DEV_TYPE` is set to "local" in your `.env` file if you want to run the project without Keycloak authentication.
 
+Make sure to set the `JWT_SECRET`
+
 ## Seeding the Database
 
 If you want to seed the database with initial data (users, organs, rosters), run:
