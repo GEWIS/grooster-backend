@@ -35,6 +35,7 @@ type RosterServiceInterface interface {
 	DeleteRosterTemplate(ID uint) error
 
 	CreateRosterTemplateShiftPreference(models.TemplateShiftPreferenceCreateRequest) (*models.RosterTemplateShiftPreference, error)
+	GetRosterTemplateShiftPreferences(models.TemplateShiftPreferenceFilterParams) ([]models.RosterTemplateShiftPreference, error)
 	UpdateRosterTemplateShiftPreference(uint, models.TemplateShiftPreferenceUpdateRequest) (*models.RosterTemplateShiftPreference, error)
 }
 
@@ -465,6 +466,27 @@ func (s *RosterService) CreateRosterTemplateShiftPreference(params models.Templa
 	}
 
 	return &templateShiftPreference, nil
+}
+
+func (s *RosterService) GetRosterTemplateShiftPreferences(params models.TemplateShiftPreferenceFilterParams) ([]models.RosterTemplateShiftPreference, error) {
+	var preferences []models.RosterTemplateShiftPreference
+
+	query := s.db.Model(&models.RosterTemplateShiftPreference{})
+
+	if params.UserID != nil {
+		query = query.Where("user_id = ?", params.UserID)
+	}
+
+	if params.TemplateID != nil {
+		query = query.Joins("JOIN roster_template_shifts ON roster_template_shifts.id = roster_template_shift_preferences.roster_template_shift_id").
+			Where("roster_template_shifts.roster_template_id = ?", params.TemplateID)
+	}
+
+	if err := query.Find(&preferences).Error; err != nil {
+		return nil, err
+	}
+
+	return preferences, nil
 }
 
 func (s *RosterService) UpdateRosterTemplateShiftPreference(id uint, params models.TemplateShiftPreferenceUpdateRequest) (*models.RosterTemplateShiftPreference, error) {
