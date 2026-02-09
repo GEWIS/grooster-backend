@@ -42,9 +42,9 @@ func NewRosterHandler(rosterService services.RosterServiceInterface, rg *gin.Rou
 	g.PUT("/template/:id", h.UpdateRosterTemplate)
 	g.DELETE("/template/:id", h.DeleteRosterTemplate)
 
-	g.POST("/roster/template/shift-preference", h.CreateRosterTemplateShiftPreference)
-	g.GET(" /roster/template/shift-preference", h.GetRosterTemplateShiftPreferences)
-	g.PATCH("/roster/template/shift-preference/{id}", h.UpdateRosterTemplateShiftPreference)
+	g.POST("/template/shift-preference", h.CreateRosterTemplateShiftPreference)
+	g.GET("/template/shift-preference", h.GetRosterTemplateShiftPreferences)
+	g.PATCH("/template/shift-preference/{id}", h.UpdateRosterTemplateShiftPreference)
 
 	return h
 }
