@@ -289,6 +289,20 @@ definitions:
       value:
         type: string
     type: object
+  models.UpdateMemberSettingsParams:
+    properties:
+      username:
+        type: string
+    type: object
+  models.UserOrgan:
+    properties:
+      organID:
+        type: integer
+      userID:
+        type: integer
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   description: A GEWIS Rooster maker for fun
@@ -392,6 +406,48 @@ paths:
       summary: Export roster assignments as PNG
       tags:
       - Export
+  /organ/{id}/member/{userId}:
+    patch:
+      consumes:
+      - application/json
+      description: Update organ-specific settings like nickname/username
+      parameters:
+      - description: Organ ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: Settings input
+        in: body
+        name: updateParams
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateMemberSettingsParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserOrgan'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update settings for a user within an organ
+      tags:
+      - Organ
   /roster:
     get:
       consumes:

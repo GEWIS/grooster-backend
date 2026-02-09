@@ -9,3 +9,15 @@ type Organ struct {
 
 	Users []*User `json:"users" gorm:"many2many:user_organs;"`
 } // @name Organ
+
+type UserOrgan struct {
+	UserID uint `gorm:"primaryKey"`
+
+	OrganID uint `gorm:"primaryKey"`
+
+	Username string `json:"username" gorm:"size:255"`
+}
+
+type UpdateMemberSettingsParams struct {
+	Username *string `json:"username"`
+}

@@ -7,7 +7,10 @@ configuration.ts
 docs/AuthApi.md
 docs/ExportApi.md
 docs/ModelsRosterTemplateShiftPreference.md
+docs/ModelsUpdateMemberSettingsParams.md
+docs/ModelsUserOrgan.md
 docs/Organ.md
+docs/OrganApi.md
 docs/Roster.md
 docs/RosterAnswer.md
 docs/RosterAnswerApi.md

@@ -67,6 +67,44 @@ export interface ModelsRosterTemplateShiftPreference {
     'value'?: string;
 }
 /**
+ * 
+ * @export
+ * @interface ModelsUpdateMemberSettingsParams
+ */
+export interface ModelsUpdateMemberSettingsParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof ModelsUpdateMemberSettingsParams
+     */
+    'username'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ModelsUserOrgan
+ */
+export interface ModelsUserOrgan {
+    /**
+     * 
+     * @type {number}
+     * @memberof ModelsUserOrgan
+     */
+    'organID'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ModelsUserOrgan
+     */
+    'userID'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ModelsUserOrgan
+     */
+    'username'?: string;
+}
+/**
  * An organ that users can be part of.
  * @export
  * @interface Organ
@@ -1048,6 +1086,133 @@ export class ExportApi extends BaseAPI {
      */
     public exportRosterIdGet(id: number, options?: RawAxiosRequestConfig) {
         return ExportApiFp(this.configuration).exportRosterIdGet(id, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * OrganApi - axios parameter creator
+ * @export
+ */
+export const OrganApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Update organ-specific settings like nickname/username
+         * @summary Update settings for a user within an organ
+         * @param {number} id Organ ID
+         * @param {number} userId User ID
+         * @param {ModelsUpdateMemberSettingsParams} updateParams Settings input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organIdMemberUserIdPatch: async (id: number, userId: number, updateParams: ModelsUpdateMemberSettingsParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('organIdMemberUserIdPatch', 'id', id)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('organIdMemberUserIdPatch', 'userId', userId)
+            // verify required parameter 'updateParams' is not null or undefined
+            assertParamExists('organIdMemberUserIdPatch', 'updateParams', updateParams)
+            const localVarPath = `/organ/{id}/member/{userId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * OrganApi - functional programming interface
+ * @export
+ */
+export const OrganApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = OrganApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Update organ-specific settings like nickname/username
+         * @summary Update settings for a user within an organ
+         * @param {number} id Organ ID
+         * @param {number} userId User ID
+         * @param {ModelsUpdateMemberSettingsParams} updateParams Settings input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organIdMemberUserIdPatch(id: number, userId: number, updateParams: ModelsUpdateMemberSettingsParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ModelsUserOrgan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organIdMemberUserIdPatch(id, userId, updateParams, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganApi.organIdMemberUserIdPatch']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * OrganApi - factory interface
+ * @export
+ */
+export const OrganApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = OrganApiFp(configuration)
+    return {
+        /**
+         * Update organ-specific settings like nickname/username
+         * @summary Update settings for a user within an organ
+         * @param {number} id Organ ID
+         * @param {number} userId User ID
+         * @param {ModelsUpdateMemberSettingsParams} updateParams Settings input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organIdMemberUserIdPatch(id: number, userId: number, updateParams: ModelsUpdateMemberSettingsParams, options?: RawAxiosRequestConfig): AxiosPromise<ModelsUserOrgan> {
+            return localVarFp.organIdMemberUserIdPatch(id, userId, updateParams, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * OrganApi - object-oriented interface
+ * @export
+ * @class OrganApi
+ * @extends {BaseAPI}
+ */
+export class OrganApi extends BaseAPI {
+    /**
+     * Update organ-specific settings like nickname/username
+     * @summary Update settings for a user within an organ
+     * @param {number} id Organ ID
+     * @param {number} userId User ID
+     * @param {ModelsUpdateMemberSettingsParams} updateParams Settings input
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganApi
+     */
+    public organIdMemberUserIdPatch(id: number, userId: number, updateParams: ModelsUpdateMemberSettingsParams, options?: RawAxiosRequestConfig) {
+        return OrganApiFp(this.configuration).organIdMemberUserIdPatch(id, userId, updateParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
