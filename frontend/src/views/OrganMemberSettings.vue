@@ -78,7 +78,7 @@ const resetName = () => {
         </div>
         <div>
           <h2 class="text-white font-semibold text-lg leading-tight">Member Profile</h2>
-          <p class="text-emerald-200/70 text-xs">Organization ID: {{ organStore.organ }}</p>
+          <p class="text-emerald-200/70 text-xs">Organ ID: {{ organStore.organ }}</p>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ const resetName = () => {
           </div>
 
           <p class="text-[11px] text-emerald-600 italic ml-1 mt-1">
-            * This name is specific to this organization and will appear on all generated rosters.
+            * This name is specific to this organ and will appear on all generated rosters.
           </p>
         </div>
       </div>
