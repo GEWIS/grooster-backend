@@ -193,9 +193,9 @@ type TemplateShiftPreferenceCreateRequest struct {
 } // @name TemplateShiftPreferenceCreateRequest
 
 type TemplateShiftPreferenceFilterParams struct {
-	UserID *uint `json:"userId"`
+	UserID uint `form:"userId"`
 
-	TemplateID *uint `json:"templateId"`
+	TemplateID uint `form:"templateId"`
 } // @name TemplateShiftPreferenceFilterParams
 
 type TemplateShiftPreferenceUpdateRequest struct {

@@ -51,11 +51,11 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 	var users []models.User
 	var values = models.Values{"J", "X", "L", "N"} //TODO Change this to input values
 
-	if err := s.db.Find(&models.Organ{}, params.OrganID).Error; err != nil {
-		return nil, err
-	}
+	err := s.db.Joins("JOIN user_organs ON user_organs.user_id = users.id").
+		Where("user_organs.organ_id = ?", params.OrganID).
+		Find(&users).Error
 
-	if err := s.db.Where("organ_id = ?", params.OrganID).Find(&users).Error; err != nil {
+	if err != nil {
 		return nil, err
 	}
 
@@ -102,7 +102,9 @@ func (s *RosterService) CreateRoster(params *models.RosterCreateRequest) (*model
 		}
 
 		var preferences []models.RosterTemplateShiftPreference
-		err := s.db.Where("user_id IN ? AND roster_template_id = ?", userIDs, *params.TemplateID).
+		err := s.db.Preload("RosterTemplateShift").
+			Joins("JOIN roster_template_shifts ON roster_template_shifts.id = roster_template_shift_preferences.roster_template_shift_id").
+			Where("roster_template_shift_preferences.user_id IN ? AND roster_template_shifts.template_id = ?", userIDs, *params.TemplateID).
 			Find(&preferences).Error
 		if err != nil {
 			return nil, err
@@ -473,14 +475,10 @@ func (s *RosterService) GetRosterTemplateShiftPreferences(params models.Template
 
 	query := s.db.Model(&models.RosterTemplateShiftPreference{})
 
-	if params.UserID != nil {
-		query = query.Where("user_id = ?", params.UserID)
-	}
+	query = query.Where("user_id = ?", params.UserID)
 
-	if params.TemplateID != nil {
-		query = query.Joins("JOIN roster_template_shifts ON roster_template_shifts.id = roster_template_shift_preferences.roster_template_shift_id").
-			Where("roster_template_shifts.roster_template_id = ?", params.TemplateID)
-	}
+	query = query.Joins("JOIN roster_template_shifts ON roster_template_shifts.id = roster_template_shift_preferences.roster_template_shift_id").
+		Where("roster_template_shifts.template_id = ?", params.TemplateID)
 
 	if err := query.Find(&preferences).Error; err != nil {
 		return nil, err
