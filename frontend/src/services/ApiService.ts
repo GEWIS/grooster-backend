@@ -7,6 +7,7 @@ import {
   SavedShiftApi,
   Configuration,
   ExportApi,
+  OrganApi,
 } from '@gewis/grooster-backend-ts';
 import { getTokenFromStorage } from '@/helpers/TokenHelper';
 
@@ -22,6 +23,8 @@ class ApiService {
   private readonly _exportApi: ExportApi;
 
   private readonly _userApi: UserApi;
+
+  private readonly _organApi: OrganApi;
 
   private readonly _authApi: AuthApi;
 
@@ -40,6 +43,7 @@ class ApiService {
     this._savedShiftApi = new SavedShiftApi(config);
     this._exportApi = new ExportApi(config);
     this._userApi = new UserApi(config);
+    this._organApi = new OrganApi(config);
     this._authApi = new AuthApi(config);
   }
 
@@ -65,6 +69,10 @@ class ApiService {
 
   get user(): UserApi {
     return this._userApi;
+  }
+
+  get organ(): OrganApi {
+    return this._organApi;
   }
 
   get auth(): AuthApi {

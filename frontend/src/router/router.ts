@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalizedGeneric } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
 import RosterView from '@/views/RosterView.vue';
 import OrganView from '@/views/OrganView.vue';
@@ -8,6 +8,7 @@ import RosterTemplateView from '@/views/RosterTemplateView.vue';
 import { useOrganStore } from '@/stores/organ.store';
 import { useRosterStore } from '@/stores/roster.store';
 import { useUserStore } from '@/stores/user.store';
+import OrganMemberSettings from '@/views/OrganMemberSettings.vue';
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: OrganView },
@@ -15,37 +16,21 @@ const routes: RouteRecordRaw[] = [
     path: '/rosters/:id',
     name: 'rosters',
     component: RosterView,
-    beforeEnter: async (to, from, next) => {
-      const store = useOrganStore();
-      const id = parseInt(to.params.id as string);
-
-      store.setOrgan(id);
-
-      if (await canAccessOrgan(id)) {
-        next();
-      } else {
-        next('/');
-      }
-    },
+    beforeEnter: handleOrganAccess,
   },
   {
     path: '/templates/:id',
     name: 'templates',
     component: RosterTemplateView,
-    beforeEnter: async (to, from, next) => {
-      const store = useOrganStore();
-      const id = parseInt(to.params.id as string);
-
-      store.setOrgan(id);
-
-      if (await canAccessOrgan(id)) {
-        next();
-      } else {
-        next('/');
-      }
-    },
+    beforeEnter: handleOrganAccess,
   },
   { path: '/callback', component: OrganView },
+  {
+    path: '/organ/:id/profile',
+    name: 'profile',
+    component: OrganMemberSettings,
+    beforeEnter: handleOrganAccess,
+  },
 ];
 
 const router = createRouter({
@@ -104,6 +89,30 @@ async function canAccessOrgan(id: number): Promise<boolean> {
   } catch (error) {
     console.warn(`Failed to check organ access for ID ${id}:`, error);
     return false;
+  }
+}
+
+/**
+ * Reusable guard to ensure the organ store is set and user has access
+ */
+async function handleOrganAccess(
+  to: RouteLocationNormalizedGeneric,
+  from: RouteLocationNormalizedGeneric,
+  next: NavigationGuardNext,
+) {
+  const store = useOrganStore();
+  const id = parseInt(to.params.id as string);
+
+  if (isNaN(id)) {
+    return next('/');
+  }
+
+  store.setOrgan(id);
+
+  if (await canAccessOrgan(id)) {
+    next();
+  } else {
+    next('/');
   }
 }
 
