@@ -407,6 +407,41 @@ paths:
       tags:
       - Export
   /organ/{id}/member/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Get organ-specific settings like nickname/username
+      parameters:
+      - description: Organ ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserOrgan'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get settings for a user within an organ
+      tags:
+      - Organ
     patch:
       consumes:
       - application/json
@@ -437,10 +472,6 @@ paths:
             $ref: '#/definitions/models.UserOrgan'
         "400":
           description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
           schema:
             type: string
       security:
