@@ -105,8 +105,8 @@ const onPreferenceChange = async (shiftId: number, templateShiftId: number, valu
   <Dialog v-model:visible="visible" modal :style="{ width: '28rem' }" @hide="emit('close')">
     <template #header>
       <div class="flex flex-col gap-1">
-        <h3 class="m-0 text-xl font-semibold text-surface-900">New Roster Template</h3>
-        <small class="text-surface-500">Define the sequence of shifts for this rotation.</small>
+        <h3 class="m-0 text-xl font-semibold text-surface-900">Roster Template Preferences</h3>
+        <small class="text-surface-500">Give your preferences for each shift in this template.</small>
       </div>
     </template>
     <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
