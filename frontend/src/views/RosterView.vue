@@ -103,10 +103,6 @@ const closeDialog = () => {
   <Card v-if="rosters" class="h-full w-full">
     <template #content>
       <div class="flex flex-col gap-5 h-full">
-        <div v-if="selectedRoster?.id" class="flex flex-col gap-5 flex-1">
-          <RosterTable :id="selectedRoster.id" />
-          <RosterAssignment v-if="selectedRoster.saved" :id="selectedRoster.id" />
-        </div>
         <div class="flex items-center justify-center gap-2">
           <Select
             v-model="selectedRoster"
@@ -147,6 +143,10 @@ const closeDialog = () => {
               @click="openDialog('delete')"
             />
           </div>
+        </div>
+        <div v-if="selectedRoster?.id" class="flex flex-col gap-5 flex-1">
+          <RosterTable :id="selectedRoster.id" />
+          <RosterAssignment v-if="selectedRoster.saved" :id="selectedRoster.id" />
         </div>
       </div>
     </template>
