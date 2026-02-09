@@ -18,6 +18,7 @@ import ListBox from 'primevue/listbox';
 import DatePicker from 'primevue/datepicker';
 import { Form } from '@primevue/forms';
 import Chip from 'primevue/chip';
+import { Divider } from 'primevue';
 import App from './App.vue';
 import router from '@/router/router';
 
@@ -46,6 +47,7 @@ app.component('ListBox', ListBox);
 app.component('DatePicker', DatePicker);
 app.component('Form', Form);
 app.component('Chip', Chip);
+app.component('Divider', Divider);
 
 app.use(pinia);
 app.use(router);

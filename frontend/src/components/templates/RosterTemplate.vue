@@ -3,12 +3,14 @@ import { RosterTemplate as RosterTemplateModel } from '@gewis/grooster-backend-t
 import { ref } from 'vue';
 import RosterTemplateDelete from '@/components/templates/dialogs/RosterTemplateDelete.vue';
 import RosterTemplateUseDialog from '@/components/templates/dialogs/RosterTemplateUseDialog.vue';
+import RosterTemplatePreferences from '@/components/templates/dialogs/RosterTemplatePreferences.vue';
+
+type Dialogs = 'Preferences' | 'Delete' | 'Roster' | 'None';
 
 const props = defineProps<{
   template: RosterTemplateModel;
 }>();
-const openDeleteDialog = ref(false);
-const openRosterDialog = ref(false);
+const openDialog = ref<Dialogs>('None');
 
 const showDetail = ref<boolean>(false);
 </script>
@@ -22,22 +24,9 @@ const showDetail = ref<boolean>(false);
             {{ props.template.name }}
           </h3>
           <div class="flex gap-2">
-            <Button
-              v-tooltip.top="'Use Template'"
-              icon="pi pi-plus"
-              rounded
-              severity="secondary"
-              text
-              @click="openRosterDialog = true"
-            />
-            <Button
-              v-tooltip.top="'Delete'"
-              icon="pi pi-trash"
-              rounded
-              severity="danger"
-              text
-              @click="openDeleteDialog = true"
-            />
+            <Button icon="pi pi-heart" rounded @click="openDialog = 'Preferences'" />
+            <Button icon="pi pi-plus" rounded severity="secondary" text @click="openDialog = 'Roster'" />
+            <Button icon="pi pi-trash" rounded severity="danger" text @click="openDialog = 'Delete'" />
           </div>
         </div>
 
@@ -76,12 +65,18 @@ const showDetail = ref<boolean>(false);
     </Card>
   </div>
 
-  <RosterTemplateDelete :open="openDeleteDialog" :template-id="props.template.id" @close="openDeleteDialog = false" />
+  <RosterTemplateDelete :open="openDialog === 'Delete'" :template-id="props.template.id" @close="openDialog = 'None'" />
   <RosterTemplateUseDialog
     :name="props.template.name"
-    :open="openRosterDialog"
+    :open="openDialog === 'Roster'"
     :shifts="props.template.shifts.map((s) => s.shiftName)"
-    @close="openRosterDialog = false"
+    :template-id="props.template.id"
+    @close="openDialog = 'None'"
+  />
+  <RosterTemplatePreferences
+    :open="openDialog === 'Preferences'"
+    :template="props.template"
+    @close="openDialog = 'None'"
   />
 </template>
 

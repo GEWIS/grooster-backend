@@ -12,6 +12,7 @@ const props = withDefaults(
     open: boolean;
     name: string;
     shifts: string[];
+    templateId: number;
   }>(),
   {
     open: false,
@@ -43,6 +44,7 @@ const addRoster = async () => {
     date: date.value.toISOString(),
     organId: parseInt(route.params.id as string),
     shifts: props.shifts,
+    templateId: props.templateId,
   };
 
   const created = await rosterStore.createRoster(createParams);
