@@ -2,10 +2,12 @@ package services
 
 import (
 	"GEWIS-Rooster/cmd/src/pkg/models"
+	"errors"
 	"gorm.io/gorm"
 )
 
 type OrganServiceInterface interface {
+	GetMemberSettings(organID uint, userID uint) (*models.UserOrgan, error)
 	UpdateMemberSettings(organID uint, userID uint, params *models.UpdateMemberSettingsParams) (*models.UserOrgan, error)
 }
 
@@ -15,6 +17,20 @@ type OrganService struct {
 
 func NewOrganService(db *gorm.DB) *OrganService {
 	return &OrganService{db: db}
+}
+
+func (o *OrganService) GetMemberSettings(organID uint, userID uint) (*models.UserOrgan, error) {
+	var userSettings models.UserOrgan
+	err := o.db.Where("organ_id = ? AND user_id = ?", organID, userID).First(&userSettings).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		return nil, err
+	}
+
+	return &userSettings, nil
 }
 
 func (o *OrganService) UpdateMemberSettings(organID uint, userID uint, params *models.UpdateMemberSettingsParams) (*models.UserOrgan, error) {
