@@ -103,7 +103,7 @@ const closeDialog = () => {
   <Card v-if="rosters" class="h-full w-full">
     <template #content>
       <div class="flex flex-col gap-5 h-full">
-        <div class="flex items-center justify-center gap-2">
+        <div class="flex flex-wrap items-center justify-center gap-2">
           <Select
             v-model="selectedRoster"
             class="w-full md:w-56 mr-4"
@@ -119,7 +119,7 @@ const closeDialog = () => {
               {{ slotProps.option.name }} ({{ slotProps.option.date.split('T')[0] }})
             </template>
           </Select>
-          <div class="flex flex-col sm:flex-row gap-3 p-4">
+          <div class="flex flex-row sm:flex-row gap-3 p-4">
             <Button
               class="p-button-success w-full sm:w-auto !justify-center"
               icon="pi pi-plus"
