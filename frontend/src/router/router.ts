@@ -7,6 +7,7 @@ import ApiService from '@/services/ApiService';
 import RosterTemplateView from '@/views/RosterTemplateView.vue';
 import { useOrganStore } from '@/stores/organ.store';
 import { useRosterStore } from '@/stores/roster.store';
+import { useUserStore } from '@/stores/user.store';
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: OrganView },
@@ -52,33 +53,36 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from) => {
   const rosterStore = useRosterStore();
+  const userStore = useUserStore();
+  const organStore = useOrganStore();
 
   if (to.params.id !== from.params.id) {
     rosterStore.clearRosters();
+  }
+
+  if (to.path === '/home') {
+    organStore.clearOrgan();
   }
 
   if (to.path === '/callback') {
     const token = to.query.token;
     if (typeof token === 'string') {
       localStorage.setItem('access_token', token);
-      // Optionally redirect to home or dashboard after storing token
-      next('/');
-      return;
+      return '/';
     }
   }
 
-  const store = useOrganStore();
-
-  if (to.path === '/home') {
-    store.clearOrgan();
-  }
-
   if (isAuthenticated()) {
-    next();
+    const gewisId = getGEWISId();
+    if (gewisId) {
+      await userStore.fetchUser(gewisId);
+    }
+    return true;
   } else {
     loginRedirect();
+    return false;
   }
 });
 
