@@ -35,6 +35,8 @@ type RosterShift struct {
 
 	RosterID uint `json:"rosterId"`
 
+	Roster *Roster `json:"-" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
+
 	Order uint `json:"order"`
 } // @name RosterShift
 
@@ -44,6 +46,8 @@ type RosterAnswer struct {
 	UserID uint `json:"userId" gorm:"uniqueIndex:user_answer_idx"`
 
 	RosterID uint `json:"rosterId" gorm:"uniqueIndex:user_answer_idx"`
+
+	Roster *Roster `json:"roster" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
 
 	RosterShiftID uint `json:"rosterShiftId" gorm:"uniqueIndex:user_answer_idx;"`
 
