@@ -102,6 +102,8 @@ export const useRosterStore = defineStore('roster', {
             rosterAnswer: [...(roster.rosterAnswer ?? []), response.data],
           };
         }
+
+        return response.data;
       } catch (error) {
         console.error('Failed to create roster answer:', error);
       }

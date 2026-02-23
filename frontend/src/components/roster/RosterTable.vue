@@ -69,10 +69,10 @@ async function onAnswerChange(user: number, shift: number, newValue: string) {
     };
 
     try {
-      await rosterStore.createAnswer(createParams);
+      const data = await rosterStore.createAnswer(createParams);
 
       shiftAnswers[user][shift] = {
-        id: props.id,
+        id: data.id,
         value: newValue,
       };
     } catch (error) {
