@@ -82,13 +82,13 @@ async function onAnswerChange(user: number, shift: number, newValue: string) {
     const updateParam: RosterAnswerUpdateRequest = {
       value: newValue,
     };
-    const rosterId = shiftAnswers[user][shift].id;
+    const rosterShiftId = shiftAnswers[user][shift].id;
 
     try {
-      await rosterStore.updateAnswer(rosterId, updateParam);
+      await rosterStore.updateAnswer(rosterShiftId, updateParam);
 
       shiftAnswers[user][shift] = {
-        id: props.id,
+        id: rosterShiftId,
         value: newValue,
       };
     } catch (error) {
