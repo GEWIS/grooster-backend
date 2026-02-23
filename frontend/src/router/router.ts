@@ -43,7 +43,7 @@ router.beforeEach(async (to, from) => {
   const userStore = useUserStore();
   const organStore = useOrganStore();
 
-  if (to.params.id !== from.params.id) {
+  if (from.name && to.params.id !== from.params.id) {
     rosterStore.clearRosters();
   }
 

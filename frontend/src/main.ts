@@ -7,6 +7,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 import Button from 'primevue/button';
 import Card from 'primevue/card';
@@ -24,6 +25,7 @@ import router from '@/router/router';
 
 const app = createApp(App);
 const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 app.use(PrimeVue, {
   theme: {

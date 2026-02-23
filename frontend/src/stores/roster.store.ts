@@ -18,6 +18,7 @@ export const useRosterStore = defineStore('roster', {
     savedRoster: {} as Record<number, SavedShiftResponse>,
     selectedRosterId: null as number | null,
   }),
+  persist: true,
   getters: {
     getRoster: (state) => {
       return (rosterId: number) => state.rosters[rosterId];
@@ -34,7 +35,7 @@ export const useRosterStore = defineStore('roster', {
   },
   actions: {
     setSelectedRoster(id: number | null) {
-      this.selectedRosterId = id ?? null;
+      this.selectedRosterId = id;
     },
     clearRosters() {
       this.rosters = {};

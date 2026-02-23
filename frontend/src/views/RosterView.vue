@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
-import type { Roster } from '@gewis/grooster-backend-ts';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import RosterTable from '@/components/roster/RosterTable.vue';
 import RosterAssignment from '@/components/roster/RosterAssignment.vue';
@@ -17,67 +16,27 @@ const route = useRoute();
 const rosterStore = useRosterStore();
 const rosters = computed(() => Object.values(rosterStore.rosters));
 const users = ref();
-const selectedRosterId = computed(() => rosterStore.selectedRosterId);
-
-const selectedRoster = ref<Roster | null>(null);
 
 const activeDialog = ref<DialogType>(null);
 
-onMounted(async () => {
-  await fetchRosters();
+const selectedRoster = computed({
+  get: () => {
+    if (!rosterStore.selectedRosterId) return null;
+
+    return rosters.value.find((r) => r.id === rosterStore.selectedRosterId) || null;
+  },
+  set: (val) => {
+    rosterStore.setSelectedRoster(val?.id ?? null);
+  },
 });
 
-watch(
-  () => rosters.value,
-  (newRosters: Roster[]) => {
-    if (!newRosters || newRosters.length === 0) {
-      selectedRoster.value = null;
-      rosterStore.setSelectedRoster(null);
-      return;
-    }
+onMounted(async () => {
+  await fetchRosters();
 
-    const storeSelectedId = rosterStore.selectedRosterId;
-    if (storeSelectedId != null) {
-      const updated = newRosters.find((response) => response.id === storeSelectedId);
-      if (updated) {
-        selectedRoster.value = updated;
-        return;
-      }
-    }
-
-    if (!selectedRoster.value) {
-      const first = newRosters[0];
-      if (first?.id != null) {
-        selectedRoster.value = first;
-        rosterStore.setSelectedRoster(first.id);
-      }
-    }
-  },
-  { immediate: true, deep: true },
-);
-
-watch(
-  () => selectedRoster.value?.id ?? null,
-  (newId) => {
-    if (newId !== rosterStore.selectedRosterId) {
-      rosterStore.setSelectedRoster(newId);
-    }
-  },
-);
-
-watch(
-  () => selectedRosterId.value,
-  (newId) => {
-    if (newId == null) {
-      selectedRoster.value = null;
-      return;
-    }
-    const updated = rosters.value.find((response) => response.id === newId);
-    if (updated) {
-      selectedRoster.value = updated;
-    }
-  },
-);
+  if (!rosterStore.selectedRosterId && rosters.value.length > 0) {
+    selectedRoster.value = rosters.value[0];
+  }
+});
 
 async function fetchRosters() {
   try {
