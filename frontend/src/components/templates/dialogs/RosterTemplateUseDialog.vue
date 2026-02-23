@@ -39,9 +39,15 @@ const visible = computed({
 const date = ref(new Date());
 
 const addRoster = async () => {
+  const d = date.value;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const dateString = `${year}-${month}-${day}T00:00:00Z`;
+
   const createParams: RosterCreateRequest = {
     name: rosterName.value,
-    date: date.value.toISOString(),
+    date: dateString,
     organId: parseInt(route.params.id as string),
     shifts: props.shifts,
     templateId: props.templateId,
