@@ -1,7 +1,9 @@
 package models
 
 import (
-	"GEWIS-Rooster/cmd/src/pkg/models"
+	"GEWIS-Rooster/internal/organ"
+	roster2 "GEWIS-Rooster/internal/roster"
+	"GEWIS-Rooster/internal/user"
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
@@ -16,11 +18,11 @@ func SeedRosters(db *gorm.DB, count int) {
 	rosterTemplates(db, count)
 }
 
-func roster(db *gorm.DB, count int) []*models.Roster {
-	var users []*models.User
-	var organs []*models.Organ
-	var rosters []*models.Roster
-	var values = models.Values{"Ja", "X", "L", "Nee"}
+func roster(db *gorm.DB, count int) []*roster2.Roster {
+	var users []*user.User
+	var organs []*organ.Organ
+	var rosters []*roster2.Roster
+	var values = roster2.Values{"Ja", "X", "L", "Nee"}
 
 	if err := db.Find(&users).Error; err != nil {
 		log.Printf("Could not get users: %v\n", err)
@@ -31,7 +33,7 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 	}
 
 	for i := 0; i < count; i++ {
-		r := &models.Roster{
+		r := &roster2.Roster{
 			Name:    "Roster" + strconv.Itoa(i),
 			Values:  values,
 			OrganID: organs[i].ID,
@@ -49,9 +51,9 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 	return rosters
 }
 
-func rosterShift(db *gorm.DB, roster []*models.Roster) {
+func rosterShift(db *gorm.DB, roster []*roster2.Roster) {
 	for _, roster := range roster {
-		shifts := []models.RosterShift{
+		shifts := []roster2.RosterShift{
 			{Name: "Shift A", RosterID: roster.ID, Order: 0},
 			{Name: "Shift B", RosterID: roster.ID, Order: 1},
 			{Name: "Shift C", RosterID: roster.ID, Order: 2},
@@ -63,12 +65,12 @@ func rosterShift(db *gorm.DB, roster []*models.Roster) {
 	}
 }
 
-func rosterAnswer(db *gorm.DB, roster []*models.Roster) {
+func rosterAnswer(db *gorm.DB, roster []*roster2.Roster) {
 	for _, roster := range roster {
-		var users []*models.User
-		var shifts []models.RosterShift
+		var users []*user.User
+		var shifts []roster2.RosterShift
 
-		var organ models.Organ
+		var organ organ.Organ
 
 		err := db.First(&organ, roster.Organ).Error
 		if err != nil {
@@ -85,10 +87,10 @@ func rosterAnswer(db *gorm.DB, roster []*models.Roster) {
 		valueCount := len(values)
 
 		i := 0
-		var answers []models.RosterAnswer
+		var answers []roster2.RosterAnswer
 		for _, user := range users {
 			for _, shift := range shifts {
-				answers = append(answers, models.RosterAnswer{
+				answers = append(answers, roster2.RosterAnswer{
 					UserID:        user.ID,
 					RosterID:      roster.ID,
 					RosterShiftID: shift.ID,
@@ -105,7 +107,7 @@ func rosterAnswer(db *gorm.DB, roster []*models.Roster) {
 }
 
 func rosterTemplates(db *gorm.DB, count int) {
-	var organ models.Organ
+	var organ organ.Organ
 	if err := db.First(&organ).Error; err != nil {
 		log.Error().Err(err).Msg("No organ found for seeding")
 		return
@@ -114,13 +116,13 @@ func rosterTemplates(db *gorm.DB, count int) {
 	for i := 0; i < count; i++ {
 		shiftName := fmt.Sprintf("Shift %d", i)
 
-		templateShifts := []models.RosterTemplateShift{
+		templateShifts := []roster2.RosterTemplateShift{
 			{
 				ShiftName: shiftName,
 			},
 		}
 
-		template := models.RosterTemplate{
+		template := roster2.RosterTemplate{
 			OrganID: organ.ID,
 			Name:    fmt.Sprintf("Template %d", i),
 			Shifts:  templateShifts,

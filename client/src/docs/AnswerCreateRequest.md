@@ -1,31 +1,23 @@
-# RosterAnswer
+# AnswerCreateRequest
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**createdAt** | **string** |  | [optional] [default to undefined]
-**id** | **number** |  | [optional] [default to undefined]
-**roster** | [**Roster**](Roster.md) |  | [optional] [default to undefined]
 **rosterId** | **number** |  | [optional] [default to undefined]
 **rosterShiftId** | **number** |  | [optional] [default to undefined]
-**updatedAt** | **string** |  | [optional] [default to undefined]
 **userId** | **number** |  | [optional] [default to undefined]
 **value** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { RosterAnswer } from './api';
+import { AnswerCreateRequest } from './api';
 
-const instance: RosterAnswer = {
-    createdAt,
-    id,
-    roster,
+const instance: AnswerCreateRequest = {
     rosterId,
     rosterShiftId,
-    updatedAt,
     userId,
     value,
 };

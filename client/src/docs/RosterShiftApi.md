@@ -18,13 +18,13 @@ All URIs are relative to *http://localhost*
 import {
     RosterShiftApi,
     Configuration,
-    RosterShiftCreateRequest
+    ShiftCreateRequest
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new RosterShiftApi(configuration);
 
-let createParams: RosterShiftCreateRequest; //Roster shift input
+let createParams: ShiftCreateRequest; //Roster shift input
 
 const { status, data } = await apiInstance.createRosterShift(
     createParams
@@ -35,7 +35,7 @@ const { status, data } = await apiInstance.createRosterShift(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **createParams** | **RosterShiftCreateRequest**| Roster shift input | |
+| **createParams** | **ShiftCreateRequest**| Roster shift input | |
 
 
 ### Return type
@@ -121,14 +121,14 @@ const { status, data } = await apiInstance.deleteRosterShift(
 import {
     RosterShiftApi,
     Configuration,
-    RosterShiftUpdateRequest
+    ShiftUpdateRequest
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new RosterShiftApi(configuration);
 
 let id: number; //Roster Shift ID (default to undefined)
-let updateParams: RosterShiftUpdateRequest; //Update input
+let updateParams: ShiftUpdateRequest; //Update input
 
 const { status, data } = await apiInstance.updateRosterShift(
     id,
@@ -140,7 +140,7 @@ const { status, data } = await apiInstance.updateRosterShift(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **updateParams** | **RosterShiftUpdateRequest**| Update input | |
+| **updateParams** | **ShiftUpdateRequest**| Update input | |
 | **id** | [**number**] | Roster Shift ID | defaults to undefined|
 
 

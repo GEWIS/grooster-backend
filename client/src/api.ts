@@ -26,83 +26,46 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
- * @interface ModelsRosterTemplateShiftPreference
+ * @interface AnswerCreateRequest
  */
-export interface ModelsRosterTemplateShiftPreference {
-    /**
-     * 
-     * @type {string}
-     * @memberof ModelsRosterTemplateShiftPreference
-     */
-    'createdAt'?: string;
+export interface AnswerCreateRequest {
     /**
      * 
      * @type {number}
-     * @memberof ModelsRosterTemplateShiftPreference
+     * @memberof AnswerCreateRequest
      */
-    'id'?: number;
+    'rosterId'?: number;
     /**
      * 
      * @type {number}
-     * @memberof ModelsRosterTemplateShiftPreference
+     * @memberof AnswerCreateRequest
      */
-    'rosterTemplateShiftID'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ModelsRosterTemplateShiftPreference
-     */
-    'updatedAt'?: string;
+    'rosterShiftId'?: number;
     /**
      * 
      * @type {number}
-     * @memberof ModelsRosterTemplateShiftPreference
+     * @memberof AnswerCreateRequest
      */
     'userId'?: number;
     /**
      * 
      * @type {string}
-     * @memberof ModelsRosterTemplateShiftPreference
+     * @memberof AnswerCreateRequest
      */
     'value'?: string;
 }
 /**
  * 
  * @export
- * @interface ModelsUpdateMemberSettingsParams
+ * @interface AnswerUpdateRequest
  */
-export interface ModelsUpdateMemberSettingsParams {
+export interface AnswerUpdateRequest {
     /**
      * 
      * @type {string}
-     * @memberof ModelsUpdateMemberSettingsParams
+     * @memberof AnswerUpdateRequest
      */
-    'username'?: string;
-}
-/**
- * 
- * @export
- * @interface ModelsUserOrgan
- */
-export interface ModelsUserOrgan {
-    /**
-     * 
-     * @type {number}
-     * @memberof ModelsUserOrgan
-     */
-    'organID'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ModelsUserOrgan
-     */
-    'userID'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ModelsUserOrgan
-     */
-    'username'?: string;
+    'value'?: string;
 }
 /**
  * An organ that users can be part of.
@@ -240,6 +203,12 @@ export interface RosterAnswer {
     'id'?: number;
     /**
      * 
+     * @type {Roster}
+     * @memberof RosterAnswer
+     */
+    'roster'?: Roster;
+    /**
+     * 
      * @type {number}
      * @memberof RosterAnswer
      */
@@ -266,50 +235,6 @@ export interface RosterAnswer {
      * 
      * @type {string}
      * @memberof RosterAnswer
-     */
-    'value'?: string;
-}
-/**
- * 
- * @export
- * @interface RosterAnswerCreateRequest
- */
-export interface RosterAnswerCreateRequest {
-    /**
-     * 
-     * @type {number}
-     * @memberof RosterAnswerCreateRequest
-     */
-    'rosterId'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof RosterAnswerCreateRequest
-     */
-    'rosterShiftId'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof RosterAnswerCreateRequest
-     */
-    'userId'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof RosterAnswerCreateRequest
-     */
-    'value'?: string;
-}
-/**
- * 
- * @export
- * @interface RosterAnswerUpdateRequest
- */
-export interface RosterAnswerUpdateRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof RosterAnswerUpdateRequest
      */
     'value'?: string;
 }
@@ -396,38 +321,6 @@ export interface RosterShift {
 /**
  * 
  * @export
- * @interface RosterShiftCreateRequest
- */
-export interface RosterShiftCreateRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof RosterShiftCreateRequest
-     */
-    'name'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof RosterShiftCreateRequest
-     */
-    'rosterId'?: number;
-}
-/**
- * 
- * @export
- * @interface RosterShiftUpdateRequest
- */
-export interface RosterShiftUpdateRequest {
-    /**
-     * 
-     * @type {number}
-     * @memberof RosterShiftUpdateRequest
-     */
-    'order'?: number;
-}
-/**
- * 
- * @export
  * @interface RosterTemplate
  */
 export interface RosterTemplate {
@@ -471,31 +364,6 @@ export interface RosterTemplate {
 /**
  * 
  * @export
- * @interface RosterTemplateCreateRequest
- */
-export interface RosterTemplateCreateRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof RosterTemplateCreateRequest
-     */
-    'name'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof RosterTemplateCreateRequest
-     */
-    'organId'?: number;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof RosterTemplateCreateRequest
-     */
-    'shifts'?: Array<string>;
-}
-/**
- * 
- * @export
  * @interface RosterTemplateShift
  */
 export interface RosterTemplateShift {
@@ -533,21 +401,45 @@ export interface RosterTemplateShift {
 /**
  * 
  * @export
- * @interface RosterTemplateUpdateParams
+ * @interface RosterTemplateShiftPreference
  */
-export interface RosterTemplateUpdateParams {
+export interface RosterTemplateShiftPreference {
     /**
      * 
      * @type {string}
-     * @memberof RosterTemplateUpdateParams
+     * @memberof RosterTemplateShiftPreference
      */
-    'name'?: string;
+    'createdAt'?: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof RosterTemplateUpdateParams
+     * @type {number}
+     * @memberof RosterTemplateShiftPreference
      */
-    'shifts'?: Array<string>;
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterTemplateShiftPreference
+     */
+    'rosterTemplateShiftID'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterTemplateShiftPreference
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterTemplateShiftPreference
+     */
+    'userId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterTemplateShiftPreference
+     */
+    'value'?: string;
 }
 /**
  * 
@@ -677,6 +569,63 @@ export interface SavedShiftUpdateRequest {
 /**
  * 
  * @export
+ * @interface ShiftCreateRequest
+ */
+export interface ShiftCreateRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ShiftCreateRequest
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftCreateRequest
+     */
+    'rosterId'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface ShiftUpdateRequest
+ */
+export interface ShiftUpdateRequest {
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftUpdateRequest
+     */
+    'order'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface TemplateCreateRequest
+ */
+export interface TemplateCreateRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof TemplateCreateRequest
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof TemplateCreateRequest
+     */
+    'organId'?: number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof TemplateCreateRequest
+     */
+    'shifts'?: Array<string>;
+}
+/**
+ * 
+ * @export
  * @interface TemplateShiftPreferenceCreateRequest
  */
 export interface TemplateShiftPreferenceCreateRequest {
@@ -711,6 +660,38 @@ export interface TemplateShiftPreferenceUpdateRequest {
      * @memberof TemplateShiftPreferenceUpdateRequest
      */
     'preference'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface TemplateUpdateParams
+ */
+export interface TemplateUpdateParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof TemplateUpdateParams
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof TemplateUpdateParams
+     */
+    'shifts'?: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface UpdateMemberSettingsParams
+ */
+export interface UpdateMemberSettingsParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateMemberSettingsParams
+     */
+    'username'?: string;
 }
 /**
  * 
@@ -781,10 +762,35 @@ export interface UserCreateRequest {
     'name'?: string;
     /**
      * 
-     * @type {Array<Organ>}
+     * @type {Array<number>}
      * @memberof UserCreateRequest
      */
-    'organs'?: Array<Organ>;
+    'organIDs'?: Array<number>;
+}
+/**
+ * 
+ * @export
+ * @interface UserOrgan
+ */
+export interface UserOrgan {
+    /**
+     * 
+     * @type {number}
+     * @memberof UserOrgan
+     */
+    'organID'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserOrgan
+     */
+    'userID'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserOrgan
+     */
+    'username'?: string;
 }
 
 /**
@@ -1143,11 +1149,11 @@ export const OrganApiAxiosParamCreator = function (configuration?: Configuration
          * @summary Update settings for a user within an organ
          * @param {number} id Organ ID
          * @param {number} userId User ID
-         * @param {ModelsUpdateMemberSettingsParams} updateParams Settings input
+         * @param {UpdateMemberSettingsParams} updateParams Settings input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organIdMemberUserIdPatch: async (id: number, userId: number, updateParams: ModelsUpdateMemberSettingsParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organIdMemberUserIdPatch: async (id: number, userId: number, updateParams: UpdateMemberSettingsParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('organIdMemberUserIdPatch', 'id', id)
             // verify required parameter 'userId' is not null or undefined
@@ -1203,7 +1209,7 @@ export const OrganApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organIdMemberUserIdGet(id: number, userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ModelsUserOrgan>> {
+        async organIdMemberUserIdGet(id: number, userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserOrgan>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organIdMemberUserIdGet(id, userId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['OrganApi.organIdMemberUserIdGet']?.[localVarOperationServerIndex]?.url;
@@ -1214,11 +1220,11 @@ export const OrganApiFp = function(configuration?: Configuration) {
          * @summary Update settings for a user within an organ
          * @param {number} id Organ ID
          * @param {number} userId User ID
-         * @param {ModelsUpdateMemberSettingsParams} updateParams Settings input
+         * @param {UpdateMemberSettingsParams} updateParams Settings input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organIdMemberUserIdPatch(id: number, userId: number, updateParams: ModelsUpdateMemberSettingsParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ModelsUserOrgan>> {
+        async organIdMemberUserIdPatch(id: number, userId: number, updateParams: UpdateMemberSettingsParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserOrgan>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organIdMemberUserIdPatch(id, userId, updateParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['OrganApi.organIdMemberUserIdPatch']?.[localVarOperationServerIndex]?.url;
@@ -1242,7 +1248,7 @@ export const OrganApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organIdMemberUserIdGet(id: number, userId: number, options?: RawAxiosRequestConfig): AxiosPromise<ModelsUserOrgan> {
+        organIdMemberUserIdGet(id: number, userId: number, options?: RawAxiosRequestConfig): AxiosPromise<UserOrgan> {
             return localVarFp.organIdMemberUserIdGet(id, userId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1250,11 +1256,11 @@ export const OrganApiFactory = function (configuration?: Configuration, basePath
          * @summary Update settings for a user within an organ
          * @param {number} id Organ ID
          * @param {number} userId User ID
-         * @param {ModelsUpdateMemberSettingsParams} updateParams Settings input
+         * @param {UpdateMemberSettingsParams} updateParams Settings input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organIdMemberUserIdPatch(id: number, userId: number, updateParams: ModelsUpdateMemberSettingsParams, options?: RawAxiosRequestConfig): AxiosPromise<ModelsUserOrgan> {
+        organIdMemberUserIdPatch(id: number, userId: number, updateParams: UpdateMemberSettingsParams, options?: RawAxiosRequestConfig): AxiosPromise<UserOrgan> {
             return localVarFp.organIdMemberUserIdPatch(id, userId, updateParams, options).then((request) => request(axios, basePath));
         },
     };
@@ -1285,12 +1291,12 @@ export class OrganApi extends BaseAPI {
      * @summary Update settings for a user within an organ
      * @param {number} id Organ ID
      * @param {number} userId User ID
-     * @param {ModelsUpdateMemberSettingsParams} updateParams Settings input
+     * @param {UpdateMemberSettingsParams} updateParams Settings input
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganApi
      */
-    public organIdMemberUserIdPatch(id: number, userId: number, updateParams: ModelsUpdateMemberSettingsParams, options?: RawAxiosRequestConfig) {
+    public organIdMemberUserIdPatch(id: number, userId: number, updateParams: UpdateMemberSettingsParams, options?: RawAxiosRequestConfig) {
         return OrganApiFp(this.configuration).organIdMemberUserIdPatch(id, userId, updateParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
@@ -1345,11 +1351,11 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * 
          * @summary Creates a template of a roster by defining the name of the shifts
-         * @param {RosterTemplateCreateRequest} [params] Template Params
+         * @param {TemplateCreateRequest} [params] Template Params
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createRosterTemplate: async (params?: RosterTemplateCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createRosterTemplate: async (params?: TemplateCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/roster/template`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1654,12 +1660,13 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * 
          * @summary Get all rosters or query by date and organ
-         * @param {string} [date] Date filter (ISO format)
-         * @param {number} [organId] Organ ID filter
+         * @param {string} [date] 
+         * @param {number} [id] 
+         * @param {number} [organId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRosters: async (date?: string, organId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRosters: async (date?: string, id?: number, organId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/roster`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1677,6 +1684,10 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
 
             if (date !== undefined) {
                 localVarQueryParameter['date'] = date;
+            }
+
+            if (id !== undefined) {
+                localVarQueryParameter['id'] = id;
             }
 
             if (organId !== undefined) {
@@ -1741,11 +1752,11 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
          * 
          * @summary Updates a roster template by ID
          * @param {number} id Template ID
-         * @param {RosterTemplateUpdateParams} [params] Update params
+         * @param {TemplateUpdateParams} [params] Update params
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateRosterTemplate: async (id: number, params?: RosterTemplateUpdateParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateRosterTemplate: async (id: number, params?: TemplateUpdateParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('updateRosterTemplate', 'id', id)
             const localVarPath = `/roster/template/{id}`
@@ -1847,11 +1858,11 @@ export const RosterApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Creates a template of a roster by defining the name of the shifts
-         * @param {RosterTemplateCreateRequest} [params] Template Params
+         * @param {TemplateCreateRequest} [params] Template Params
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createRosterTemplate(params?: RosterTemplateCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RosterTemplate>>> {
+        async createRosterTemplate(params?: TemplateCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RosterTemplate>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createRosterTemplate(params, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.createRosterTemplate']?.[localVarOperationServerIndex]?.url;
@@ -1864,7 +1875,7 @@ export const RosterApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createRosterTemplateShiftPreference(params: TemplateShiftPreferenceCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ModelsRosterTemplateShiftPreference>> {
+        async createRosterTemplateShiftPreference(params: TemplateShiftPreferenceCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterTemplateShiftPreference>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createRosterTemplateShiftPreference(params, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.createRosterTemplateShiftPreference']?.[localVarOperationServerIndex]?.url;
@@ -1930,7 +1941,7 @@ export const RosterApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRosterTemplateShiftPreferences(userId: number, templateId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ModelsRosterTemplateShiftPreference>>> {
+        async getRosterTemplateShiftPreferences(userId: number, templateId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RosterTemplateShiftPreference>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRosterTemplateShiftPreferences(userId, templateId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.getRosterTemplateShiftPreferences']?.[localVarOperationServerIndex]?.url;
@@ -1952,13 +1963,14 @@ export const RosterApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get all rosters or query by date and organ
-         * @param {string} [date] Date filter (ISO format)
-         * @param {number} [organId] Organ ID filter
+         * @param {string} [date] 
+         * @param {number} [id] 
+         * @param {number} [organId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRosters(date?: string, organId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Roster>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getRosters(date, organId, options);
+        async getRosters(date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Roster>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRosters(date, id, organId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.getRosters']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -1981,11 +1993,11 @@ export const RosterApiFp = function(configuration?: Configuration) {
          * 
          * @summary Updates a roster template by ID
          * @param {number} id Template ID
-         * @param {RosterTemplateUpdateParams} [params] Update params
+         * @param {TemplateUpdateParams} [params] Update params
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateRosterTemplate(id: number, params?: RosterTemplateUpdateParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterTemplate>> {
+        async updateRosterTemplate(id: number, params?: TemplateUpdateParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterTemplate>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateRosterTemplate(id, params, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.updateRosterTemplate']?.[localVarOperationServerIndex]?.url;
@@ -1999,7 +2011,7 @@ export const RosterApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateRosterTemplateShiftPreference(id: number, params: TemplateShiftPreferenceUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ModelsRosterTemplateShiftPreference>> {
+        async updateRosterTemplateShiftPreference(id: number, params: TemplateShiftPreferenceUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterTemplateShiftPreference>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateRosterTemplateShiftPreference(id, params, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.updateRosterTemplateShiftPreference']?.[localVarOperationServerIndex]?.url;
@@ -2028,11 +2040,11 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
         /**
          * 
          * @summary Creates a template of a roster by defining the name of the shifts
-         * @param {RosterTemplateCreateRequest} [params] Template Params
+         * @param {TemplateCreateRequest} [params] Template Params
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createRosterTemplate(params?: RosterTemplateCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<RosterTemplate>> {
+        createRosterTemplate(params?: TemplateCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<RosterTemplate>> {
             return localVarFp.createRosterTemplate(params, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2042,7 +2054,7 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createRosterTemplateShiftPreference(params: TemplateShiftPreferenceCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ModelsRosterTemplateShiftPreference> {
+        createRosterTemplateShiftPreference(params: TemplateShiftPreferenceCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterTemplateShiftPreference> {
             return localVarFp.createRosterTemplateShiftPreference(params, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2093,7 +2105,7 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRosterTemplateShiftPreferences(userId: number, templateId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<ModelsRosterTemplateShiftPreference>> {
+        getRosterTemplateShiftPreferences(userId: number, templateId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<RosterTemplateShiftPreference>> {
             return localVarFp.getRosterTemplateShiftPreferences(userId, templateId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2109,13 +2121,14 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
         /**
          * 
          * @summary Get all rosters or query by date and organ
-         * @param {string} [date] Date filter (ISO format)
-         * @param {number} [organId] Organ ID filter
+         * @param {string} [date] 
+         * @param {number} [id] 
+         * @param {number} [organId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRosters(date?: string, organId?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<Roster>> {
-            return localVarFp.getRosters(date, organId, options).then((request) => request(axios, basePath));
+        getRosters(date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<Roster>> {
+            return localVarFp.getRosters(date, id, organId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2132,11 +2145,11 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
          * 
          * @summary Updates a roster template by ID
          * @param {number} id Template ID
-         * @param {RosterTemplateUpdateParams} [params] Update params
+         * @param {TemplateUpdateParams} [params] Update params
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateRosterTemplate(id: number, params?: RosterTemplateUpdateParams, options?: RawAxiosRequestConfig): AxiosPromise<RosterTemplate> {
+        updateRosterTemplate(id: number, params?: TemplateUpdateParams, options?: RawAxiosRequestConfig): AxiosPromise<RosterTemplate> {
             return localVarFp.updateRosterTemplate(id, params, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2147,7 +2160,7 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateRosterTemplateShiftPreference(id: number, params: TemplateShiftPreferenceUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ModelsRosterTemplateShiftPreference> {
+        updateRosterTemplateShiftPreference(id: number, params: TemplateShiftPreferenceUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterTemplateShiftPreference> {
             return localVarFp.updateRosterTemplateShiftPreference(id, params, options).then((request) => request(axios, basePath));
         },
     };
@@ -2175,12 +2188,12 @@ export class RosterApi extends BaseAPI {
     /**
      * 
      * @summary Creates a template of a roster by defining the name of the shifts
-     * @param {RosterTemplateCreateRequest} [params] Template Params
+     * @param {TemplateCreateRequest} [params] Template Params
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RosterApi
      */
-    public createRosterTemplate(params?: RosterTemplateCreateRequest, options?: RawAxiosRequestConfig) {
+    public createRosterTemplate(params?: TemplateCreateRequest, options?: RawAxiosRequestConfig) {
         return RosterApiFp(this.configuration).createRosterTemplate(params, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2272,14 +2285,15 @@ export class RosterApi extends BaseAPI {
     /**
      * 
      * @summary Get all rosters or query by date and organ
-     * @param {string} [date] Date filter (ISO format)
-     * @param {number} [organId] Organ ID filter
+     * @param {string} [date] 
+     * @param {number} [id] 
+     * @param {number} [organId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RosterApi
      */
-    public getRosters(date?: string, organId?: number, options?: RawAxiosRequestConfig) {
-        return RosterApiFp(this.configuration).getRosters(date, organId, options).then((request) => request(this.axios, this.basePath));
+    public getRosters(date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig) {
+        return RosterApiFp(this.configuration).getRosters(date, id, organId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2299,12 +2313,12 @@ export class RosterApi extends BaseAPI {
      * 
      * @summary Updates a roster template by ID
      * @param {number} id Template ID
-     * @param {RosterTemplateUpdateParams} [params] Update params
+     * @param {TemplateUpdateParams} [params] Update params
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RosterApi
      */
-    public updateRosterTemplate(id: number, params?: RosterTemplateUpdateParams, options?: RawAxiosRequestConfig) {
+    public updateRosterTemplate(id: number, params?: TemplateUpdateParams, options?: RawAxiosRequestConfig) {
         return RosterApiFp(this.configuration).updateRosterTemplate(id, params, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2333,11 +2347,11 @@ export const RosterAnswerApiAxiosParamCreator = function (configuration?: Config
         /**
          * 
          * @summary Create a new roster shift answer
-         * @param {RosterAnswerCreateRequest} createParams Roster answer input
+         * @param {AnswerCreateRequest} createParams Roster answer input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createRosterAnswer: async (createParams: RosterAnswerCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createRosterAnswer: async (createParams: AnswerCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createParams' is not null or undefined
             assertParamExists('createRosterAnswer', 'createParams', createParams)
             const localVarPath = `/roster/answer`;
@@ -2373,11 +2387,11 @@ export const RosterAnswerApiAxiosParamCreator = function (configuration?: Config
          * 
          * @summary Updates a roster answer with the new value
          * @param {number} id Roster Answer ID
-         * @param {RosterAnswerUpdateRequest} updateParams New answer value
+         * @param {AnswerUpdateRequest} updateParams New answer value
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateRosterAnswer: async (id: number, updateParams: RosterAnswerUpdateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateRosterAnswer: async (id: number, updateParams: AnswerUpdateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('updateRosterAnswer', 'id', id)
             // verify required parameter 'updateParams' is not null or undefined
@@ -2425,11 +2439,11 @@ export const RosterAnswerApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Create a new roster shift answer
-         * @param {RosterAnswerCreateRequest} createParams Roster answer input
+         * @param {AnswerCreateRequest} createParams Roster answer input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createRosterAnswer(createParams: RosterAnswerCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterAnswer>> {
+        async createRosterAnswer(createParams: AnswerCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterAnswer>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createRosterAnswer(createParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterAnswerApi.createRosterAnswer']?.[localVarOperationServerIndex]?.url;
@@ -2439,11 +2453,11 @@ export const RosterAnswerApiFp = function(configuration?: Configuration) {
          * 
          * @summary Updates a roster answer with the new value
          * @param {number} id Roster Answer ID
-         * @param {RosterAnswerUpdateRequest} updateParams New answer value
+         * @param {AnswerUpdateRequest} updateParams New answer value
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateRosterAnswer(id: number, updateParams: RosterAnswerUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterAnswer>> {
+        async updateRosterAnswer(id: number, updateParams: AnswerUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterAnswer>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateRosterAnswer(id, updateParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterAnswerApi.updateRosterAnswer']?.[localVarOperationServerIndex]?.url;
@@ -2462,22 +2476,22 @@ export const RosterAnswerApiFactory = function (configuration?: Configuration, b
         /**
          * 
          * @summary Create a new roster shift answer
-         * @param {RosterAnswerCreateRequest} createParams Roster answer input
+         * @param {AnswerCreateRequest} createParams Roster answer input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createRosterAnswer(createParams: RosterAnswerCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterAnswer> {
+        createRosterAnswer(createParams: AnswerCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterAnswer> {
             return localVarFp.createRosterAnswer(createParams, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Updates a roster answer with the new value
          * @param {number} id Roster Answer ID
-         * @param {RosterAnswerUpdateRequest} updateParams New answer value
+         * @param {AnswerUpdateRequest} updateParams New answer value
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateRosterAnswer(id: number, updateParams: RosterAnswerUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterAnswer> {
+        updateRosterAnswer(id: number, updateParams: AnswerUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterAnswer> {
             return localVarFp.updateRosterAnswer(id, updateParams, options).then((request) => request(axios, basePath));
         },
     };
@@ -2493,12 +2507,12 @@ export class RosterAnswerApi extends BaseAPI {
     /**
      * 
      * @summary Create a new roster shift answer
-     * @param {RosterAnswerCreateRequest} createParams Roster answer input
+     * @param {AnswerCreateRequest} createParams Roster answer input
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RosterAnswerApi
      */
-    public createRosterAnswer(createParams: RosterAnswerCreateRequest, options?: RawAxiosRequestConfig) {
+    public createRosterAnswer(createParams: AnswerCreateRequest, options?: RawAxiosRequestConfig) {
         return RosterAnswerApiFp(this.configuration).createRosterAnswer(createParams, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2506,12 +2520,12 @@ export class RosterAnswerApi extends BaseAPI {
      * 
      * @summary Updates a roster answer with the new value
      * @param {number} id Roster Answer ID
-     * @param {RosterAnswerUpdateRequest} updateParams New answer value
+     * @param {AnswerUpdateRequest} updateParams New answer value
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RosterAnswerApi
      */
-    public updateRosterAnswer(id: number, updateParams: RosterAnswerUpdateRequest, options?: RawAxiosRequestConfig) {
+    public updateRosterAnswer(id: number, updateParams: AnswerUpdateRequest, options?: RawAxiosRequestConfig) {
         return RosterAnswerApiFp(this.configuration).updateRosterAnswer(id, updateParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
@@ -2527,11 +2541,11 @@ export const RosterShiftApiAxiosParamCreator = function (configuration?: Configu
         /**
          * 
          * @summary Create a new roster shift
-         * @param {RosterShiftCreateRequest} createParams Roster shift input
+         * @param {ShiftCreateRequest} createParams Roster shift input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createRosterShift: async (createParams: RosterShiftCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createRosterShift: async (createParams: ShiftCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createParams' is not null or undefined
             assertParamExists('createRosterShift', 'createParams', createParams)
             const localVarPath = `/roster/shift`;
@@ -2604,11 +2618,11 @@ export const RosterShiftApiAxiosParamCreator = function (configuration?: Configu
          * 
          * @summary Update a roster shift
          * @param {number} id Roster Shift ID
-         * @param {RosterShiftUpdateRequest} updateParams Update input
+         * @param {ShiftUpdateRequest} updateParams Update input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateRosterShift: async (id: number, updateParams: RosterShiftUpdateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateRosterShift: async (id: number, updateParams: ShiftUpdateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('updateRosterShift', 'id', id)
             // verify required parameter 'updateParams' is not null or undefined
@@ -2656,11 +2670,11 @@ export const RosterShiftApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Create a new roster shift
-         * @param {RosterShiftCreateRequest} createParams Roster shift input
+         * @param {ShiftCreateRequest} createParams Roster shift input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createRosterShift(createParams: RosterShiftCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterShift>> {
+        async createRosterShift(createParams: ShiftCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterShift>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createRosterShift(createParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterShiftApi.createRosterShift']?.[localVarOperationServerIndex]?.url;
@@ -2683,11 +2697,11 @@ export const RosterShiftApiFp = function(configuration?: Configuration) {
          * 
          * @summary Update a roster shift
          * @param {number} id Roster Shift ID
-         * @param {RosterShiftUpdateRequest} updateParams Update input
+         * @param {ShiftUpdateRequest} updateParams Update input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateRosterShift(id: number, updateParams: RosterShiftUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterShift>> {
+        async updateRosterShift(id: number, updateParams: ShiftUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterShift>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateRosterShift(id, updateParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterShiftApi.updateRosterShift']?.[localVarOperationServerIndex]?.url;
@@ -2706,11 +2720,11 @@ export const RosterShiftApiFactory = function (configuration?: Configuration, ba
         /**
          * 
          * @summary Create a new roster shift
-         * @param {RosterShiftCreateRequest} createParams Roster shift input
+         * @param {ShiftCreateRequest} createParams Roster shift input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createRosterShift(createParams: RosterShiftCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterShift> {
+        createRosterShift(createParams: ShiftCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterShift> {
             return localVarFp.createRosterShift(createParams, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2727,11 +2741,11 @@ export const RosterShiftApiFactory = function (configuration?: Configuration, ba
          * 
          * @summary Update a roster shift
          * @param {number} id Roster Shift ID
-         * @param {RosterShiftUpdateRequest} updateParams Update input
+         * @param {ShiftUpdateRequest} updateParams Update input
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateRosterShift(id: number, updateParams: RosterShiftUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterShift> {
+        updateRosterShift(id: number, updateParams: ShiftUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterShift> {
             return localVarFp.updateRosterShift(id, updateParams, options).then((request) => request(axios, basePath));
         },
     };
@@ -2747,12 +2761,12 @@ export class RosterShiftApi extends BaseAPI {
     /**
      * 
      * @summary Create a new roster shift
-     * @param {RosterShiftCreateRequest} createParams Roster shift input
+     * @param {ShiftCreateRequest} createParams Roster shift input
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RosterShiftApi
      */
-    public createRosterShift(createParams: RosterShiftCreateRequest, options?: RawAxiosRequestConfig) {
+    public createRosterShift(createParams: ShiftCreateRequest, options?: RawAxiosRequestConfig) {
         return RosterShiftApiFp(this.configuration).createRosterShift(createParams, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2772,12 +2786,12 @@ export class RosterShiftApi extends BaseAPI {
      * 
      * @summary Update a roster shift
      * @param {number} id Roster Shift ID
-     * @param {RosterShiftUpdateRequest} updateParams Update input
+     * @param {ShiftUpdateRequest} updateParams Update input
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RosterShiftApi
      */
-    public updateRosterShift(id: number, updateParams: RosterShiftUpdateRequest, options?: RawAxiosRequestConfig) {
+    public updateRosterShift(id: number, updateParams: ShiftUpdateRequest, options?: RawAxiosRequestConfig) {
         return RosterShiftApiFp(this.configuration).updateRosterShift(id, updateParams, options).then((request) => request(this.axios, this.basePath));
     }
 }

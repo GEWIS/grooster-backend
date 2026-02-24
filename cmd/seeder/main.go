@@ -2,8 +2,10 @@ package main
 
 import (
 	"GEWIS-Rooster/cmd/seeder/seeder"
-	database "GEWIS-Rooster/cmd/src/pkg"
-	"GEWIS-Rooster/cmd/src/pkg/models"
+	"GEWIS-Rooster/internal/organ"
+	"GEWIS-Rooster/internal/platform/database"
+	"GEWIS-Rooster/internal/roster"
+	"GEWIS-Rooster/internal/user"
 	"database/sql"
 	"github.com/rs/zerolog/log"
 )
@@ -24,7 +26,7 @@ func main() {
 		}
 	}(sqlDB)
 
-	err = db.AutoMigrate(&models.User{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}, &models.Organ{}, &models.RosterTemplate{}, &models.RosterTemplateShift{})
+	err = db.AutoMigrate(&user.User{}, &roster.Roster{}, &roster.RosterShift{}, &roster.RosterAnswer{}, &roster.SavedShift{}, &organ.Organ{}, &roster.RosterTemplate{}, &roster.RosterTemplateShift{})
 	if err != nil {
 		return
 	}

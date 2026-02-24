@@ -1,4 +1,4 @@
-# RosterAnswer
+# RosterTemplateShiftPreference
 
 
 ## Properties
@@ -7,9 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **createdAt** | **string** |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
-**roster** | [**Roster**](Roster.md) |  | [optional] [default to undefined]
-**rosterId** | **number** |  | [optional] [default to undefined]
-**rosterShiftId** | **number** |  | [optional] [default to undefined]
+**rosterTemplateShiftID** | **number** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
 **userId** | **number** |  | [optional] [default to undefined]
 **value** | **string** |  | [optional] [default to undefined]
@@ -17,14 +15,12 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { RosterAnswer } from './api';
+import { RosterTemplateShiftPreference } from './api';
 
-const instance: RosterAnswer = {
+const instance: RosterTemplateShiftPreference = {
     createdAt,
     id,
-    roster,
-    rosterId,
-    rosterShiftId,
+    rosterTemplateShiftID,
     updatedAt,
     userId,
     value,
