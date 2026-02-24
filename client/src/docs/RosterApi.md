@@ -16,6 +16,7 @@ All URIs are relative to *http://localhost*
 |[**getRosters**](#getrosters) | **GET** /roster | Get all rosters or query by date and organ|
 |[**updateRoster**](#updateroster) | **PATCH** /roster/{id} | Update a roster|
 |[**updateRosterTemplate**](#updaterostertemplate) | **PUT** /roster/template/{id} | Updates a roster template by ID|
+|[**updateRosterTemplateShift**](#updaterostertemplateshift) | **PATCH** /roster/template/shift/{id} | Updates a roster template shift by ID|
 |[**updateRosterTemplateShiftPreference**](#updaterostertemplateshiftpreference) | **PATCH** /roster/template/shift-preference/{id} | Updates a roster template shift preference by ID|
 
 # **createRoster**
@@ -635,6 +636,62 @@ const { status, data } = await apiInstance.updateRosterTemplate(
 ### Return type
 
 **RosterTemplate**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateRosterTemplateShift**
+> RosterTemplateShift updateRosterTemplateShift(params)
+
+
+### Example
+
+```typescript
+import {
+    RosterApi,
+    Configuration,
+    TemplateShiftUpdateRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterApi(configuration);
+
+let id: number; //Shift ID (default to undefined)
+let params: TemplateShiftUpdateRequest; //Update params
+
+const { status, data } = await apiInstance.updateRosterTemplateShift(
+    id,
+    params
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **params** | **TemplateShiftUpdateRequest**| Update params | |
+| **id** | [**number**] | Shift ID | defaults to undefined|
+
+
+### Return type
+
+**RosterTemplateShift**
 
 ### Authorization
 

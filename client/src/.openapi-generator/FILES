@@ -27,10 +27,14 @@ docs/SavedShiftOrdering.md
 docs/SavedShiftResponse.md
 docs/SavedShiftUpdateRequest.md
 docs/ShiftCreateRequest.md
+docs/ShiftGroup.md
+docs/ShiftGroupApi.md
+docs/ShiftGroupCreateRequest.md
 docs/ShiftUpdateRequest.md
 docs/TemplateCreateRequest.md
 docs/TemplateShiftPreferenceCreateRequest.md
 docs/TemplateShiftPreferenceUpdateRequest.md
+docs/TemplateShiftUpdateRequest.md
 docs/TemplateUpdateParams.md
 docs/UpdateMemberSettingsParams.md
 docs/User.md

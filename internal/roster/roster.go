@@ -33,6 +33,8 @@ type ShiftCreateRequest struct {
 
 type ShiftUpdateRequest struct {
 	Order *int `json:"order"`
+
+	ShiftGroupID *uint `json:"shiftGroupId"`
 } // @name ShiftUpdateRequest
 
 type AnswerCreateRequest struct {
@@ -85,6 +87,10 @@ type TemplateUpdateParams struct {
 	Shifts []string `json:"shifts"`
 } // @name TemplateUpdateParams
 
+type TemplateShiftUpdateRequest struct {
+	ShiftGroupID *uint `json:"shiftGroupId"`
+} // @name TemplateShiftUpdateRequest
+
 type TemplateShiftPreferenceCreateRequest struct {
 	UserID uint `json:"userId"`
 
@@ -102,3 +108,13 @@ type TemplateShiftPreferenceFilterParams struct {
 type TemplateShiftPreferenceUpdateRequest struct {
 	Preference string `json:"preference"`
 } // @name TemplateShiftPreferenceUpdateRequest
+
+type ShiftGroupCreateRequest struct {
+	Name string `json:"name" binding:"required"`
+
+	OrganID uint `json:"organId" binding:"required"`
+} // @name ShiftGroupCreateRequest
+
+type ShiftGroupFilterParams struct {
+	OrganID uint `form:"organ_id" binding:"required"`
+}

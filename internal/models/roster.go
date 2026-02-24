@@ -38,6 +38,10 @@ type RosterShift struct {
 	Roster *Roster `json:"-" gorm:"foreignKey:RosterID;constraint:fk_rosters_shifts,OnDelete:CASCADE;"`
 
 	Order uint `json:"order"`
+
+	ShiftGroupID *uint `json:"shiftGroupId" gorm:"default:null"`
+
+	ShiftGroup *ShiftGroup `json:"-" gorm:"foreignKey:ShiftGroupID;constraint:OnDelete:SET NULL;"`
 } // @name RosterShift
 
 type RosterAnswer struct {
@@ -92,6 +96,10 @@ type RosterTemplateShift struct {
 	Template *RosterTemplate `json:"-" gorm:"foreignKey:TemplateID;constraint:OnDelete:CASCADE;"`
 
 	ShiftName string `json:"shiftName"`
+
+	ShiftGroupID *uint `json:"shiftGroupId" gorm:"default:null"`
+
+	ShiftGroup *ShiftGroup `json:"-" gorm:"foreignKey:ShiftGroupID;constraint:OnDelete:SET NULL;"`
 } // @name RosterTemplateShift
 
 type RosterTemplateShiftPreference struct {
@@ -107,3 +115,13 @@ type RosterTemplateShiftPreference struct {
 
 	Preference string `json:"value"`
 } // @name RosterTemplateShiftPreference
+
+type ShiftGroup struct {
+	BaseModel
+
+	OrganID uint `json:"organId" gorm:"uniqueIndex:organ_shift_group"`
+
+	Organ Organ `json:"organ" gorm:"foreignKey:OrganID;constraint:OnDelete:CASCADE;"`
+
+	Name string `json:"name" gorm:"uniqueIndex:organ_shift_group"`
+} // @name ShiftGroup

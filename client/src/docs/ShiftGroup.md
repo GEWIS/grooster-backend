@@ -1,4 +1,4 @@
-# RosterTemplateShift
+# ShiftGroup
 
 
 ## Properties
@@ -7,22 +7,22 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **createdAt** | **string** |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
-**shiftGroupId** | **number** |  | [optional] [default to undefined]
-**shiftName** | **string** |  | [optional] [default to undefined]
-**templateId** | **number** |  | [optional] [default to undefined]
+**name** | **string** |  | [optional] [default to undefined]
+**organ** | [**Organ**](Organ.md) |  | [optional] [default to undefined]
+**organId** | **number** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { RosterTemplateShift } from './api';
+import { ShiftGroup } from './api';
 
-const instance: RosterTemplateShift = {
+const instance: ShiftGroup = {
     createdAt,
     id,
-    shiftGroupId,
-    shiftName,
-    templateId,
+    name,
+    organ,
+    organId,
     updatedAt,
 };
 ```

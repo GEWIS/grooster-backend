@@ -1,21 +1,21 @@
-# ShiftUpdateRequest
+# ShiftGroupCreateRequest
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**order** | **number** |  | [optional] [default to undefined]
-**shiftGroupId** | **number** |  | [optional] [default to undefined]
+**name** | **string** |  | [optional] [default to undefined]
+**organId** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { ShiftUpdateRequest } from './api';
+import { ShiftGroupCreateRequest } from './api';
 
-const instance: ShiftUpdateRequest = {
-    order,
-    shiftGroupId,
+const instance: ShiftGroupCreateRequest = {
+    name,
+    organId,
 };
 ```
 
