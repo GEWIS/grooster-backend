@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue';
-import { RosterTemplateCreateRequest } from '@gewis/grooster-backend-ts';
+import { TemplateCreateRequest } from '@gewis/grooster-backend-ts';
 import { useRoute } from 'vue-router';
 import { useTemplateStore } from '@/stores/template.store';
 
@@ -60,7 +60,7 @@ const removeShift = (index: number) => {
 };
 
 const saveTemplate = async () => {
-  const params: RosterTemplateCreateRequest = {
+  const params: TemplateCreateRequest = {
     name: templateName.value,
     organId: parseInt(route.params.id as string),
     shifts: shifts.value,

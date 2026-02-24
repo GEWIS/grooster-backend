@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from 'vue';
-import { ModelsUserOrgan } from '@gewis/grooster-backend-ts';
-import { ModelsUpdateMemberSettingsParams } from '@gewis/grooster-backend-ts/dist/api';
+import { UserOrgan } from '@gewis/grooster-backend-ts';
+import { UpdateMemberSettingsParams } from '@gewis/grooster-backend-ts/dist/api';
 import ApiService from '@/services/ApiService';
 import { useUserStore } from '@/stores/user.store';
 import { useOrganStore } from '@/stores/organ.store';
@@ -9,7 +9,7 @@ import { useOrganStore } from '@/stores/organ.store';
 const userStore = useUserStore();
 const organStore = useOrganStore();
 
-const memberSettings = ref<ModelsUserOrgan | null>(null);
+const memberSettings = ref<UserOrgan | null>(null);
 const editName = ref('');
 const isSaving = ref(false);
 
@@ -47,7 +47,7 @@ const updateMemberSettings = async () => {
   if (!isChanged.value) return;
 
   isSaving.value = true;
-  const params: ModelsUpdateMemberSettingsParams = {
+  const params: UpdateMemberSettingsParams = {
     username: editName.value,
   };
 

@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia';
 import type {
-  RosterAnswerUpdateRequest,
-  RosterShiftCreateRequest,
+  AnswerUpdateRequest,
+  ShiftCreateRequest,
   SavedShiftUpdateRequest,
   RosterCreateRequest,
   Roster,
-  RosterAnswerCreateRequest,
+  AnswerCreateRequest,
   SavedShiftResponse,
   RosterUpdateRequest,
-  RosterShiftUpdateRequest,
+  ShiftUpdateRequest,
 } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 
@@ -90,7 +90,7 @@ export const useRosterStore = defineStore('roster', {
         console.error('Failed to delete an roster:', error);
       }
     },
-    async createAnswer(params: RosterAnswerCreateRequest) {
+    async createAnswer(params: AnswerCreateRequest) {
       try {
         const response = await ApiService.rosterAnswer.createRosterAnswer(params);
         const rosterId = response.data?.rosterId;
@@ -108,7 +108,7 @@ export const useRosterStore = defineStore('roster', {
         console.error('Failed to create roster answer:', error);
       }
     },
-    async updateAnswer(id: number, params: RosterAnswerUpdateRequest) {
+    async updateAnswer(id: number, params: AnswerUpdateRequest) {
       try {
         const response = await ApiService.rosterAnswer.updateRosterAnswer(id, params);
         const rosterId = response.data?.rosterId;
@@ -137,7 +137,7 @@ export const useRosterStore = defineStore('roster', {
         console.error('Failed to update roster answer:', error);
       }
     },
-    async createShift(params: RosterShiftCreateRequest) {
+    async createShift(params: ShiftCreateRequest) {
       await ApiService.rosterShift.createRosterShift(params).then((res) => {
         const roster = this.rosters[res.data.rosterId];
 
@@ -154,7 +154,7 @@ export const useRosterStore = defineStore('roster', {
         };
       });
     },
-    async updateShift(shiftId: number, params: RosterShiftUpdateRequest) {
+    async updateShift(shiftId: number, params: ShiftUpdateRequest) {
       try {
         await ApiService.rosterShift.updateRosterShift(shiftId, params);
 

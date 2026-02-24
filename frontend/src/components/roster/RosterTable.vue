@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch, ref, onMounted } from 'vue';
-import {
-  RosterAnswer,
-  RosterAnswerUpdateRequest,
-  Roster,
-  RosterAnswerCreateRequest,
-  User,
-} from '@gewis/grooster-backend-ts';
+import { RosterAnswer, AnswerUpdateRequest, Roster, AnswerCreateRequest, User } from '@gewis/grooster-backend-ts';
 import { useRoute } from 'vue-router';
 import { useRosterStore } from '@/stores/roster.store';
 import { getGEWISId } from '@/helpers/TokenHelper';
@@ -61,7 +55,7 @@ watch(
 
 async function onAnswerChange(user: number, shift: number, newValue: string) {
   if (!shiftAnswers[user][shift].id) {
-    const createParams: RosterAnswerCreateRequest = {
+    const createParams: AnswerCreateRequest = {
       rosterId: props.id,
       rosterShiftId: shift,
       userId: user,
@@ -79,7 +73,7 @@ async function onAnswerChange(user: number, shift: number, newValue: string) {
       console.error(error);
     }
   } else {
-    const updateParam: RosterAnswerUpdateRequest = {
+    const updateParam: AnswerUpdateRequest = {
       value: newValue,
     };
     const rosterShiftId = shiftAnswers[user][shift].id;
