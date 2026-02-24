@@ -1,22 +1,21 @@
-package models
+package seeder_models
 
 import (
-	"GEWIS-Rooster/internal/organ"
-	"GEWIS-Rooster/internal/user"
+	"GEWIS-Rooster/internal/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"strconv"
 )
 
 func SeedUser(d *gorm.DB, count int) {
-	var organs []organ.Organ
+	var organs []models.Organ
 
 	if err := d.Find(&organs).Error; err != nil {
 		log.Printf("Seeder Error")
 	}
 
 	for i := 0; i < count; i++ {
-		user := user.User{
+		user := models.User{
 			Name:    "User" + strconv.Itoa(i),
 			GEWISID: uint(1000 + i),
 			Organs:  organs,

@@ -1,10 +1,8 @@
 package seeder
 
 import (
-	"GEWIS-Rooster/cmd/seeder/models"
-	"GEWIS-Rooster/internal/organ"
-	mainModels "GEWIS-Rooster/internal/roster"
-	"GEWIS-Rooster/internal/user"
+	"GEWIS-Rooster/cmd/seeder/seeder_models"
+	"GEWIS-Rooster/internal/models"
 	"fmt"
 	"gorm.io/gorm"
 )
@@ -17,22 +15,22 @@ func Seeder(d *gorm.DB) {
 	}
 
 	err = d.AutoMigrate(
-		&user.User{},
-		&mainModels.Roster{},
-		&mainModels.RosterShift{},
-		&mainModels.RosterAnswer{},
-		&mainModels.SavedShift{},
-		&organ.Organ{},
-		&mainModels.RosterTemplate{},
-		&mainModels.RosterTemplateShift{},
+		&models.User{},
+		&models.Roster{},
+		&models.RosterShift{},
+		&models.RosterAnswer{},
+		&models.SavedShift{},
+		&models.Organ{},
+		&models.RosterTemplate{},
+		&models.RosterTemplateShift{},
 	)
 	if err != nil {
 		return
 	}
 
-	models.OrganSeeder(d, 2)
-	models.SeedUser(d, 2)
-	models.SeedRosters(d, 2)
+	seeder_models.OrganSeeder(d, 2)
+	seeder_models.SeedUser(d, 2)
+	seeder_models.SeedRosters(d, 2)
 }
 
 func WipeAllTables(db *gorm.DB) error {
