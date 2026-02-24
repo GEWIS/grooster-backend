@@ -1,18 +1,40 @@
 <script setup lang="ts">
-import { RosterTemplate as RosterTemplateModel } from '@gewis/grooster-backend-ts';
+import {
+  RosterTemplate as RosterTemplateModel,
+  ShiftGroup,
+  TemplateShiftUpdateRequest,
+} from '@gewis/grooster-backend-ts';
 import { ref } from 'vue';
 import RosterTemplateDelete from '@/components/templates/dialogs/RosterTemplateDelete.vue';
 import RosterTemplateUseDialog from '@/components/templates/dialogs/RosterTemplateUseDialog.vue';
 import RosterTemplatePreferences from '@/components/templates/dialogs/RosterTemplatePreferences.vue';
+import ApiService from '@/services/ApiService';
 
 type Dialogs = 'Preferences' | 'Delete' | 'Roster' | 'None';
 
 const props = defineProps<{
   template: RosterTemplateModel;
+  shiftGroups: ShiftGroup[];
 }>();
 const openDialog = ref<Dialogs>('None');
 
 const showDetail = ref<boolean>(false);
+
+const handleGroupChange = async (shiftId: number, groupId: number) => {
+  try {
+    const params: TemplateShiftUpdateRequest = {
+      shiftGroupId: groupId,
+    };
+
+    await ApiService.roster.updateRosterTemplateShift(shiftId, params);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const getGroupName = (id: number) => {
+  return props.shiftGroups.find((g) => g.id === id)?.name || '';
+};
 </script>
 
 <template>
@@ -53,10 +75,44 @@ const showDetail = ref<boolean>(false);
               <li
                 v-for="shift in props.template.shifts"
                 :key="shift.id"
-                class="flex items-center p-2 bg-gray-50 rounded-md border border-gray-100"
+                class="flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-100 gap-3"
               >
-                <i class="pi pi-clock mr-3 text-blue-500"></i>
-                <span class="text-sm font-medium text-gray-700">{{ shift.shiftName }}</span>
+                <div class="flex items-center min-w-0 flex-1 gap-1">
+                  <i class="pi pi-clock mr-2 text-blue-500 text-sm"></i>
+                  <span class="text-sm font-medium text-gray-700 truncate">
+                    {{ shift.shiftName }}
+                  </span>
+                </div>
+
+                <div class="flex-shrink-0 w-40 h-8">
+                  <Select
+                    v-model="shift.shiftGroupId"
+                    class="w-full h-8 text-xs flex items-center border-gray-200"
+                    option-label="name"
+                    option-value="id"
+                    :options="shiftGroups"
+                    placeholder="Assign..."
+                    show-clear
+                    @change="(e) => handleGroupChange(shift.id, e.value)"
+                  >
+                    <template #value="slotProps">
+                      <div v-if="slotProps.value" class="flex items-center gap-2 text-xs truncate">
+                        <span class="truncate">{{ getGroupName(slotProps.value) }}</span>
+                      </div>
+                      <span v-else class="text-xs text-gray-400">Assign...</span>
+                    </template>
+
+                    <template #option="slotProps">
+                      <div class="flex items-center gap-2 text-xs">
+                        <div
+                          class="w-2 h-2 rounded-full flex-shrink-0"
+                          :style="{ backgroundColor: slotProps.option.color || '#cbd5e1' }"
+                        ></div>
+                        <span class="truncate">{{ slotProps.option.name }}</span>
+                      </div>
+                    </template>
+                  </Select>
+                </div>
               </li>
             </ul>
           </div>
