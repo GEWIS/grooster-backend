@@ -13,9 +13,9 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the rest of the code (cmd directory)
-COPY ./cmd ./cmd
+COPY . .
 
-RUN CGO_ENABLED=1 go build -o app ./cmd/src
+RUN CGO_ENABLED=1 go build -o app ./cmd/server/main.go
 
 FROM alpine:3.22
 
