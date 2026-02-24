@@ -11,9 +11,9 @@ type Roster struct {
 
 	Name string `json:"name"`
 
-	RosterShift []RosterShift `json:"rosterShift" gorm:"foreignKey:RosterID"`
+	RosterShift []RosterShift `json:"rosterShift" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
 
-	RosterAnswer []RosterAnswer `json:"rosterAnswer" gorm:"foreignKey:RosterID"`
+	RosterAnswer []RosterAnswer `json:"rosterAnswer" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
 
 	Values Values `json:"values" gorm:"serializer:json"`
 
