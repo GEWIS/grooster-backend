@@ -1,20 +1,18 @@
-# ShiftUpdateRequest
+# TemplateShiftUpdateRequest
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**order** | **number** |  | [optional] [default to undefined]
 **shiftGroupId** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { ShiftUpdateRequest } from './api';
+import { TemplateShiftUpdateRequest } from './api';
 
-const instance: ShiftUpdateRequest = {
-    order,
+const instance: TemplateShiftUpdateRequest = {
     shiftGroupId,
 };
 ```

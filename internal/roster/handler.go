@@ -41,9 +41,15 @@ func NewRosterHandler(rosterService Service, rg *gin.RouterGroup) *Handler {
 	g.PUT("/template/:id", h.UpdateRosterTemplate)
 	g.DELETE("/template/:id", h.DeleteRosterTemplate)
 
+	g.PATCH("/template/shift/:id", h.UpdateRosterTemplateShift)
+
 	g.POST("/template/shift-preference", h.CreateRosterTemplateShiftPreference)
 	g.GET("/template/shift-preference", h.GetRosterTemplateShiftPreferences)
-	g.PATCH("/template/shift-preference/{id}", h.UpdateRosterTemplateShiftPreference)
+	g.PATCH("/template/shift-preference/:id", h.UpdateRosterTemplateShiftPreference)
+
+	g.POST("/shift-groups", h.CreateShiftGroup)
+	g.GET("/shift-groups", h.GetShiftGroups)
+	g.GET("/shift-groups/:id", h.GetShiftGroup)
 
 	return h
 }
@@ -647,6 +653,43 @@ func (h *Handler) DeleteRosterTemplate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Deleted successfully"})
 }
 
+// UpdateRosterTemplateShift
+//
+//	@Summary   Updates a roster template shift by ID
+//	@Security  BearerAuth
+//	@Tags      Roster
+//	@Accept    json
+//	@Produce   json
+//	@Param     id     path      int    true   "Shift ID"
+//	@Param     params body      TemplateShiftUpdateRequest  true "Update params"
+//	@Success   200    {object}   models.RosterTemplateShift
+//	@Failure   400    {string}   string
+//	@Failure   404    {string}   string
+//	@ID        updateRosterTemplateShift
+//	@Router    /roster/template/shift/{id} [patch]
+func (h *Handler) UpdateRosterTemplateShift(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	var updateParams TemplateShiftUpdateRequest
+	if err := c.ShouldBindJSON(&updateParams); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	shift, err := h.rosterService.UpdateRosterTemplateShift(uint(id64), &updateParams)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, shift)
+}
+
 // CreateRosterTemplateShiftPreference
 //
 //	@Summary   Creates a roster template shift preference
@@ -746,4 +789,88 @@ func (h *Handler) UpdateRosterTemplateShiftPreference(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, updatedPreference)
+}
+
+// CreateShiftGroup
+//
+//	@Summary   Create a new shift group
+//	@Security  BearerAuth
+//	@Tags      ShiftGroup
+//	@Accept    json
+//	@Produce   json
+//	@Param     params body      ShiftGroupCreateRequest  true "Shift Group Details"
+//	@Success   201    {object}   models.ShiftGroup
+//	@Failure   400    {string}   string
+//	@ID        createShiftGroup
+//	@Router    /roster/shift-groups [post]
+func (h *Handler) CreateShiftGroup(c *gin.Context) {
+	var params ShiftGroupCreateRequest
+	if err := c.ShouldBindJSON(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	group, err := h.rosterService.CreateShiftGroup(params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, group)
+}
+
+// GetShiftGroups
+//
+//	@Summary   Get all shift groups for an organ
+//	@Security  BearerAuth
+//	@Tags      ShiftGroup
+//	@Produce   json
+//	@Param     organ_id query    int  true "Organ ID"
+//	@Success   200      {array}   models.ShiftGroup
+//	@Failure   400      {string}  string
+//	@ID        getShiftGroups
+//	@Router    /roster/shift-groups [get]
+func (h *Handler) GetShiftGroups(c *gin.Context) {
+	var filters ShiftGroupFilterParams
+
+	if err := c.ShouldBindQuery(&filters); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	groups, err := h.rosterService.GetShiftGroups(filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, groups)
+}
+
+// GetShiftGroup
+//
+//	@Summary   Get a specific shift group by ID
+//	@Security  BearerAuth
+//	@Tags      ShiftGroup
+//	@Produce   json
+//	@Param     id path      int  true "Shift Group ID"
+//	@Success   200 {object} models.ShiftGroup
+//	@Failure   404 {string}   string
+//	@ID        getShiftGroup
+//	@Router    /roster/shift-groups/{id} [get]
+func (h *Handler) GetShiftGroup(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	group, err := h.rosterService.GetShiftGroup(uint(id64))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Shift group not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, group)
 }

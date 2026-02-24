@@ -629,6 +629,132 @@ const docTemplate = `{
                 }
             }
         },
+        "/roster/shift-groups": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ShiftGroup"
+                ],
+                "summary": "Get all shift groups for an organ",
+                "operationId": "getShiftGroups",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Organ ID",
+                        "name": "organ_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ShiftGroup"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ShiftGroup"
+                ],
+                "summary": "Create a new shift group",
+                "operationId": "createShiftGroup",
+                "parameters": [
+                    {
+                        "description": "Shift Group Details",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ShiftGroupCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ShiftGroup"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/roster/shift-groups/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ShiftGroup"
+                ],
+                "summary": "Get a specific shift group by ID",
+                "operationId": "getShiftGroup",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Shift Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ShiftGroup"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/roster/shift/{id}": {
             "delete": {
                 "security": [
@@ -954,6 +1080,64 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/RosterTemplateShiftPreference"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/roster/template/shift/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roster"
+                ],
+                "summary": "Updates a roster template shift by ID",
+                "operationId": "updateRosterTemplateShift",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Shift ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update params",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TemplateShiftUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/RosterTemplateShift"
                         }
                     },
                     "400": {
@@ -1688,6 +1872,9 @@ const docTemplate = `{
                 "rosterId": {
                     "type": "integer"
                 },
+                "shiftGroupId": {
+                    "type": "integer"
+                },
                 "updatedAt": {
                     "type": "string"
                 }
@@ -1726,6 +1913,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "shiftGroupId": {
                     "type": "integer"
                 },
                 "shiftName": {
@@ -1858,10 +2048,47 @@ const docTemplate = `{
                 }
             }
         },
+        "ShiftGroup": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organ": {
+                    "$ref": "#/definitions/Organ"
+                },
+                "organId": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "ShiftGroupCreateRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "organId": {
+                    "type": "integer"
+                }
+            }
+        },
         "ShiftUpdateRequest": {
             "type": "object",
             "properties": {
                 "order": {
+                    "type": "integer"
+                },
+                "shiftGroupId": {
                     "type": "integer"
                 }
             }
@@ -1902,6 +2129,14 @@ const docTemplate = `{
             "properties": {
                 "preference": {
                     "type": "string"
+                }
+            }
+        },
+        "TemplateShiftUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "shiftGroupId": {
+                    "type": "integer"
                 }
             }
         },

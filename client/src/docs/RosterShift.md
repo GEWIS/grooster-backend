@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **name** | **string** |  | [optional] [default to undefined]
 **order** | **number** |  | [optional] [default to undefined]
 **rosterId** | **number** |  | [optional] [default to undefined]
+**shiftGroupId** | **number** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
 
 ## Example
@@ -23,6 +24,7 @@ const instance: RosterShift = {
     name,
     order,
     rosterId,
+    shiftGroupId,
     updatedAt,
 };
 ```

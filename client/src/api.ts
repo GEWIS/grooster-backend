@@ -313,6 +313,12 @@ export interface RosterShift {
     'rosterId'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof RosterShift
+     */
+    'shiftGroupId'?: number;
+    /**
+     * 
      * @type {string}
      * @memberof RosterShift
      */
@@ -379,6 +385,12 @@ export interface RosterTemplateShift {
      * @memberof RosterTemplateShift
      */
     'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterTemplateShift
+     */
+    'shiftGroupId'?: number;
     /**
      * 
      * @type {string}
@@ -588,6 +600,68 @@ export interface ShiftCreateRequest {
 /**
  * 
  * @export
+ * @interface ShiftGroup
+ */
+export interface ShiftGroup {
+    /**
+     * 
+     * @type {string}
+     * @memberof ShiftGroup
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftGroup
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ShiftGroup
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {Organ}
+     * @memberof ShiftGroup
+     */
+    'organ'?: Organ;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftGroup
+     */
+    'organId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ShiftGroup
+     */
+    'updatedAt'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ShiftGroupCreateRequest
+ */
+export interface ShiftGroupCreateRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ShiftGroupCreateRequest
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftGroupCreateRequest
+     */
+    'organId'?: number;
+}
+/**
+ * 
+ * @export
  * @interface ShiftUpdateRequest
  */
 export interface ShiftUpdateRequest {
@@ -597,6 +671,12 @@ export interface ShiftUpdateRequest {
      * @memberof ShiftUpdateRequest
      */
     'order'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftUpdateRequest
+     */
+    'shiftGroupId'?: number;
 }
 /**
  * 
@@ -660,6 +740,19 @@ export interface TemplateShiftPreferenceUpdateRequest {
      * @memberof TemplateShiftPreferenceUpdateRequest
      */
     'preference'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface TemplateShiftUpdateRequest
+ */
+export interface TemplateShiftUpdateRequest {
+    /**
+     * 
+     * @type {number}
+     * @memberof TemplateShiftUpdateRequest
+     */
+    'shiftGroupId'?: number;
 }
 /**
  * 
@@ -1791,6 +1884,49 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * 
+         * @summary Updates a roster template shift by ID
+         * @param {number} id Shift ID
+         * @param {TemplateShiftUpdateRequest} params Update params
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRosterTemplateShift: async (id: number, params: TemplateShiftUpdateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateRosterTemplateShift', 'id', id)
+            // verify required parameter 'params' is not null or undefined
+            assertParamExists('updateRosterTemplateShift', 'params', params)
+            const localVarPath = `/roster/template/shift/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(params, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Updates a roster template shift preference by ID
          * @param {number} id Preference ID
          * @param {TemplateShiftPreferenceUpdateRequest} params Update params
@@ -2005,6 +2141,20 @@ export const RosterApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Updates a roster template shift by ID
+         * @param {number} id Shift ID
+         * @param {TemplateShiftUpdateRequest} params Update params
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateRosterTemplateShift(id: number, params: TemplateShiftUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterTemplateShift>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateRosterTemplateShift(id, params, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterApi.updateRosterTemplateShift']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Updates a roster template shift preference by ID
          * @param {number} id Preference ID
          * @param {TemplateShiftPreferenceUpdateRequest} params Update params
@@ -2151,6 +2301,17 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
          */
         updateRosterTemplate(id: number, params?: TemplateUpdateParams, options?: RawAxiosRequestConfig): AxiosPromise<RosterTemplate> {
             return localVarFp.updateRosterTemplate(id, params, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Updates a roster template shift by ID
+         * @param {number} id Shift ID
+         * @param {TemplateShiftUpdateRequest} params Update params
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRosterTemplateShift(id: number, params: TemplateShiftUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterTemplateShift> {
+            return localVarFp.updateRosterTemplateShift(id, params, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2320,6 +2481,19 @@ export class RosterApi extends BaseAPI {
      */
     public updateRosterTemplate(id: number, params?: TemplateUpdateParams, options?: RawAxiosRequestConfig) {
         return RosterApiFp(this.configuration).updateRosterTemplate(id, params, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Updates a roster template shift by ID
+     * @param {number} id Shift ID
+     * @param {TemplateShiftUpdateRequest} params Update params
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterApi
+     */
+    public updateRosterTemplateShift(id: number, params: TemplateShiftUpdateRequest, options?: RawAxiosRequestConfig) {
+        return RosterApiFp(this.configuration).updateRosterTemplateShift(id, params, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3057,6 +3231,266 @@ export class SavedShiftApi extends BaseAPI {
      */
     public updateSavedShift(id: number, updateParams: SavedShiftUpdateRequest, options?: RawAxiosRequestConfig) {
         return SavedShiftApiFp(this.configuration).updateSavedShift(id, updateParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * ShiftGroupApi - axios parameter creator
+ * @export
+ */
+export const ShiftGroupApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Create a new shift group
+         * @param {ShiftGroupCreateRequest} params Shift Group Details
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createShiftGroup: async (params: ShiftGroupCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'params' is not null or undefined
+            assertParamExists('createShiftGroup', 'params', params)
+            const localVarPath = `/roster/shift-groups`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(params, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get a specific shift group by ID
+         * @param {number} id Shift Group ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getShiftGroup: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getShiftGroup', 'id', id)
+            const localVarPath = `/roster/shift-groups/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all shift groups for an organ
+         * @param {number} organId Organ ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getShiftGroups: async (organId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organId' is not null or undefined
+            assertParamExists('getShiftGroups', 'organId', organId)
+            const localVarPath = `/roster/shift-groups`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (organId !== undefined) {
+                localVarQueryParameter['organ_id'] = organId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ShiftGroupApi - functional programming interface
+ * @export
+ */
+export const ShiftGroupApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ShiftGroupApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Create a new shift group
+         * @param {ShiftGroupCreateRequest} params Shift Group Details
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createShiftGroup(params: ShiftGroupCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ShiftGroup>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createShiftGroup(params, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ShiftGroupApi.createShiftGroup']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get a specific shift group by ID
+         * @param {number} id Shift Group ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getShiftGroup(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ShiftGroup>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getShiftGroup(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ShiftGroupApi.getShiftGroup']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get all shift groups for an organ
+         * @param {number} organId Organ ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getShiftGroups(organId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ShiftGroup>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getShiftGroups(organId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ShiftGroupApi.getShiftGroups']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * ShiftGroupApi - factory interface
+ * @export
+ */
+export const ShiftGroupApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ShiftGroupApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Create a new shift group
+         * @param {ShiftGroupCreateRequest} params Shift Group Details
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createShiftGroup(params: ShiftGroupCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ShiftGroup> {
+            return localVarFp.createShiftGroup(params, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get a specific shift group by ID
+         * @param {number} id Shift Group ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getShiftGroup(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ShiftGroup> {
+            return localVarFp.getShiftGroup(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all shift groups for an organ
+         * @param {number} organId Organ ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getShiftGroups(organId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<ShiftGroup>> {
+            return localVarFp.getShiftGroups(organId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ShiftGroupApi - object-oriented interface
+ * @export
+ * @class ShiftGroupApi
+ * @extends {BaseAPI}
+ */
+export class ShiftGroupApi extends BaseAPI {
+    /**
+     * 
+     * @summary Create a new shift group
+     * @param {ShiftGroupCreateRequest} params Shift Group Details
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ShiftGroupApi
+     */
+    public createShiftGroup(params: ShiftGroupCreateRequest, options?: RawAxiosRequestConfig) {
+        return ShiftGroupApiFp(this.configuration).createShiftGroup(params, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get a specific shift group by ID
+     * @param {number} id Shift Group ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ShiftGroupApi
+     */
+    public getShiftGroup(id: number, options?: RawAxiosRequestConfig) {
+        return ShiftGroupApiFp(this.configuration).getShiftGroup(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all shift groups for an organ
+     * @param {number} organId Organ ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ShiftGroupApi
+     */
+    public getShiftGroups(organId: number, options?: RawAxiosRequestConfig) {
+        return ShiftGroupApiFp(this.configuration).getShiftGroups(organId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

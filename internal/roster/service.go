@@ -34,9 +34,15 @@ type Service interface {
 	UpdateRosterTemplate(uint, *TemplateUpdateParams) (*models.RosterTemplate, error)
 	DeleteRosterTemplate(ID uint) error
 
+	UpdateRosterTemplateShift(uint, *TemplateShiftUpdateRequest) (*models.RosterTemplateShift, error)
+
 	CreateRosterTemplateShiftPreference(TemplateShiftPreferenceCreateRequest) (*models.RosterTemplateShiftPreference, error)
 	GetRosterTemplateShiftPreferences(TemplateShiftPreferenceFilterParams) ([]models.RosterTemplateShiftPreference, error)
 	UpdateRosterTemplateShiftPreference(uint, TemplateShiftPreferenceUpdateRequest) (*models.RosterTemplateShiftPreference, error)
+
+	CreateShiftGroup(ShiftGroupCreateRequest) (*models.ShiftGroup, error)
+	GetShiftGroups(ShiftGroupFilterParams) (*[]models.ShiftGroup, error)
+	GetShiftGroup(uint) (*models.ShiftGroup, error)
 }
 
 type service struct {
@@ -77,14 +83,31 @@ func (s *service) CreateRoster(params *CreateRequest) (*models.Roster, error) {
 		return nil, err
 	}
 
+	groupMapping := make(map[string]*uint)
+
+	if params.TemplateID != nil {
+		var templateShifts []models.RosterTemplateShift
+		s.db.Where("template_id = ?", params.TemplateID).Find(&templateShifts)
+
+		for _, ts := range templateShifts {
+			groupMapping[ts.ShiftName] = ts.ShiftGroupID
+		}
+	}
+
 	nameToShiftID := make(map[string]uint)
 
 	if params.Shifts != nil && len(params.Shifts) > 0 {
 		for index, shift := range params.Shifts {
+			var groupID *uint
+			if gID, ok := groupMapping[shift]; ok {
+				groupID = gID
+			}
+
 			rosterShift := &models.RosterShift{
-				Name:     shift,
-				RosterID: roster.ID,
-				Order:    uint(index),
+				Name:         shift,
+				RosterID:     roster.ID,
+				Order:        uint(index),
+				ShiftGroupID: groupID,
 			}
 
 			if err := s.db.Create(&rosterShift).Error; err != nil {
@@ -238,6 +261,10 @@ func (s *service) UpdateRosterShift(ID uint, updateParams *ShiftUpdateRequest) (
 
 	if updateParams.Order != nil {
 		updates["order"] = updateParams.Order
+	}
+
+	if updateParams.ShiftGroupID != nil {
+		updates["shift_group_id"] = updateParams.ShiftGroupID
 	}
 
 	if err := s.db.Model(&rosterShift).Updates(updates).Error; err != nil {
@@ -456,6 +483,24 @@ func (s *service) DeleteRosterTemplate(ID uint) error {
 	return nil
 }
 
+func (s *service) UpdateRosterTemplateShift(ID uint, updateParams *TemplateShiftUpdateRequest) (*models.RosterTemplateShift, error) {
+	var templateShift models.RosterTemplateShift
+
+	if err := s.db.First(&templateShift, ID).Error; err != nil {
+		return nil, err
+	}
+
+	updates := map[string]interface{}{
+		"shift_group_id": updateParams.ShiftGroupID,
+	}
+
+	if err := s.db.Model(&templateShift).Updates(updates).Error; err != nil {
+		return nil, err
+	}
+
+	return &templateShift, nil
+}
+
 func (s *service) CreateRosterTemplateShiftPreference(params TemplateShiftPreferenceCreateRequest) (*models.RosterTemplateShiftPreference, error) {
 	templateShiftPreference := models.RosterTemplateShiftPreference{
 		UserID:                params.UserID,
@@ -504,6 +549,43 @@ func (s *service) UpdateRosterTemplateShiftPreference(id uint, params TemplateSh
 	return &templateShiftPreference, nil
 }
 
+func (s *service) CreateShiftGroup(params ShiftGroupCreateRequest) (*models.ShiftGroup, error) {
+	shiftGroup := models.ShiftGroup{
+		OrganID: params.OrganID,
+		Name:    params.Name,
+	}
+
+	if err := s.db.Create(&shiftGroup).Error; err != nil {
+		return nil, err
+	}
+
+	return &shiftGroup, nil
+}
+
+func (s *service) GetShiftGroups(filters ShiftGroupFilterParams) (*[]models.ShiftGroup, error) {
+	var shiftGroups []models.ShiftGroup
+
+	db := s.db.Model(&models.ShiftGroup{})
+
+	db = db.Where("organ_id = ?", filters.OrganID)
+
+	if err := db.Find(&shiftGroups).Error; err != nil {
+		return nil, err
+	}
+
+	return &shiftGroups, nil
+}
+
+func (s *service) GetShiftGroup(ID uint) (*models.ShiftGroup, error) {
+	var shiftGroup models.ShiftGroup
+
+	if err := s.db.First(&shiftGroup, ID).Error; err != nil {
+		return nil, err
+	}
+
+	return &shiftGroup, nil
+}
+
 func (s *service) createSavedShift(rID uint, shift *models.RosterShift) error {
 	var savedShift = models.SavedShift{
 		RosterID:    rID,
@@ -531,11 +613,17 @@ func (s *service) getSavedShiftOrdering(savedShifts []*models.SavedShift) ([]*mo
 			return nil, err
 		}
 
+		// Get the latest shift from users to check when they were last assigned
+		// It first checks by groups and if no group is assigned it checks on name
 		err := s.db.Table("users AS u").
 			Select("u.*, MAX(r.date) AS last_date").
 			Joins("JOIN user_organs AS uo ON u.id = uo.user_id").
+			Joins("JOIN roster_shifts AS target_rs ON target_rs.name = ?", savedShift.RosterShift.Name).
+			Joins(`LEFT JOIN roster_shifts AS rs ON (
+				(target_rs.shift_group_id IS NOT NULL AND rs.shift_group_id = target_rs.shift_group_id) OR 
+				(target_rs.shift_group_id IS NULL AND rs.name = target_rs.name)
+			)`).
 			Joins("LEFT JOIN user_shift_saved AS uss ON uss.user_id = u.id").
-			Joins("LEFT JOIN roster_shifts AS rs ON rs.name = ? ", savedShift.RosterShift.Name).
 			Joins("LEFT JOIN saved_shifts AS ss ON ss.roster_shift_id = rs.id AND ss.id = uss.saved_shift_id").
 			Joins("LEFT JOIN rosters AS r ON r.id = ss.roster_id").
 			Where("uo.organ_id = ?", organID).
