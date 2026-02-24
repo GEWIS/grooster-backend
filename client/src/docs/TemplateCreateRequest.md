@@ -1,23 +1,23 @@
-# UserCreateRequest
+# TemplateCreateRequest
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**gewisid** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
-**organIDs** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+**organId** | **number** |  | [optional] [default to undefined]
+**shifts** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { UserCreateRequest } from './api';
+import { TemplateCreateRequest } from './api';
 
-const instance: UserCreateRequest = {
-    gewisid,
+const instance: TemplateCreateRequest = {
     name,
-    organIDs,
+    organId,
+    shifts,
 };
 ```
 

@@ -17,13 +17,13 @@ All URIs are relative to *http://localhost*
 import {
     RosterAnswerApi,
     Configuration,
-    RosterAnswerCreateRequest
+    AnswerCreateRequest
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new RosterAnswerApi(configuration);
 
-let createParams: RosterAnswerCreateRequest; //Roster answer input
+let createParams: AnswerCreateRequest; //Roster answer input
 
 const { status, data } = await apiInstance.createRosterAnswer(
     createParams
@@ -34,7 +34,7 @@ const { status, data } = await apiInstance.createRosterAnswer(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **createParams** | **RosterAnswerCreateRequest**| Roster answer input | |
+| **createParams** | **AnswerCreateRequest**| Roster answer input | |
 
 
 ### Return type
@@ -69,14 +69,14 @@ const { status, data } = await apiInstance.createRosterAnswer(
 import {
     RosterAnswerApi,
     Configuration,
-    RosterAnswerUpdateRequest
+    AnswerUpdateRequest
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new RosterAnswerApi(configuration);
 
 let id: number; //Roster Answer ID (default to undefined)
-let updateParams: RosterAnswerUpdateRequest; //New answer value
+let updateParams: AnswerUpdateRequest; //New answer value
 
 const { status, data } = await apiInstance.updateRosterAnswer(
     id,
@@ -88,7 +88,7 @@ const { status, data } = await apiInstance.updateRosterAnswer(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **updateParams** | **RosterAnswerUpdateRequest**| New answer value | |
+| **updateParams** | **AnswerUpdateRequest**| New answer value | |
 | **id** | [**number**] | Roster Answer ID | defaults to undefined|
 
 

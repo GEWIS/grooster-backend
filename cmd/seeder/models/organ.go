@@ -1,7 +1,7 @@
 package models
 
 import (
-	"GEWIS-Rooster/cmd/src/pkg/models"
+	"GEWIS-Rooster/internal/organ"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"strconv"
@@ -9,7 +9,7 @@ import (
 
 func OrganSeeder(d *gorm.DB, count int) {
 	for i := 0; i < count; i++ {
-		user := models.Organ{
+		user := organ.Organ{
 			Name: "Organ" + strconv.Itoa(i),
 		}
 

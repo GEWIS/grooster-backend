@@ -80,13 +80,13 @@ const { status, data } = await apiInstance.createRoster(
 import {
     RosterApi,
     Configuration,
-    RosterTemplateCreateRequest
+    TemplateCreateRequest
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new RosterApi(configuration);
 
-let params: RosterTemplateCreateRequest; //Template Params (optional)
+let params: TemplateCreateRequest; //Template Params (optional)
 
 const { status, data } = await apiInstance.createRosterTemplate(
     params
@@ -97,7 +97,7 @@ const { status, data } = await apiInstance.createRosterTemplate(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **params** | **RosterTemplateCreateRequest**| Template Params | |
+| **params** | **TemplateCreateRequest**| Template Params | |
 
 
 ### Return type
@@ -123,7 +123,7 @@ const { status, data } = await apiInstance.createRosterTemplate(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **createRosterTemplateShiftPreference**
-> ModelsRosterTemplateShiftPreference createRosterTemplateShiftPreference(params)
+> RosterTemplateShiftPreference createRosterTemplateShiftPreference(params)
 
 
 ### Example
@@ -154,7 +154,7 @@ const { status, data } = await apiInstance.createRosterTemplateShiftPreference(
 
 ### Return type
 
-**ModelsRosterTemplateShiftPreference**
+**RosterTemplateShiftPreference**
 
 ### Authorization
 
@@ -383,7 +383,7 @@ const { status, data } = await apiInstance.getRosterTemplate(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getRosterTemplateShiftPreferences**
-> Array<ModelsRosterTemplateShiftPreference> getRosterTemplateShiftPreferences()
+> Array<RosterTemplateShiftPreference> getRosterTemplateShiftPreferences()
 
 
 ### Example
@@ -416,7 +416,7 @@ const { status, data } = await apiInstance.getRosterTemplateShiftPreferences(
 
 ### Return type
 
-**Array<ModelsRosterTemplateShiftPreference>**
+**Array<RosterTemplateShiftPreference>**
 
 ### Authorization
 
@@ -502,11 +502,13 @@ import {
 const configuration = new Configuration();
 const apiInstance = new RosterApi(configuration);
 
-let date: string; //Date filter (ISO format) (optional) (default to undefined)
-let organId: number; //Organ ID filter (optional) (default to undefined)
+let date: string; // (optional) (default to undefined)
+let id: number; // (optional) (default to undefined)
+let organId: number; // (optional) (default to undefined)
 
 const { status, data } = await apiInstance.getRosters(
     date,
+    id,
     organId
 );
 ```
@@ -515,8 +517,9 @@ const { status, data } = await apiInstance.getRosters(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **date** | [**string**] | Date filter (ISO format) | (optional) defaults to undefined|
-| **organId** | [**number**] | Organ ID filter | (optional) defaults to undefined|
+| **date** | [**string**] |  | (optional) defaults to undefined|
+| **id** | [**number**] |  | (optional) defaults to undefined|
+| **organId** | [**number**] |  | (optional) defaults to undefined|
 
 
 ### Return type
@@ -606,14 +609,14 @@ const { status, data } = await apiInstance.updateRoster(
 import {
     RosterApi,
     Configuration,
-    RosterTemplateUpdateParams
+    TemplateUpdateParams
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new RosterApi(configuration);
 
 let id: number; //Template ID (default to undefined)
-let params: RosterTemplateUpdateParams; //Update params (optional)
+let params: TemplateUpdateParams; //Update params (optional)
 
 const { status, data } = await apiInstance.updateRosterTemplate(
     id,
@@ -625,7 +628,7 @@ const { status, data } = await apiInstance.updateRosterTemplate(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **params** | **RosterTemplateUpdateParams**| Update params | |
+| **params** | **TemplateUpdateParams**| Update params | |
 | **id** | [**number**] | Template ID | defaults to undefined|
 
 
@@ -653,7 +656,7 @@ const { status, data } = await apiInstance.updateRosterTemplate(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **updateRosterTemplateShiftPreference**
-> ModelsRosterTemplateShiftPreference updateRosterTemplateShiftPreference(params)
+> RosterTemplateShiftPreference updateRosterTemplateShiftPreference(params)
 
 
 ### Example
@@ -687,7 +690,7 @@ const { status, data } = await apiInstance.updateRosterTemplateShiftPreference(
 
 ### Return type
 
-**ModelsRosterTemplateShiftPreference**
+**RosterTemplateShiftPreference**
 
 ### Authorization
 

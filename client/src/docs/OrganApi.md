@@ -8,7 +8,7 @@ All URIs are relative to *http://localhost*
 |[**organIdMemberUserIdPatch**](#organidmemberuseridpatch) | **PATCH** /organ/{id}/member/{userId} | Update settings for a user within an organ|
 
 # **organIdMemberUserIdGet**
-> ModelsUserOrgan organIdMemberUserIdGet()
+> UserOrgan organIdMemberUserIdGet()
 
 Get organ-specific settings like nickname/username
 
@@ -42,7 +42,7 @@ const { status, data } = await apiInstance.organIdMemberUserIdGet(
 
 ### Return type
 
-**ModelsUserOrgan**
+**UserOrgan**
 
 ### Authorization
 
@@ -64,7 +64,7 @@ const { status, data } = await apiInstance.organIdMemberUserIdGet(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **organIdMemberUserIdPatch**
-> ModelsUserOrgan organIdMemberUserIdPatch(updateParams)
+> UserOrgan organIdMemberUserIdPatch(updateParams)
 
 Update organ-specific settings like nickname/username
 
@@ -74,7 +74,7 @@ Update organ-specific settings like nickname/username
 import {
     OrganApi,
     Configuration,
-    ModelsUpdateMemberSettingsParams
+    UpdateMemberSettingsParams
 } from './api';
 
 const configuration = new Configuration();
@@ -82,7 +82,7 @@ const apiInstance = new OrganApi(configuration);
 
 let id: number; //Organ ID (default to undefined)
 let userId: number; //User ID (default to undefined)
-let updateParams: ModelsUpdateMemberSettingsParams; //Settings input
+let updateParams: UpdateMemberSettingsParams; //Settings input
 
 const { status, data } = await apiInstance.organIdMemberUserIdPatch(
     id,
@@ -95,14 +95,14 @@ const { status, data } = await apiInstance.organIdMemberUserIdPatch(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **updateParams** | **ModelsUpdateMemberSettingsParams**| Settings input | |
+| **updateParams** | **UpdateMemberSettingsParams**| Settings input | |
 | **id** | [**number**] | Organ ID | defaults to undefined|
 | **userId** | [**number**] | User ID | defaults to undefined|
 
 
 ### Return type
 
-**ModelsUserOrgan**
+**UserOrgan**
 
 ### Authorization
 

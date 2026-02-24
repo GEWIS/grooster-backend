@@ -2,7 +2,9 @@ package seeder
 
 import (
 	"GEWIS-Rooster/cmd/seeder/models"
-	mainModels "GEWIS-Rooster/cmd/src/pkg/models"
+	"GEWIS-Rooster/internal/organ"
+	mainModels "GEWIS-Rooster/internal/roster"
+	"GEWIS-Rooster/internal/user"
 	"fmt"
 	"gorm.io/gorm"
 )
@@ -15,12 +17,12 @@ func Seeder(d *gorm.DB) {
 	}
 
 	err = d.AutoMigrate(
-		&mainModels.User{},
+		&user.User{},
 		&mainModels.Roster{},
 		&mainModels.RosterShift{},
 		&mainModels.RosterAnswer{},
 		&mainModels.SavedShift{},
-		&mainModels.Organ{},
+		&organ.Organ{},
 		&mainModels.RosterTemplate{},
 		&mainModels.RosterTemplateShift{},
 	)

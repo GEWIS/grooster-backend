@@ -1,23 +1,21 @@
-# UserCreateRequest
+# ShiftCreateRequest
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**gewisid** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
-**organIDs** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+**rosterId** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { UserCreateRequest } from './api';
+import { ShiftCreateRequest } from './api';
 
-const instance: UserCreateRequest = {
-    gewisid,
+const instance: ShiftCreateRequest = {
     name,
-    organIDs,
+    rosterId,
 };
 ```
 
