@@ -11,7 +11,7 @@ type Roster struct {
 
 	Name string `json:"name"`
 
-	RosterShift []RosterShift `json:"rosterShift"`
+	RosterShift []RosterShift `json:"rosterShift" gorm:"foreignKey:RosterID"`
 
 	RosterAnswer []RosterAnswer `json:"rosterAnswer" gorm:"foreignKey:RosterID"`
 
