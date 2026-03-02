@@ -1,0 +1,8 @@
+client
+
+openapitools.json
+package-lock.json
+README.md
+
+.env
+.env-example

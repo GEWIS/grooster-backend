@@ -58,8 +58,14 @@ openapi-generator-cli generate -i docs/swagger.yaml -g typescript-axios -o clien
 
 1. Ensure your `.env` is configured (see Configuration section above).
 2. Seed the database if necessary.
-3. Start the server:
+3. Start the server
 
 ```
 go run ./cmd/src/main.go
+```
+
+## Creating migrations
+First make sure you have installed golang-migrate on your pc
+```
+migrate create -ext sql -dir db/migrations -seq file_name
 ```
