@@ -18,10 +18,45 @@ func NewOrganHandler(rg *gin.RouterGroup, organService Service) *Handler {
 
 	g := rg.Group("/organ")
 
+	g.GET("/:id", h.GetMembersSettings)
 	g.GET("/:id/member/:userId", h.GetMemberSettings)
 	g.PATCH("/:id/member/:userId", h.UpdateMemberSettings)
 
 	return h
+}
+
+// GetMembersSettings
+//
+//	@Summary      Get settings for all members within an organ
+//	@Security     BearerAuth
+//	@Description  Get organ-specific settings like nickname/username for all its members
+//	@Tags         Organ
+//	@Accept       json
+//	@Produce      json
+//	@Param        id             path      uint                                true  "Organ ID"
+//	@Success      200            {object}  models.UserOrgan
+//	@Failure      400            {string}  string
+//	@Failure 404 {string} string
+//	@ID	getMembersSettings
+//	@Router       /organ/{id} [get]
+func (o *Handler) GetMembersSettings(c *gin.Context) {
+	organID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, "Invalid Organ ID")
+		return
+	}
+
+	settings, err := o.organService.GetMembersSettings(uint(organID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Could not find Organ"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, settings)
 }
 
 // GetMemberSettings

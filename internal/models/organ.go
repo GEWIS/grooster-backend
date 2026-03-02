@@ -11,9 +11,9 @@ type Organ struct {
 } // @name Organ
 
 type UserOrgan struct {
-	UserID uint `gorm:"primaryKey"`
+	UserID uint `json:"userId"  gorm:"primaryKey"`
 
-	OrganID uint `gorm:"primaryKey"`
+	OrganID uint `json:"organId"  gorm:"primaryKey"`
 
 	Username string `json:"username" gorm:"size:255"`
 } // @name UserOrgan

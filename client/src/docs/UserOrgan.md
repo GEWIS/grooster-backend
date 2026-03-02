@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**organID** | **number** |  | [optional] [default to undefined]
-**userID** | **number** |  | [optional] [default to undefined]
+**organId** | **number** |  | [optional] [default to undefined]
+**userId** | **number** |  | [optional] [default to undefined]
 **username** | **string** |  | [optional] [default to undefined]
 
 ## Example
@@ -15,8 +15,8 @@ Name | Type | Description | Notes
 import { UserOrgan } from './api';
 
 const instance: UserOrgan = {
-    organID,
-    userID,
+    organId,
+    userId,
     username,
 };
 ```

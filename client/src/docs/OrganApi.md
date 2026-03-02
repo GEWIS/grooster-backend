@@ -4,8 +4,62 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
+|[**getMembersSettings**](#getmemberssettings) | **GET** /organ/{id} | Get settings for all members within an organ|
 |[**organIdMemberUserIdGet**](#organidmemberuseridget) | **GET** /organ/{id}/member/{userId} | Get settings for a user within an organ|
 |[**organIdMemberUserIdPatch**](#organidmemberuseridpatch) | **PATCH** /organ/{id}/member/{userId} | Update settings for a user within an organ|
+
+# **getMembersSettings**
+> UserOrgan getMembersSettings()
+
+Get organ-specific settings like nickname/username for all its members
+
+### Example
+
+```typescript
+import {
+    OrganApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new OrganApi(configuration);
+
+let id: number; //Organ ID (default to undefined)
+
+const { status, data } = await apiInstance.getMembersSettings(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | Organ ID | defaults to undefined|
+
+
+### Return type
+
+**UserOrgan**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **organIdMemberUserIdGet**
 > UserOrgan organIdMemberUserIdGet()
