@@ -286,6 +286,14 @@ const getStatusColorClass = (value: string) => {
 
       <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
         <Button
+          class="w-full sm:w-auto !justify-center"
+          label="Fill Roster"
+          outlined
+          severity="secondary"
+          size="small"
+          @click="rosterStore.fillRoster(props.id)"
+        />
+        <Button
           v-if="roster.saved"
           class="w-full sm:w-auto !justify-center"
           icon="pi pi-lock-open"

@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 import type {
-  AnswerUpdateRequest,
-  ShiftCreateRequest,
-  SavedShiftUpdateRequest,
-  RosterCreateRequest,
-  Roster,
   AnswerCreateRequest,
-  SavedShiftResponse,
+  AnswerUpdateRequest,
+  Roster,
+  RosterCreateRequest,
   RosterUpdateRequest,
+  SavedShiftResponse,
+  SavedShiftUpdateRequest,
+  ShiftCreateRequest,
   ShiftUpdateRequest,
 } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
@@ -238,6 +238,33 @@ export const useRosterStore = defineStore('roster', {
           this.savedRoster[updatedShift.rosterId].savedShifts.splice(index, 1, updatedShift);
         }
       });
+    },
+    async fillRoster(rosterId: number) {
+      try {
+        const { data: newAnswers } = await ApiService.roster.fillRoster(rosterId);
+
+        const roster = this.rosters[rosterId];
+        const existingAnswers = roster.rosterAnswer ?? [];
+
+        const answerMap = new Map(existingAnswers.map((ans) => [ans.id, ans]));
+
+        newAnswers.forEach((answer) => {
+          answerMap.set(answer.id, answer);
+        });
+
+        const mergedAnswers = Array.from(answerMap.values());
+
+        this.rosters = {
+          ...this.rosters,
+          [rosterId]: {
+            ...roster,
+
+            rosterAnswer: mergedAnswers,
+          },
+        };
+      } catch (e) {
+        console.error('Fill Roster', e);
+      }
     },
   },
 });
