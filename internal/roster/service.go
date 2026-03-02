@@ -2,6 +2,7 @@ package roster
 
 import (
 	"GEWIS-Rooster/internal/models"
+	"GEWIS-Rooster/internal/user"
 	"errors"
 	"fmt"
 	"gorm.io/datatypes"
@@ -21,6 +22,9 @@ type Service interface {
 	CreateRosterShift(*ShiftCreateRequest) (*models.RosterShift, error)
 	UpdateRosterShift(uint, *ShiftUpdateRequest) (*models.RosterShift, error)
 	DeleteRosterShift(ID uint) error
+
+	FillRosterPreferences(uint) ([]*models.RosterAnswer, error)
+
 	CreateRosterAnswer(*AnswerCreateRequest) (*models.RosterAnswer, error)
 	UpdateRosterAnswer(uint, *AnswerUpdateRequest) (*models.RosterAnswer, error)
 
@@ -45,12 +49,17 @@ type Service interface {
 	GetShiftGroup(uint) (*models.ShiftGroup, error)
 }
 
-type service struct {
-	db *gorm.DB
+type UserProvider interface {
+	Get(*user.FilterParams) ([]*models.User, error)
 }
 
-func NewRosterService(db *gorm.DB) Service {
-	return &service{db: db}
+type service struct {
+	db *gorm.DB
+	u  UserProvider
+}
+
+func NewRosterService(db *gorm.DB, userService UserProvider) Service {
+	return &service{db: db, u: userService}
 }
 
 func (s *service) CreateRoster(params *CreateRequest) (*models.Roster, error) {
@@ -73,10 +82,11 @@ func (s *service) CreateRoster(params *CreateRequest) (*models.Roster, error) {
 	}
 
 	roster := models.Roster{
-		Name:    params.Name,
-		Date:    params.Date,
-		OrganID: params.OrganID,
-		Values:  values,
+		Name:       params.Name,
+		Date:       params.Date,
+		OrganID:    params.OrganID,
+		Values:     values,
+		TemplateID: params.TemplateID,
 	}
 
 	if err := s.db.Create(&roster).Error; err != nil {
@@ -94,8 +104,6 @@ func (s *service) CreateRoster(params *CreateRequest) (*models.Roster, error) {
 		}
 	}
 
-	nameToShiftID := make(map[string]uint)
-
 	if params.Shifts != nil && len(params.Shifts) > 0 {
 		for index, shift := range params.Shifts {
 			var groupID *uint
@@ -112,39 +120,6 @@ func (s *service) CreateRoster(params *CreateRequest) (*models.Roster, error) {
 
 			if err := s.db.Create(&rosterShift).Error; err != nil {
 				return nil, err
-			}
-
-			nameToShiftID[rosterShift.Name] = rosterShift.ID
-		}
-	}
-
-	if params.TemplateID != nil {
-		userIDs := make([]uint, len(users))
-		for i, getUser := range users {
-			userIDs[i] = getUser.ID
-		}
-
-		var preferences []models.RosterTemplateShiftPreference
-		err := s.db.Preload("RosterTemplateShift").
-			Joins("JOIN roster_template_shifts ON roster_template_shifts.id = roster_template_shift_preferences.roster_template_shift_id").
-			Where("roster_template_shift_preferences.user_id IN ? AND roster_template_shifts.template_id = ?", userIDs, *params.TemplateID).
-			Find(&preferences).Error
-		if err != nil {
-			return nil, err
-		}
-
-		for _, pref := range preferences {
-			if newShiftID, exists := nameToShiftID[pref.RosterTemplateShift.ShiftName]; exists {
-				answer := models.RosterAnswer{
-					UserID:        pref.UserID,
-					RosterID:      roster.ID,
-					RosterShiftID: newShiftID,
-					Value:         pref.Preference,
-				}
-
-				if err := s.db.Create(&answer).Error; err != nil {
-					return nil, err
-				}
 			}
 		}
 	}
@@ -282,6 +257,90 @@ func (s *service) DeleteRosterShift(ID uint) error {
 	}
 
 	return nil
+}
+
+func (s *service) FillRosterPreferences(rosterID uint) ([]*models.RosterAnswer, error) {
+	filter := &FilterParams{
+		ID: &rosterID,
+	}
+
+	rosters, err := s.GetRosters(filter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(rosters) == 0 || len(rosters) > 1 {
+		return nil, errors.New("only one roster should be found")
+	}
+
+	toFillRoster := rosters[0]
+
+	if toFillRoster.TemplateID == nil {
+		return nil, errors.New("roster shift has no linked template")
+	}
+
+	userFilter := user.FilterParams{
+		OrganID: &toFillRoster.OrganID,
+	}
+	users, err := s.u.Get(&userFilter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	userIDs := make([]uint, len(users))
+	for i, getUser := range users {
+		userIDs[i] = getUser.ID
+	}
+
+	var preferences []models.RosterTemplateShiftPreference
+	err = s.db.Preload("RosterTemplateShift").
+		Joins("JOIN roster_template_shifts ON roster_template_shifts.id = roster_template_shift_preferences.roster_template_shift_id").
+		Where("roster_template_shift_preferences.user_id IN ? AND roster_template_shifts.template_id = ?", userIDs, toFillRoster.TemplateID).
+		Find(&preferences).Error
+	if err != nil {
+		return nil, err
+	}
+
+	nameToShiftID := make(map[string]uint)
+
+	for _, shift := range toFillRoster.RosterShift {
+		nameToShiftID[shift.Name] = shift.ID
+	}
+
+	newAnswers := make([]*models.RosterAnswer, len(preferences))
+
+	for prefID, pref := range preferences {
+		if newShiftID, exists := nameToShiftID[pref.RosterTemplateShift.ShiftName]; exists {
+			var existingAnswer models.RosterAnswer
+
+			err := s.db.Where("user_id = ? AND roster_id = ? AND roster_shift_id = ?",
+				pref.UserID, toFillRoster.ID, newShiftID).First(&existingAnswer).Error
+
+			if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil, err
+			}
+
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				answer := models.RosterAnswer{
+					UserID:        pref.UserID,
+					RosterID:      toFillRoster.ID,
+					RosterShiftID: newShiftID,
+					Value:         pref.Preference,
+				}
+
+				if err := s.db.Create(&answer).Error; err != nil {
+					return nil, err
+				}
+				newAnswers[prefID] = &answer
+			} else {
+				newAnswers[prefID] = &existingAnswer
+			}
+		}
+	}
+
+	return newAnswers, nil
 }
 
 func (s *service) CreateRosterAnswer(params *AnswerCreateRequest) (*models.RosterAnswer, error) {

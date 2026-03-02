@@ -25,6 +25,8 @@ func NewRosterHandler(rosterService Service, rg *gin.RouterGroup) *Handler {
 	g.PATCH("/:id", h.UpdateRoster)
 	g.DELETE("/:id", h.DeleteRoster)
 
+	g.POST("/:id/fill", h.FillRosterPreferences)
+
 	g.POST("/shift", h.CreateRosterShift)
 	g.PATCH("/shift/:id", h.UpdateRosterShift)
 	g.DELETE("/shift/:id", h.DeleteRosterShift)
@@ -311,6 +313,34 @@ func (h *Handler) DeleteRosterShift(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Roster deleted",
 	})
+}
+
+// FillRosterPreferences
+//
+//	@Summary	Fills a roster with the linked user template preferences
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"Roster ID"
+//	@Success	200	{array}	models.RosterAnswer
+//	@Failure	400	{string}	string
+//	@Failure 404 {string} string
+//	@ID			fillRoster
+//	@Router		/roster/{id}/fill [post]
+func (h *Handler) FillRosterPreferences(c *gin.Context) {
+	rosterID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid roster ID"})
+		return
+	}
+
+	answers, err := h.rosterService.FillRosterPreferences(uint(rosterID))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, answers)
 }
 
 // CreateRosterAnswer

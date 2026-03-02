@@ -11,8 +11,10 @@ type Roster struct {
 
 	Name string `json:"name"`
 
+	// TODO change to RosterShifts, will be breaking
 	RosterShift []RosterShift `json:"rosterShift" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
 
+	// TODO change to RosterAnswer, will be breaking
 	RosterAnswer []RosterAnswer `json:"rosterAnswer" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
 
 	Values Values `json:"values" gorm:"serializer:json"`
@@ -51,7 +53,7 @@ type RosterAnswer struct {
 
 	RosterID uint `json:"rosterId" gorm:"uniqueIndex:user_answer_idx"`
 
-	Roster *Roster `json:"roster" gorm:"foreignKey:RosterID;constraint:fk_roster_answers_roster,OnDelete:CASCADE;"`
+	Roster *Roster `json:"-" gorm:"foreignKey:RosterID;constraint:fk_roster_answers_roster,OnDelete:CASCADE;"`
 
 	RosterShiftID uint `json:"rosterShiftId" gorm:"uniqueIndex:user_answer_idx;"`
 

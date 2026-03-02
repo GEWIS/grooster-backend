@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** |  | [optional] [default to undefined]
-**organId** | **number** |  | [optional] [default to undefined]
+**name** | **string** |  | [default to undefined]
+**organId** | **number** |  | [default to undefined]
 
 ## Example
 

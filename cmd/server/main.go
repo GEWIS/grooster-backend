@@ -63,7 +63,7 @@ func main() {
 	api := r.Group(os.Getenv("BASE_PATH"))
 
 	userService := user.NewUserService(db)
-	rosterService := roster.NewRosterService(db)
+	rosterService := roster.NewRosterService(db, userService)
 	exportService := export.NewExportService(rosterService, db)
 	organService := organ.NewOrganService(db)
 
