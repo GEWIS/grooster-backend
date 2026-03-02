@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import {
-  AnswerCreateRequest,
-  AnswerUpdateRequest,
-  Roster,
-  RosterAnswer,
-  User,
-  UserOrgan,
-} from '@gewis/grooster-backend-ts';
+import { AnswerCreateRequest, AnswerUpdateRequest, Roster, RosterAnswer, User } from '@gewis/grooster-backend-ts';
 import { useRoute } from 'vue-router';
 import { useRosterStore } from '@/stores/roster.store';
 import { getGEWISId } from '@/helpers/TokenHelper';
@@ -22,7 +15,7 @@ const props = defineProps<{
 const rosterStore = useRosterStore();
 const roster = computed<Roster | undefined>(() => rosterStore.getRoster(props.id));
 
-type UserWithNickname = User & UserOrgan;
+type UserWithNickname = User & { displayName: string };
 const users = ref<UserWithNickname[]>();
 const loadUsers = async () => {
   const userId = parseInt(route.params.id as string);
@@ -37,10 +30,25 @@ const loadUsers = async () => {
 
   const nicknameMap = new Map(memberSettings.map((setting) => [setting.userId, setting.username]));
 
-  users.value = rawUsers.map((user) => ({
-    ...user,
-    username: nicknameMap.get(user.id) || '',
-  }));
+  users.value = rawUsers.map((user) => {
+    const nickname = nicknameMap.get(user.id) || '';
+    let displayName = user.name;
+
+    if (nickname) {
+      const nameParts = user.name.split(' ');
+
+      if (nameParts.length > 1) {
+        displayName = `${nameParts[0]} (${nickname}) ${nameParts.slice(1).join(' ')}`;
+      } else {
+        displayName = `${user.name} (${nickname})`;
+      }
+    }
+
+    return {
+      ...user,
+      displayName: displayName,
+    };
+  });
 };
 
 onMounted(loadUsers);
@@ -263,11 +271,13 @@ const getStatusColorClass = (value: string) => {
 
         <tbody class="divide-y divide-gray-100">
           <tr v-for="user in sortedUsers" :key="user.id" class="hover:bg-blue-50/30 transition-colors">
-            <td
-              class="px-4 py-3 text-sm border-r border-gray-50"
-              :class="user.gewis_id === getGEWISId() ? 'font-bold text-gray-900' : 'font-medium text-gray-900'"
-            >
-              {{ user.username || user.name }}
+            <td class="px-4 py-3 text-sm border-r border-gray-50">
+              <div
+                class="max-w-[200px] overflow-x-auto whitespace-nowrap"
+                :class="user.gewis_id === getGEWISId() ? 'font-bold text-gray-900' : 'font-medium text-gray-900'"
+              >
+                {{ user.displayName || user.name }}
+              </div>
             </td>
 
             <template v-if="roster.rosterShift">
