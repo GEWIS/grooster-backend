@@ -1,6 +1,13 @@
 <script setup lang="ts">
-import { computed, reactive, watch, ref, onMounted } from 'vue';
-import { RosterAnswer, AnswerUpdateRequest, Roster, AnswerCreateRequest, User } from '@gewis/grooster-backend-ts';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
+import {
+  AnswerCreateRequest,
+  AnswerUpdateRequest,
+  Roster,
+  RosterAnswer,
+  User,
+  UserOrgan,
+} from '@gewis/grooster-backend-ts';
 import { useRoute } from 'vue-router';
 import { useRosterStore } from '@/stores/roster.store';
 import { getGEWISId } from '@/helpers/TokenHelper';
@@ -15,10 +22,25 @@ const props = defineProps<{
 const rosterStore = useRosterStore();
 const roster = computed<Roster | undefined>(() => rosterStore.getRoster(props.id));
 
-const users = ref<User[]>();
+type UserWithNickname = User & UserOrgan;
+const users = ref<UserWithNickname[]>();
 const loadUsers = async () => {
-  const response = await ApiService.user.userGet(parseInt(route.params.id as string));
-  users.value = response.data;
+  const userId = parseInt(route.params.id as string);
+
+  const [userResponse, organResponse] = await Promise.all([
+    ApiService.user.userGet(userId),
+    ApiService.organ.getMembersSettings(userId),
+  ]);
+
+  const rawUsers = userResponse.data;
+  const memberSettings = organResponse.data;
+
+  const nicknameMap = new Map(memberSettings.map((setting) => [setting.userId, setting.username]));
+
+  users.value = rawUsers.map((user) => ({
+    ...user,
+    username: nicknameMap.get(user.id) || '',
+  }));
 };
 
 onMounted(loadUsers);
@@ -245,7 +267,7 @@ const getStatusColorClass = (value: string) => {
               class="px-4 py-3 text-sm border-r border-gray-50"
               :class="user.gewis_id === getGEWISId() ? 'font-bold text-gray-900' : 'font-medium text-gray-900'"
             >
-              {{ user.name }}
+              {{ user.username || user.name }}
             </td>
 
             <template v-if="roster.rosterShift">
