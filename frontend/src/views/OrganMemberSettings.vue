@@ -52,7 +52,7 @@ const updateMemberSettings = async () => {
   };
 
   try {
-    const { data } = await ApiService.organ.organIdMemberUserIdPatch(userStore.user.id, organStore.organ, params);
+    const { data } = await ApiService.organ.organIdMemberUserIdPatch(organStore.organ, userStore.user.id, params);
     memberSettings.value = data;
     editName.value = data.username;
   } catch (e) {
