@@ -21,7 +21,7 @@ const fetchMemberData = async () => {
   if (!userStore.user?.id || !organStore.organ) return;
 
   try {
-    const { data } = await ApiService.organ.organIdMemberUserIdGet(userStore.user.id, organStore.organ);
+    const { data } = await ApiService.organ.organIdMemberUserIdGet(organStore.organ, userStore.user.id);
     memberSettings.value = data;
     editName.value = data.username || '';
   } catch (e) {
