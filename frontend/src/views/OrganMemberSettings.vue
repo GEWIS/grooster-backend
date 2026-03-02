@@ -94,6 +94,7 @@ const resetName = () => {
                 id="username"
                 v-model="editName"
                 class="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-emerald-950 font-medium"
+                maxlength="25"
                 placeholder="Your name in this organ..."
                 type="text"
                 @keyup.enter="updateMemberSettings"
