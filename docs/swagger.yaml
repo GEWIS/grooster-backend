@@ -463,7 +463,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/UserOrgan'
+            items:
+              $ref: '#/definitions/UserOrgan'
+            type: array
         "400":
           description: Bad Request
           schema:
