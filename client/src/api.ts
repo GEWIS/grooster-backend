@@ -865,13 +865,13 @@ export interface UserOrgan {
      * @type {number}
      * @memberof UserOrgan
      */
-    'organID'?: number;
+    'organId'?: number;
     /**
      * 
      * @type {number}
      * @memberof UserOrgan
      */
-    'userID'?: number;
+    'userId'?: number;
     /**
      * 
      * @type {string}
@@ -1191,6 +1191,43 @@ export class ExportApi extends BaseAPI {
 export const OrganApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Get organ-specific settings like nickname/username for all its members
+         * @summary Get settings for all members within an organ
+         * @param {number} id Organ ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMembersSettings: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getMembersSettings', 'id', id)
+            const localVarPath = `/organ/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get organ-specific settings like nickname/username
          * @summary Get settings for a user within an organ
          * @param {number} id Organ ID
@@ -1289,6 +1326,19 @@ export const OrganApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = OrganApiAxiosParamCreator(configuration)
     return {
         /**
+         * Get organ-specific settings like nickname/username for all its members
+         * @summary Get settings for all members within an organ
+         * @param {number} id Organ ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMembersSettings(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserOrgan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMembersSettings(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganApi.getMembersSettings']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get organ-specific settings like nickname/username
          * @summary Get settings for a user within an organ
          * @param {number} id Organ ID
@@ -1328,6 +1378,16 @@ export const OrganApiFactory = function (configuration?: Configuration, basePath
     const localVarFp = OrganApiFp(configuration)
     return {
         /**
+         * Get organ-specific settings like nickname/username for all its members
+         * @summary Get settings for all members within an organ
+         * @param {number} id Organ ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMembersSettings(id: number, options?: RawAxiosRequestConfig): AxiosPromise<UserOrgan> {
+            return localVarFp.getMembersSettings(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get organ-specific settings like nickname/username
          * @summary Get settings for a user within an organ
          * @param {number} id Organ ID
@@ -1360,6 +1420,18 @@ export const OrganApiFactory = function (configuration?: Configuration, basePath
  * @extends {BaseAPI}
  */
 export class OrganApi extends BaseAPI {
+    /**
+     * Get organ-specific settings like nickname/username for all its members
+     * @summary Get settings for all members within an organ
+     * @param {number} id Organ ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganApi
+     */
+    public getMembersSettings(id: number, options?: RawAxiosRequestConfig) {
+        return OrganApiFp(this.configuration).getMembersSettings(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Get organ-specific settings like nickname/username
      * @summary Get settings for a user within an organ

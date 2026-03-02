@@ -334,9 +334,9 @@ definitions:
     type: object
   UserOrgan:
     properties:
-      organID:
+      organId:
         type: integer
-      userID:
+      userId:
         type: integer
       username:
         type: string
@@ -444,6 +444,39 @@ paths:
       summary: Export roster assignments as PNG
       tags:
       - Export
+  /organ/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get organ-specific settings like nickname/username for all its
+        members
+      operationId: getMembersSettings
+      parameters:
+      - description: Organ ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserOrgan'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get settings for all members within an organ
+      tags:
+      - Organ
   /organ/{id}/member/{userId}:
     get:
       consumes:

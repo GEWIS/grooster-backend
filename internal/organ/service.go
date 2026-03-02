@@ -7,6 +7,7 @@ import (
 )
 
 type Service interface {
+	GetMembersSettings(organID uint) ([]*models.UserOrgan, error)
 	GetMemberSettings(organID uint, userID uint) (*models.UserOrgan, error)
 	UpdateMemberSettings(organID uint, userID uint, params *UpdateMemberSettingsParams) (*models.UserOrgan, error)
 }
@@ -17,6 +18,17 @@ type service struct {
 
 func NewOrganService(db *gorm.DB) Service {
 	return &service{db: db}
+}
+
+func (o *service) GetMembersSettings(organID uint) ([]*models.UserOrgan, error) {
+	var membersSettings []*models.UserOrgan
+	err := o.db.Where("organ_id = ?", organID).Find(&membersSettings).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return membersSettings, nil
 }
 
 func (o *service) GetMemberSettings(organID uint, userID uint) (*models.UserOrgan, error) {

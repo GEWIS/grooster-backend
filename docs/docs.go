@@ -166,6 +166,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/organ/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get organ-specific settings like nickname/username for all its members",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organ"
+                ],
+                "summary": "Get settings for all members within an organ",
+                "operationId": "getMembersSettings",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Organ ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/UserOrgan"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/organ/{id}/member/{userId}": {
             "get": {
                 "security": [
@@ -2269,10 +2319,10 @@ const docTemplate = `{
         "UserOrgan": {
             "type": "object",
             "properties": {
-                "organID": {
+                "organId": {
                     "type": "integer"
                 },
-                "userID": {
+                "userId": {
                     "type": "integer"
                 },
                 "username": {
