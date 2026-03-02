@@ -15,5 +15,5 @@ type UserOrgan struct {
 
 	OrganID uint `json:"organId"  gorm:"primaryKey"`
 
-	Username string `json:"username" gorm:"size:255"`
+	Username string `json:"username" gorm:"size:25"`
 } // @name UserOrgan
