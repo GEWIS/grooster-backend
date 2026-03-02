@@ -1332,7 +1332,7 @@ export const OrganApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMembersSettings(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserOrgan>> {
+        async getMembersSettings(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UserOrgan>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMembersSettings(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['OrganApi.getMembersSettings']?.[localVarOperationServerIndex]?.url;
@@ -1384,7 +1384,7 @@ export const OrganApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMembersSettings(id: number, options?: RawAxiosRequestConfig): AxiosPromise<UserOrgan> {
+        getMembersSettings(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<UserOrgan>> {
             return localVarFp.getMembersSettings(id, options).then((request) => request(axios, basePath));
         },
         /**

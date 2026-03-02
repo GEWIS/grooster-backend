@@ -198,7 +198,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/UserOrgan"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/UserOrgan"
+                            }
                         }
                     },
                     "400": {

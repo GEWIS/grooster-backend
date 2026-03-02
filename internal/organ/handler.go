@@ -34,7 +34,7 @@ func NewOrganHandler(rg *gin.RouterGroup, organService Service) *Handler {
 //	@Accept       json
 //	@Produce      json
 //	@Param        id             path      uint                                true  "Organ ID"
-//	@Success      200            {object}  models.UserOrgan
+//	@Success      200            {array}  models.UserOrgan
 //	@Failure      400            {string}  string
 //	@Failure 404 {string} string
 //	@ID	getMembersSettings

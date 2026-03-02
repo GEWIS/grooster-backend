@@ -9,7 +9,7 @@ All URIs are relative to *http://localhost*
 |[**organIdMemberUserIdPatch**](#organidmemberuseridpatch) | **PATCH** /organ/{id}/member/{userId} | Update settings for a user within an organ|
 
 # **getMembersSettings**
-> UserOrgan getMembersSettings()
+> Array<UserOrgan> getMembersSettings()
 
 Get organ-specific settings like nickname/username for all its members
 
@@ -40,7 +40,7 @@ const { status, data } = await apiInstance.getMembersSettings(
 
 ### Return type
 
-**UserOrgan**
+**Array<UserOrgan>**
 
 ### Authorization
 
