@@ -9,6 +9,7 @@ All URIs are relative to *http://localhost*
 |[**createRosterTemplateShiftPreference**](#createrostertemplateshiftpreference) | **POST** /roster/template/shift-preference | Creates a roster template shift preference|
 |[**deleteRoster**](#deleteroster) | **DELETE** /roster/{id} | DeleteRoster a roster|
 |[**deleteRosterTemplate**](#deleterostertemplate) | **DELETE** /roster/template/{id} | Deletes a roster template by ID|
+|[**fillRoster**](#fillroster) | **POST** /roster/{id}/fill | Fills a roster with the linked user template preferences|
 |[**getRoster**](#getroster) | **GET** /roster/{id} | Get a specific roster by id|
 |[**getRosterTemplate**](#getrostertemplate) | **GET** /roster/template/{id} | Get a roster template by ID|
 |[**getRosterTemplateShiftPreferences**](#getrostertemplateshiftpreferences) | **GET** /roster/template/shift-preference | Gets shift preferences filtered by user and template|
@@ -259,6 +260,58 @@ const { status, data } = await apiInstance.deleteRosterTemplate(
 ### Return type
 
 **string**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **fillRoster**
+> Array<RosterAnswer> fillRoster()
+
+
+### Example
+
+```typescript
+import {
+    RosterApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterApi(configuration);
+
+let id: number; //Roster ID (default to undefined)
+
+const { status, data } = await apiInstance.fillRoster(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | Roster ID | defaults to undefined|
+
+
+### Return type
+
+**Array<RosterAnswer>**
 
 ### Authorization
 

@@ -1452,6 +1452,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/roster/{id}/fill": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roster"
+                ],
+                "summary": "Fills a roster with the linked user template preferences",
+                "operationId": "fillRoster",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Roster ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/RosterAnswer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/roster/{id}/save": {
             "post": {
                 "security": [
@@ -1774,12 +1826,14 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "rosterAnswer": {
+                    "description": "TODO change to RosterAnswer, will be breaking",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/RosterAnswer"
                     }
                 },
                 "rosterShift": {
+                    "description": "TODO change to RosterShifts, will be breaking",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/RosterShift"
@@ -1810,9 +1864,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                },
-                "roster": {
-                    "$ref": "#/definitions/Roster"
                 },
                 "rosterId": {
                     "type": "integer"
@@ -2073,6 +2124,10 @@ const docTemplate = `{
         },
         "ShiftGroupCreateRequest": {
             "type": "object",
+            "required": [
+                "name",
+                "organId"
+            ],
             "properties": {
                 "name": {
                     "type": "string"

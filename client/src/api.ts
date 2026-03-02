@@ -147,13 +147,13 @@ export interface Roster {
      */
     'organId'?: number;
     /**
-     * 
+     * TODO change to RosterAnswer, will be breaking
      * @type {Array<RosterAnswer>}
      * @memberof Roster
      */
     'rosterAnswer'?: Array<RosterAnswer>;
     /**
-     * 
+     * TODO change to RosterShifts, will be breaking
      * @type {Array<RosterShift>}
      * @memberof Roster
      */
@@ -201,12 +201,6 @@ export interface RosterAnswer {
      * @memberof RosterAnswer
      */
     'id'?: number;
-    /**
-     * 
-     * @type {Roster}
-     * @memberof RosterAnswer
-     */
-    'roster'?: Roster;
     /**
      * 
      * @type {number}
@@ -651,13 +645,13 @@ export interface ShiftGroupCreateRequest {
      * @type {string}
      * @memberof ShiftGroupCreateRequest
      */
-    'name'?: string;
+    'name': string;
     /**
      * 
      * @type {number}
      * @memberof ShiftGroupCreateRequest
      */
-    'organId'?: number;
+    'organId': number;
 }
 /**
  * 
@@ -1593,6 +1587,43 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * 
+         * @summary Fills a roster with the linked user template preferences
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fillRoster: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('fillRoster', 'id', id)
+            const localVarPath = `/roster/{id}/fill`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get a specific roster by id
          * @param {number} id Roster ID
          * @param {*} [options] Override http request option.
@@ -2045,6 +2076,19 @@ export const RosterApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Fills a roster with the linked user template preferences
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async fillRoster(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RosterAnswer>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fillRoster(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterApi.fillRoster']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get a specific roster by id
          * @param {number} id Roster ID
          * @param {*} [options] Override http request option.
@@ -2229,6 +2273,16 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * 
+         * @summary Fills a roster with the linked user template preferences
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fillRoster(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<RosterAnswer>> {
+            return localVarFp.fillRoster(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get a specific roster by id
          * @param {number} id Roster ID
          * @param {*} [options] Override http request option.
@@ -2392,6 +2446,18 @@ export class RosterApi extends BaseAPI {
      */
     public deleteRosterTemplate(id: number, options?: RawAxiosRequestConfig) {
         return RosterApiFp(this.configuration).deleteRosterTemplate(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Fills a roster with the linked user template preferences
+     * @param {number} id Roster ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterApi
+     */
+    public fillRoster(id: number, options?: RawAxiosRequestConfig) {
+        return RosterApiFp(this.configuration).fillRoster(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

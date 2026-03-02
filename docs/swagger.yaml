@@ -46,10 +46,12 @@ definitions:
       organId:
         type: integer
       rosterAnswer:
+        description: TODO change to RosterAnswer, will be breaking
         items:
           $ref: '#/definitions/RosterAnswer'
         type: array
       rosterShift:
+        description: TODO change to RosterShifts, will be breaking
         items:
           $ref: '#/definitions/RosterShift'
         type: array
@@ -70,8 +72,6 @@ definitions:
         type: string
       id:
         type: integer
-      roster:
-        $ref: '#/definitions/Roster'
       rosterId:
         type: integer
       rosterShiftId:
@@ -245,6 +245,9 @@ definitions:
         type: string
       organId:
         type: integer
+    required:
+    - name
+    - organId
     type: object
   ShiftUpdateRequest:
     properties:
@@ -665,6 +668,39 @@ paths:
       security:
       - BearerAuth: []
       summary: Update a roster
+      tags:
+      - Roster
+  /roster/{id}/fill:
+    post:
+      consumes:
+      - application/json
+      operationId: fillRoster
+      parameters:
+      - description: Roster ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RosterAnswer'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Fills a roster with the linked user template preferences
       tags:
       - Roster
   /roster/{id}/save:
