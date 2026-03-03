@@ -63,7 +63,7 @@ func ConnectDB(name string) *gorm.DB {
 }
 
 func runDBMigrations(dsn string) {
-	d, err := iofs.New(migrationFS, "db/migrations")
+	d, err := iofs.New(migrationFS, "migrations")
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create migration source")
 	}
