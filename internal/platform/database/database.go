@@ -32,7 +32,9 @@ func ConnectDB(name string) *gorm.DB {
 			log.Fatal().Msgf("Failed to connect database: %v", err)
 		}
 
-		runDBMigrations(dsn)
+		mysqlDsn := "mysql://" + dsn
+
+		runDBMigrations(mysqlDsn)
 	} else {
 		dsn = "sqlite3://" + name
 		db, err = gorm.Open(sqlite.Open(name), &gorm.Config{})
