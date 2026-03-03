@@ -5,6 +5,7 @@ import (
 	"embed"
 	"errors"
 	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/mysql"
