@@ -62,9 +62,10 @@ type SavedShiftResponse struct {
 } // @name SavedShiftResponse
 
 type FilterParams struct {
-	ID      *uint      `form:"id"`
-	Date    *time.Time `form:"date" time_format:"2006-01-02"`
-	OrganID *uint      `form:"organId"`
+	ID       *uint      `form:"id"`
+	Date     *time.Time `form:"date" time_format:"2006-01-02"`
+	OrganID  *uint      `form:"organId"`
+	Archived *bool      `form:"archived"`
 } // @name RosterFilterParams
 
 type TemplateCreateRequest struct {

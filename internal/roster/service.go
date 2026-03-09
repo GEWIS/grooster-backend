@@ -136,22 +136,26 @@ func (s *service) GetRosters(params *FilterParams) ([]*models.Roster, error) {
 
 	if params.ID != nil {
 		db = db.Where("id = ?", *params.ID)
-	}
+	} else {
+		oneWeekAgo := time.Now().UTC().AddDate(0, 0, -7)
 
-	if params.Date != nil {
-		db = db.Where("date = ?", *params.Date)
+		if params.Archived != nil && *params.Archived {
+			db = db.Where("date < ?", oneWeekAgo)
+		} else {
+			db = db.Where("date >= ?", oneWeekAgo)
+		}
 	}
 
 	if params.OrganID != nil {
 		db = db.Where("organ_id = ?", *params.OrganID)
 	}
 
+	var rosters []*models.Roster
 	db.
 		Preload("RosterShift").
-		Preload("RosterAnswer").
-		Preload("Organ")
+		Preload("Organ").
+		Preload("RosterAnswer")
 
-	var rosters []*models.Roster
 	if err := db.Find(&rosters).Error; err != nil {
 		return nil, err
 	}
