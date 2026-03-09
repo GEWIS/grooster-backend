@@ -40,6 +40,7 @@ onMounted(async () => {
 
 async function fetchRosters() {
   try {
+    rosterStore.clearRosters();
     await rosterStore.fetchRosters(parseInt(route.params.id as string));
 
     const response = await ApiService.user.userGet(parseInt(route.params.id as string));
