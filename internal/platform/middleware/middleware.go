@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"GEWIS-Rooster/internal/models"
+	"GEWIS-Rooster/internal/user"
 	"context"
 	"fmt"
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -21,6 +23,10 @@ type AuthProvider interface {
 	HandleLocalAuthentication(ctx *gin.Context) (string, error)
 }
 
+type UserProvider interface {
+	Get(*user.FilterParams) ([]*models.User, error)
+}
+
 type AuthMiddlewareInterface interface {
 	AuthMiddlewareCheck() gin.HandlerFunc
 	SetupOIDC() (*oidc.IDToken, *oidc.Config)
@@ -28,10 +34,11 @@ type AuthMiddlewareInterface interface {
 
 type AuthMiddleware struct {
 	authService AuthProvider
+	userService UserProvider
 }
 
-func NewAuthMiddleware(auth AuthProvider) *AuthMiddleware {
-	return &AuthMiddleware{authService: auth}
+func NewAuthMiddleware(auth AuthProvider, user UserProvider) *AuthMiddleware {
+	return &AuthMiddleware{authService: auth, userService: user}
 }
 
 // AuthMiddlewareCheck creates a middleware that validates OIDC tokens
@@ -88,6 +95,25 @@ func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 			return
 		}
 
+		var authUser models.User
+
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			gewisID := claims["sub"].(uint)
+
+			users, err := a.userService.Get(&user.FilterParams{GEWISID: &gewisID})
+
+			if len(users) == 0 || len(users) > 1 || err != nil {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+				return
+			}
+
+			authUser = *users[0]
+		} else {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+
+		c.Set("userID", authUser.ID)
 		c.Next()
 	}
 }

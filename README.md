@@ -67,5 +67,5 @@ go run ./cmd/src/main.go
 ## Creating migrations
 First make sure you have installed golang-migrate on your pc
 ```
-migrate create -ext sql -dir db/migrations -seq file_name
+migrate create -ext sql -dir internal/platform/database/migrations -seq file_name
 ```

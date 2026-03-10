@@ -10,10 +10,20 @@ type Organ struct {
 	Users []*User `json:"users" gorm:"many2many:user_organs;"`
 } // @name Organ
 
+type OrganRole string
+
+const (
+	RoleOwner  OrganRole = "owner"
+	RoleAdmin  OrganRole = "admin"
+	RoleMember OrganRole = "member"
+)
+
 type UserOrgan struct {
 	UserID uint `json:"userId"  gorm:"primaryKey"`
 
 	OrganID uint `json:"organId"  gorm:"primaryKey"`
 
 	Username string `json:"username" gorm:"size:25"`
+
+	Role OrganRole `json:"role" gorm:"type:varchar(20);default:'member'"`
 } // @name UserOrgan
