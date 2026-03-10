@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalizedGeneric } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalizedGeneric } from 'vue-router';
 import RosterView from '@/views/RosterView.vue';
 import OrganView from '@/views/OrganView.vue';
 import { getGEWISId, isAuthenticated, loginRedirect } from '@/helpers/TokenHelper';
@@ -81,11 +81,7 @@ async function canAccessOrgan(id: number): Promise<boolean> {
 
     if (!user?.organs?.length) return false;
 
-    const hasAccess = user.organs.some((organ) => organ.id === id);
-    if (!hasAccess) return false;
-
-    await ApiService.roster.getRoster(id);
-    return true;
+    return user.organs.some((organ) => organ.id === id);
   } catch (error) {
     console.warn(`Failed to check organ access for ID ${id}:`, error);
     return false;
