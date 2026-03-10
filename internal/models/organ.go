@@ -18,6 +18,12 @@ const (
 	RoleMember OrganRole = "member"
 )
 
+var RoleWeights = map[OrganRole]int{
+	RoleMember: 1,
+	RoleAdmin:  2,
+	RoleOwner:  3,
+}
+
 type UserOrgan struct {
 	UserID uint `json:"userId"  gorm:"primaryKey"`
 

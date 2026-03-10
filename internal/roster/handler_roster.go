@@ -1,17 +1,20 @@
 package roster
 
 import (
+	"GEWIS-Rooster/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
-func (h *Handler) registerRosterRoutes(g *gin.RouterGroup) {
-	g.POST("", h.CreateRoster)
-	g.GET("", h.GetRosters)
-	g.GET(":id", h.GetRoster)
-	g.PATCH("/:id", h.UpdateRoster)
-	g.DELETE("/:id", h.DeleteRoster)
+func (h *Handler) registerRosterRoutes(g *gin.RouterGroup, db *gorm.DB) {
+	g.POST("", requireRosterOrganRoleBody(db, models.RoleAdmin), h.CreateRoster)
+	g.GET("", requireRosterOrganRoleQuery(db, "organId", models.RoleMember), h.GetRosters)
+	g.GET(":id", requireRosterOrganRoleParam(db, "id", models.RoleMember), h.GetRoster)
+	g.PATCH("/:id", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.UpdateRoster)
+	g.DELETE("/:id", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.DeleteRoster)
 }
 
 // CreateRoster
@@ -29,7 +32,8 @@ func (h *Handler) registerRosterRoutes(g *gin.RouterGroup) {
 func (h *Handler) CreateRoster(c *gin.Context) {
 	var param *CreateRequest
 
-	if err := c.ShouldBindJSON(&param); err != nil {
+	// Due to the middleware checking the body, we also use ShouldBindBodyWith here
+	if err := c.ShouldBindBodyWith(&param, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
@@ -171,4 +175,49 @@ func (h *Handler) DeleteRoster(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Roster deleted",
 	})
+}
+
+func requireRosterOrganRoleQuery(db *gorm.DB, queryStr string, minRole models.OrganRole) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		val := c.Query(queryStr)
+		if val == "" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": queryStr + " is required"})
+			return
+		}
+		checkAccess(c, db, val, minRole)
+	}
+}
+
+// requireRosterOrganRoleParam validates the existence of a roster by its ID
+// from the URL parameters and ensures the current user has the required
+// minimum role within that roster's organization.
+func requireRosterOrganRoleParam(db *gorm.DB, paramStr string, minRole models.OrganRole) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		rosterID := c.Param(paramStr)
+		if rosterID == "" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": paramStr + " is required"})
+			return
+		}
+
+		var roster models.Roster
+		if err := db.First(&roster, "id = ?", rosterID).Error; err != nil {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Roster not found"})
+			return
+		}
+
+		checkAccess(c, db, roster.OrganID, minRole)
+	}
+}
+
+func requireRosterOrganRoleBody(db *gorm.DB, minRole models.OrganRole) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var body struct {
+			OrganID uint `json:"organId"`
+		}
+		if err := c.ShouldBindBodyWith(&body, binding.JSON); err != nil || body.OrganID == 0 {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Valid organId is required in body"})
+			return
+		}
+		checkAccess(c, db, body.OrganID, minRole)
+	}
 }

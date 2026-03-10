@@ -1,6 +1,7 @@
 package roster
 
 import (
+	"GEWIS-Rooster/internal/models"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -8,14 +9,14 @@ import (
 	"strconv"
 )
 
-func (h *Handler) registerTemplateRoutes(g *gin.RouterGroup) {
+func (h *Handler) registerTemplateRoutes(g *gin.RouterGroup, db *gorm.DB) {
 	templateGroup := g.Group("/template")
 	{
-		templateGroup.POST("", h.CreateRosterTemplate)
+		templateGroup.POST("", requireRosterOrganRoleBody(db, models.RoleAdmin), h.CreateRosterTemplate)
 		templateGroup.GET("", h.GetRosterTemplates)
 		templateGroup.GET("/:id", h.GetRosterTemplate)
-		templateGroup.PUT("/:id", h.UpdateRosterTemplate)
-		templateGroup.DELETE("/:id", h.DeleteRosterTemplate)
+		templateGroup.PUT("/:id", requireTemplateOrganRoleParam(db, "id", models.RoleAdmin), h.UpdateRosterTemplate)
+		templateGroup.DELETE("/:id", requireTemplateOrganRoleParam(db, "id", models.RoleAdmin), h.DeleteRosterTemplate)
 
 		templateGroup.PATCH("/shift/:id", h.UpdateRosterTemplateShift)
 
@@ -323,4 +324,25 @@ func (h *Handler) UpdateRosterTemplateShiftPreference(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, updatedPreference)
+}
+
+// requireRosterOrganRoleParam validates the existence of a roster by its ID
+// from the URL parameters and ensures the current user has the required
+// minimum role within that roster's organization.
+func requireTemplateOrganRoleParam(db *gorm.DB, paramStr string, minRole models.OrganRole) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		templateID := c.Param(paramStr)
+		if templateID == "" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": paramStr + " is required"})
+			return
+		}
+
+		var template models.RosterTemplate
+		if err := db.First(&template, "id = ?", templateID).Error; err != nil {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Roster not found"})
+			return
+		}
+
+		checkAccess(c, db, template.OrganID, minRole)
+	}
 }
