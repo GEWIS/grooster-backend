@@ -81,7 +81,7 @@ func main() {
 	protectedGroup.Use(authMiddle.AuthMiddlewareCheck())
 	{
 		user.NewUserHandler(protectedGroup, userService)
-		roster.NewRosterHandler(rosterService, protectedGroup)
+		roster.NewRosterHandler(rosterService, protectedGroup, db)
 		export.NewExportHandler(exportService, protectedGroup)
 		organ.NewOrganHandler(protectedGroup, organService)
 	}

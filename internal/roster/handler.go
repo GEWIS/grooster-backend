@@ -1,6 +1,7 @@
 package roster
 
 import (
+	"GEWIS-Rooster/internal/models"
 	_ "GEWIS-Rooster/internal/models"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -14,21 +15,21 @@ type Handler struct {
 	rosterService Service
 }
 
-func NewRosterHandler(rosterService Service, rg *gin.RouterGroup) *Handler {
+func NewRosterHandler(rosterService Service, rg *gin.RouterGroup, db *gorm.DB) *Handler {
 	h := &Handler{rosterService: rosterService}
 	g := rg.Group("/roster")
 
-	h.registerRosterRoutes(g)
-	h.registerShiftRoutes(g)
-	h.registerTemplateRoutes(g)
+	h.registerRosterRoutes(g, db)
+	h.registerShiftRoutes(g, db)
+	h.registerTemplateRoutes(g, db)
 
-	g.POST("/:id/fill", h.FillRosterPreferences)
+	g.POST("/:id/fill", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.FillRosterPreferences)
 
-	g.POST("/:id/save", h.SaveRoster)
+	g.POST("/:id/save", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.SaveRoster)
 	g.PATCH("/saved-shift/:id", h.UpdateSavedShift)
 	g.GET("/saved-shift/:id", h.GetSavedRoster)
 
-	g.POST("/shift-groups", h.CreateShiftGroup)
+	g.POST("/shift-groups", requireRosterOrganRoleBody(db, models.RoleAdmin), h.CreateShiftGroup)
 	g.GET("/shift-groups", h.GetShiftGroups)
 	g.GET("/shift-groups/:id", h.GetShiftGroup)
 
