@@ -71,23 +71,16 @@ func (s *service) HandleLocalAuthentication(ctx *gin.Context) (string, error) {
 		return "", err
 	}
 
-	now := time.Now()
-	claims := jwt.MapClaims{
-		"sub":  localUser.GEWISID,
-		"name": localUser.Name,
-		"iat":  now.Unix(),
-		"exp":  now.Add(7 * 24 * time.Hour).Unix(), // 7 days expiry
-	}
+	jwtToken, err := s.CreateInternalToken(&localUser)
 
-	secret := os.Getenv("JWT_SECRET")
-	if strings.TrimSpace(secret) == "" {
-		err := fmt.Errorf("JWT_SECRET environment variable is not set or is empty")
-		log.Error().Err(err).Msg("failed to create internal token due to missing JWT secret")
+	if err != nil {
+		log.Error().Msg(err.Error())
 		return "", err
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(secret))
+	ctx.Set("userID", localUser.ID)
+
+	return jwtToken, nil
 }
 
 func (s *service) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error) {
@@ -238,11 +231,23 @@ func (s *service) GetOrgans(claims map[string]interface{}) ([]models.Organ, erro
 
 func (s *service) CreateInternalToken(user *models.User) (string, error) {
 	now := time.Now()
+
+	var userOrgans []models.UserOrgan
+	if err := s.db.Where("user_id = ?", user.ID).Find(&userOrgans).Error; err != nil {
+		return "", err
+	}
+
+	roles := make(map[uint]string)
+	for _, uo := range userOrgans {
+		roles[uo.OrganID] = string(uo.Role)
+	}
+
 	claims := jwt.MapClaims{
-		"sub":  user.GEWISID,
-		"name": user.Name,
-		"iat":  now.Unix(),
-		"exp":  now.Add(7 * 24 * time.Hour).Unix(), // 7 days expiry
+		"sub":    user.GEWISID,
+		"name":   user.Name,
+		"organs": roles,
+		"iat":    now.Unix(),
+		"exp":    now.Add(7 * 24 * time.Hour).Unix(),
 	}
 
 	secret := os.Getenv("JWT_SECRET")

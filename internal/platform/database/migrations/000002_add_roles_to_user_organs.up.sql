@@ -1,0 +1,1 @@
+ALTER TABLE user_organs DROP COLUMN role;

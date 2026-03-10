@@ -71,7 +71,7 @@ func main() {
 	provider, config := m.SetupOIDC()
 
 	authService := auth.NewAuthService(userService, db)
-	authMiddle := middleware.NewAuthMiddleware(authService)
+	authMiddle := middleware.NewAuthMiddleware(authService, userService)
 
 	// Auth routes (no authentication required)
 	authGroup := api.Group("/auth")
