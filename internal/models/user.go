@@ -5,7 +5,7 @@ package models
 type User struct {
 	BaseModel
 
-	Name string `json:"name"`
+	Name string `json:"name" gorm:"type:varchar(255)"`
 
 	GEWISID uint `json:"gewis_id" gorm:"uniqueIndex:idx_name"`
 
