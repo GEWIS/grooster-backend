@@ -141,8 +141,8 @@ func (h *Handler) DeleteRosterShift(c *gin.Context) {
 func (h *Handler) CreateRosterAnswer(c *gin.Context) {
 	var param *AnswerCreateRequest
 
-	if err := c.ShouldBindJSON(&param); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	if err := c.ShouldBindBodyWith(&param, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Request " + err.Error()})
 		return
 	}
 
