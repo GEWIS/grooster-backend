@@ -9,7 +9,7 @@ type Values []string
 type Roster struct {
 	BaseModel
 
-	Name string `json:"name"`
+	Name string `json:"name" gorm:"type:varchar(255)"`
 
 	// TODO change to RosterShifts, will be breaking
 	RosterShift []RosterShift `json:"rosterShift" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
@@ -33,7 +33,7 @@ type Roster struct {
 type RosterShift struct {
 	BaseModel
 
-	Name string `json:"name"`
+	Name string `json:"name" gorm:"type:varchar(255)"`
 
 	RosterID uint `json:"rosterId"`
 
@@ -85,7 +85,7 @@ type RosterTemplate struct {
 
 	OrganID uint `json:"organId"`
 
-	Name string `json:"name"`
+	Name string `json:"name" gorm:"type:varchar(255)"`
 
 	Shifts []RosterTemplateShift `json:"shifts" gorm:"foreignKey:TemplateID;constraint:OnDelete:CASCADE;"`
 } // @name RosterTemplate
@@ -97,7 +97,7 @@ type RosterTemplateShift struct {
 
 	Template *RosterTemplate `json:"-" gorm:"foreignKey:TemplateID;constraint:OnDelete:CASCADE;"`
 
-	ShiftName string `json:"shiftName"`
+	ShiftName string `json:"shiftName" gorm:"type:varchar(255)"`
 
 	ShiftGroupID *uint `json:"shiftGroupId" gorm:"default:null"`
 
@@ -125,5 +125,5 @@ type ShiftGroup struct {
 
 	Organ Organ `json:"organ" gorm:"foreignKey:OrganID;constraint:OnDelete:CASCADE;"`
 
-	Name string `json:"name" gorm:"uniqueIndex:organ_shift_group"`
+	Name string `json:"name" gorm:"type:varchar(255);uniqueIndex:organ_shift_group"`
 } // @name ShiftGroup

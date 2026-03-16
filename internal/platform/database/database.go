@@ -18,13 +18,13 @@ import (
 var migrationFS embed.FS
 
 func ConnectDB(name string) *gorm.DB {
-	devType := os.Getenv("DEV_TYPE")
+	devType := os.Getenv("DATABASE_TYPE")
 
 	var db *gorm.DB
 	var err error
 	var dsn string
 
-	if devType == "production" {
+	if devType == "mysql" {
 		dsn = os.Getenv("DATABASE_DSN")
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
