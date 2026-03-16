@@ -7,11 +7,13 @@ import RosterTemplateAdd from '@/components/templates/dialogs/RosterTemplateAdd.
 import { useTemplateStore } from '@/stores/template.store';
 import ShiftGroupAdd from '@/components/templates/dialogs/ShiftGroupAdd.vue';
 import ApiService from '@/services/ApiService';
+import { Role, useAuthStore } from '@/stores/auth.store';
 
 type Dialogs = 'AddTemplate' | 'AddGroup' | 'None';
 
 const organStore = useOrganStore();
 const templateStore = useTemplateStore();
+const authStore = useAuthStore();
 
 const templates = computed(() => Object.values(templateStore.templates));
 const openDialog = ref<Dialogs>('None');
@@ -46,8 +48,15 @@ onMounted(async () => {
         <p class="text-gray-500">Manage and deploy your recurring shift schedules and groups.</p>
       </div>
       <div class="flex gap-2">
-        <Button class="p-button-outlined" icon="pi pi-users" label="Add shift group" @click="openDialog = 'AddGroup'" />
         <Button
+          v-if="authStore.can([Role.Admin, Role.Owner])"
+          class="p-button-outlined"
+          icon="pi pi-users"
+          label="Add shift group"
+          @click="openDialog = 'AddGroup'"
+        />
+        <Button
+          v-if="authStore.can([Role.Admin, Role.Owner])"
           class="p-button-raised shadow-md"
           icon="pi pi-plus"
           label="Create Template"

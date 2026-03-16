@@ -8,10 +8,12 @@ import AddDialog from '@/components/roster/dialogs/AddDialog.vue';
 import ApiService from '@/services/ApiService';
 import DeleteDialog from '@/components/roster/dialogs/DeleteDialog.vue';
 import EditDialog from '@/components/roster/dialogs/EditDialog.vue';
+import { Role, useAuthStore } from '@/stores/auth.store';
 
 type DialogType = 'add' | 'edit' | 'delete';
 
 const route = useRoute();
+const authStore = useAuthStore();
 
 const rosterStore = useRosterStore();
 const rosters = computed(() => Object.values(rosterStore.rosters));
@@ -81,6 +83,7 @@ const closeDialog = () => {
           </Select>
           <div class="flex flex-row sm:flex-row gap-3 p-4">
             <Button
+              v-if="authStore.can([Role.Admin, Role.Owner])"
               class="p-button-success w-full sm:w-auto !justify-center"
               icon="pi pi-plus"
               label="Add Roster"
@@ -88,7 +91,7 @@ const closeDialog = () => {
             />
 
             <Button
-              v-if="selectedRoster"
+              v-if="selectedRoster && authStore.can([Role.Admin, Role.Owner])"
               class="p-button-outlined w-full sm:w-auto !justify-center"
               icon="pi pi-pencil"
               label="Edit"
@@ -96,7 +99,7 @@ const closeDialog = () => {
             />
 
             <Button
-              v-if="selectedRoster"
+              v-if="selectedRoster && authStore.can([Role.Admin, Role.Owner])"
               class="p-button-danger p-button-outlined w-full sm:w-auto !justify-center"
               icon="pi pi-trash"
               label="Delete"

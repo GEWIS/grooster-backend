@@ -9,6 +9,7 @@ import RosterTemplateDelete from '@/components/templates/dialogs/RosterTemplateD
 import RosterTemplateUseDialog from '@/components/templates/dialogs/RosterTemplateUseDialog.vue';
 import RosterTemplatePreferences from '@/components/templates/dialogs/RosterTemplatePreferences.vue';
 import ApiService from '@/services/ApiService';
+import { Role, useAuthStore } from '@/stores/auth.store';
 
 type Dialogs = 'Preferences' | 'Delete' | 'Roster' | 'None';
 
@@ -17,6 +18,8 @@ const props = defineProps<{
   shiftGroups: ShiftGroup[];
 }>();
 const openDialog = ref<Dialogs>('None');
+
+const authStore = useAuthStore();
 
 const showDetail = ref<boolean>(false);
 
@@ -47,8 +50,22 @@ const getGroupName = (id: number) => {
           </h3>
           <div class="flex gap-2">
             <Button icon="pi pi-heart" rounded @click="openDialog = 'Preferences'" />
-            <Button icon="pi pi-plus" rounded severity="secondary" text @click="openDialog = 'Roster'" />
-            <Button icon="pi pi-trash" rounded severity="danger" text @click="openDialog = 'Delete'" />
+            <Button
+              v-if="authStore.can([Role.Admin, Role.Owner])"
+              icon="pi pi-plus"
+              rounded
+              severity="secondary"
+              text
+              @click="openDialog = 'Roster'"
+            />
+            <Button
+              v-if="authStore.can([Role.Admin, Role.Owner])"
+              icon="pi pi-trash"
+              rounded
+              severity="danger"
+              text
+              @click="openDialog = 'Delete'"
+            />
           </div>
         </div>
 
@@ -88,6 +105,7 @@ const getGroupName = (id: number) => {
                   <Select
                     v-model="shift.shiftGroupId"
                     class="w-full h-8 text-xs flex items-center border-gray-200"
+                    :disabled="!authStore.can([Role.Admin, Role.Owner])"
                     option-label="name"
                     option-value="id"
                     :options="shiftGroups"

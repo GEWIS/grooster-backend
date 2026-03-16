@@ -5,8 +5,10 @@ import { useRoute } from 'vue-router';
 import { useRosterStore } from '@/stores/roster.store';
 import { getGEWISId } from '@/helpers/TokenHelper';
 import ApiService from '@/services/ApiService';
+import { Role, useAuthStore } from '@/stores/auth.store';
 
 const route = useRoute();
+const authStore = useAuthStore();
 
 const props = defineProps<{
   id: number;
@@ -306,6 +308,7 @@ const getStatusColorClass = (value: string) => {
       class="bg-gray-50 px-4 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4"
     >
       <Button
+        v-if="authStore.can([Role.Admin, Role.Owner])"
         class="w-full sm:w-auto !justify-center"
         :disabled="roster.saved"
         icon="pi pi-plus"
@@ -318,6 +321,7 @@ const getStatusColorClass = (value: string) => {
 
       <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
         <Button
+          v-if="authStore.can([Role.Admin, Role.Owner])"
           class="w-full sm:w-auto !justify-center"
           label="Fill Roster"
           outlined
@@ -326,7 +330,7 @@ const getStatusColorClass = (value: string) => {
           @click="rosterStore.fillRoster(props.id)"
         />
         <Button
-          v-if="roster.saved"
+          v-if="roster.saved && authStore.can([Role.Admin, Role.Owner])"
           class="w-full sm:w-auto !justify-center"
           icon="pi pi-lock-open"
           label="Unlock Roster"
@@ -337,7 +341,7 @@ const getStatusColorClass = (value: string) => {
         />
 
         <Button
-          v-else
+          v-else-if="authStore.can([Role.Admin, Role.Owner])"
           class="w-full sm:w-auto !justify-center"
           icon="pi pi-save"
           label="Lock Roster"

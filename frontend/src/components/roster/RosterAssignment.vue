@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { User, SavedShiftUpdateRequest, SavedShift } from '@gewis/grooster-backend-ts';
-import { onMounted, reactive, computed, watch } from 'vue';
+import { SavedShift, SavedShiftUpdateRequest, User } from '@gewis/grooster-backend-ts';
+import { computed, onMounted, reactive, watch } from 'vue';
 import { useRosterStore } from '@/stores/roster.store';
 import ApiService from '@/services/ApiService';
+import { Role, useAuthStore } from '@/stores/auth.store';
 
 const props = defineProps<{
   id: number;
 }>();
 
 const rosterStore = useRosterStore();
+const authStore = useAuthStore();
+
 const savedRoster = computed(() => {
   const data = rosterStore.getSavedRoster(props.id);
 
@@ -165,6 +168,7 @@ const exportRoster = async () => {
             >
               <span class="text-sm font-medium text-slate-700">{{ user.name }}</span>
               <Button
+                v-if="authStore.can([Role.Admin, Role.Owner])"
                 class="!p-0 !w-7 !h-7 !text-slate-400 group-hover:!text-red-500"
                 icon="pi pi-times"
                 rounded
@@ -175,6 +179,7 @@ const exportRoster = async () => {
 
             <div class="relative min-w-[180px]">
               <Select
+                v-if="authStore.can([Role.Admin, Role.Owner])"
                 :key="'select-' + shift.id"
                 v-model="selectedIds[shift.id]"
                 class="!w-full !rounded-lg !border-dashed !border-slate-300 !bg-transparent hover:!border-indigo-400 transition-all !text-sm"
