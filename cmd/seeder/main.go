@@ -6,10 +6,11 @@ import (
 	"GEWIS-Rooster/internal/platform/database"
 	"database/sql"
 	"github.com/rs/zerolog/log"
+	"os"
 )
 
 func main() {
-	db := database.ConnectDB("local.db")
+	db := database.ConnectDB(os.Getenv("DATABASE"))
 	sqlDB, _ := db.DB()
 
 	err := seeder.WipeAllTables(db)

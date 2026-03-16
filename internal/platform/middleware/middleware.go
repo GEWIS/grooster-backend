@@ -98,11 +98,24 @@ func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 		var authUser models.User
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			gewisID := claims["sub"].(uint)
+			subValue, exists := claims["sub"]
+			if !exists {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Subject missing in token"})
+				return
+			}
+
+			var gewisID uint
+
+			if floatVal, ok := subValue.(float64); ok {
+				gewisID = uint(floatVal)
+			} else {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid subject format"})
+				return
+			}
 
 			users, err := a.userService.Get(&user.FilterParams{GEWISID: &gewisID})
 
-			if len(users) == 0 || len(users) > 1 || err != nil {
+			if err != nil || len(users) != 1 {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 				return
 			}
