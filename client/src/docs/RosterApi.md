@@ -556,11 +556,13 @@ import {
 const configuration = new Configuration();
 const apiInstance = new RosterApi(configuration);
 
+let archived: boolean; // (optional) (default to undefined)
 let date: string; // (optional) (default to undefined)
 let id: number; // (optional) (default to undefined)
 let organId: number; // (optional) (default to undefined)
 
 const { status, data } = await apiInstance.getRosters(
+    archived,
     date,
     id,
     organId
@@ -571,6 +573,7 @@ const { status, data } = await apiInstance.getRosters(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
+| **archived** | [**boolean**] |  | (optional) defaults to undefined|
 | **date** | [**string**] |  | (optional) defaults to undefined|
 | **id** | [**number**] |  | (optional) defaults to undefined|
 | **organId** | [**number**] |  | (optional) defaults to undefined|

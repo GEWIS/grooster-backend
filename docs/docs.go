@@ -332,6 +332,71 @@ const docTemplate = `{
                 }
             }
         },
+        "/organ/{id}/member/{userId}/role": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update a users role within a specific organ",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Organ"
+                ],
+                "summary": "Update the role of a user within a specific organ",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Organ ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Settings input",
+                        "name": "updateParams",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdateMemberRoleParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/UserOrgan"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/roster": {
             "get": {
                 "security": [
@@ -351,6 +416,11 @@ const docTemplate = `{
                 "summary": "Get all rosters or query by date and organ",
                 "operationId": "getRosters",
                 "parameters": [
+                    {
+                        "type": "boolean",
+                        "name": "archived",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "name": "date",
@@ -1833,6 +1903,19 @@ const docTemplate = `{
                 }
             }
         },
+        "GEWIS-Rooster_internal_models.OrganRole": {
+            "type": "string",
+            "enum": [
+                "owner",
+                "admin",
+                "member"
+            ],
+            "x-enum-varnames": [
+                "RoleOwner",
+                "RoleAdmin",
+                "RoleMember"
+            ]
+        },
         "Organ": {
             "description": "An organ that users can be part of.",
             "type": "object",
@@ -2262,6 +2345,14 @@ const docTemplate = `{
                 }
             }
         },
+        "UpdateMemberRoleParams": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "$ref": "#/definitions/GEWIS-Rooster_internal_models.OrganRole"
+                }
+            }
+        },
         "UpdateMemberSettingsParams": {
             "type": "object",
             "properties": {
@@ -2324,6 +2415,9 @@ const docTemplate = `{
             "properties": {
                 "organId": {
                     "type": "integer"
+                },
+                "role": {
+                    "$ref": "#/definitions/GEWIS-Rooster_internal_models.OrganRole"
                 },
                 "userId": {
                     "type": "integer"

@@ -83,7 +83,7 @@ func main() {
 		user.NewUserHandler(protectedGroup, userService)
 		roster.NewRosterHandler(rosterService, protectedGroup, db)
 		export.NewExportHandler(exportService, protectedGroup)
-		organ.NewOrganHandler(protectedGroup, organService)
+		organ.NewOrganHandler(protectedGroup, organService, db)
 	}
 
 	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

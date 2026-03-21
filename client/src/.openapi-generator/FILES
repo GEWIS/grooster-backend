@@ -8,6 +8,7 @@ docs/AnswerCreateRequest.md
 docs/AnswerUpdateRequest.md
 docs/AuthApi.md
 docs/ExportApi.md
+docs/GEWISRoosterInternalModelsOrganRole.md
 docs/Organ.md
 docs/OrganApi.md
 docs/Roster.md
@@ -36,6 +37,7 @@ docs/TemplateShiftPreferenceCreateRequest.md
 docs/TemplateShiftPreferenceUpdateRequest.md
 docs/TemplateShiftUpdateRequest.md
 docs/TemplateUpdateParams.md
+docs/UpdateMemberRoleParams.md
 docs/UpdateMemberSettingsParams.md
 docs/User.md
 docs/UserApi.md

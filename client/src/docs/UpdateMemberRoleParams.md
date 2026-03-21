@@ -1,25 +1,19 @@
-# UserOrgan
+# UpdateMemberRoleParams
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**organId** | **number** |  | [optional] [default to undefined]
 **role** | [**GEWISRoosterInternalModelsOrganRole**](GEWISRoosterInternalModelsOrganRole.md) |  | [optional] [default to undefined]
-**userId** | **number** |  | [optional] [default to undefined]
-**username** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { UserOrgan } from './api';
+import { UpdateMemberRoleParams } from './api';
 
-const instance: UserOrgan = {
-    organId,
+const instance: UpdateMemberRoleParams = {
     role,
-    userId,
-    username,
 };
 ```
 

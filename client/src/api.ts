@@ -68,6 +68,21 @@ export interface AnswerUpdateRequest {
     'value'?: string;
 }
 /**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const GEWISRoosterInternalModelsOrganRole = {
+    RoleOwner: 'owner',
+    RoleAdmin: 'admin',
+    RoleMember: 'member'
+} as const;
+
+export type GEWISRoosterInternalModelsOrganRole = typeof GEWISRoosterInternalModelsOrganRole[keyof typeof GEWISRoosterInternalModelsOrganRole];
+
+
+/**
  * An organ that users can be part of.
  * @export
  * @interface Organ
@@ -770,6 +785,21 @@ export interface TemplateUpdateParams {
 /**
  * 
  * @export
+ * @interface UpdateMemberRoleParams
+ */
+export interface UpdateMemberRoleParams {
+    /**
+     * 
+     * @type {GEWISRoosterInternalModelsOrganRole}
+     * @memberof UpdateMemberRoleParams
+     */
+    'role'?: GEWISRoosterInternalModelsOrganRole;
+}
+
+
+/**
+ * 
+ * @export
  * @interface UpdateMemberSettingsParams
  */
 export interface UpdateMemberSettingsParams {
@@ -868,6 +898,12 @@ export interface UserOrgan {
     'organId'?: number;
     /**
      * 
+     * @type {GEWISRoosterInternalModelsOrganRole}
+     * @memberof UserOrgan
+     */
+    'role'?: GEWISRoosterInternalModelsOrganRole;
+    /**
+     * 
      * @type {number}
      * @memberof UserOrgan
      */
@@ -879,6 +915,8 @@ export interface UserOrgan {
      */
     'username'?: string;
 }
+
+
 
 /**
  * AuthApi - axios parameter creator
@@ -1315,6 +1353,53 @@ export const OrganApiAxiosParamCreator = function (configuration?: Configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Update a users role within a specific organ
+         * @summary Update the role of a user within a specific organ
+         * @param {number} id Organ ID
+         * @param {number} userId User ID
+         * @param {UpdateMemberRoleParams} updateParams Settings input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organIdMemberUserIdRolePatch: async (id: number, userId: number, updateParams: UpdateMemberRoleParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('organIdMemberUserIdRolePatch', 'id', id)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('organIdMemberUserIdRolePatch', 'userId', userId)
+            // verify required parameter 'updateParams' is not null or undefined
+            assertParamExists('organIdMemberUserIdRolePatch', 'updateParams', updateParams)
+            const localVarPath = `/organ/{id}/member/{userId}/role`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1367,6 +1452,21 @@ export const OrganApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['OrganApi.organIdMemberUserIdPatch']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Update a users role within a specific organ
+         * @summary Update the role of a user within a specific organ
+         * @param {number} id Organ ID
+         * @param {number} userId User ID
+         * @param {UpdateMemberRoleParams} updateParams Settings input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organIdMemberUserIdRolePatch(id: number, userId: number, updateParams: UpdateMemberRoleParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserOrgan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organIdMemberUserIdRolePatch(id, userId, updateParams, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganApi.organIdMemberUserIdRolePatch']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -1409,6 +1509,18 @@ export const OrganApiFactory = function (configuration?: Configuration, basePath
          */
         organIdMemberUserIdPatch(id: number, userId: number, updateParams: UpdateMemberSettingsParams, options?: RawAxiosRequestConfig): AxiosPromise<UserOrgan> {
             return localVarFp.organIdMemberUserIdPatch(id, userId, updateParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update a users role within a specific organ
+         * @summary Update the role of a user within a specific organ
+         * @param {number} id Organ ID
+         * @param {number} userId User ID
+         * @param {UpdateMemberRoleParams} updateParams Settings input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organIdMemberUserIdRolePatch(id: number, userId: number, updateParams: UpdateMemberRoleParams, options?: RawAxiosRequestConfig): AxiosPromise<UserOrgan> {
+            return localVarFp.organIdMemberUserIdRolePatch(id, userId, updateParams, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1457,6 +1569,20 @@ export class OrganApi extends BaseAPI {
      */
     public organIdMemberUserIdPatch(id: number, userId: number, updateParams: UpdateMemberSettingsParams, options?: RawAxiosRequestConfig) {
         return OrganApiFp(this.configuration).organIdMemberUserIdPatch(id, userId, updateParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update a users role within a specific organ
+     * @summary Update the role of a user within a specific organ
+     * @param {number} id Organ ID
+     * @param {number} userId User ID
+     * @param {UpdateMemberRoleParams} updateParams Settings input
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganApi
+     */
+    public organIdMemberUserIdRolePatch(id: number, userId: number, updateParams: UpdateMemberRoleParams, options?: RawAxiosRequestConfig) {
+        return OrganApiFp(this.configuration).organIdMemberUserIdRolePatch(id, userId, updateParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -1856,13 +1982,14 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * 
          * @summary Get all rosters or query by date and organ
+         * @param {boolean} [archived] 
          * @param {string} [date] 
          * @param {number} [id] 
          * @param {number} [organId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRosters: async (date?: string, id?: number, organId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRosters: async (archived?: boolean, date?: string, id?: number, organId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/roster`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1877,6 +2004,10 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
 
             // authentication BearerAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (archived !== undefined) {
+                localVarQueryParameter['archived'] = archived;
+            }
 
             if (date !== undefined) {
                 localVarQueryParameter['date'] = date;
@@ -2215,14 +2346,15 @@ export const RosterApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get all rosters or query by date and organ
+         * @param {boolean} [archived] 
          * @param {string} [date] 
          * @param {number} [id] 
          * @param {number} [organId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRosters(date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Roster>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getRosters(date, id, organId, options);
+        async getRosters(archived?: boolean, date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Roster>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRosters(archived, date, id, organId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.getRosters']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -2397,14 +2529,15 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
         /**
          * 
          * @summary Get all rosters or query by date and organ
+         * @param {boolean} [archived] 
          * @param {string} [date] 
          * @param {number} [id] 
          * @param {number} [organId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRosters(date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<Roster>> {
-            return localVarFp.getRosters(date, id, organId, options).then((request) => request(axios, basePath));
+        getRosters(archived?: boolean, date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<Roster>> {
+            return localVarFp.getRosters(archived, date, id, organId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2584,6 +2717,7 @@ export class RosterApi extends BaseAPI {
     /**
      * 
      * @summary Get all rosters or query by date and organ
+     * @param {boolean} [archived] 
      * @param {string} [date] 
      * @param {number} [id] 
      * @param {number} [organId] 
@@ -2591,8 +2725,8 @@ export class RosterApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof RosterApi
      */
-    public getRosters(date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig) {
-        return RosterApiFp(this.configuration).getRosters(date, id, organId, options).then((request) => request(this.axios, this.basePath));
+    public getRosters(archived?: boolean, date?: string, id?: number, organId?: number, options?: RawAxiosRequestConfig) {
+        return RosterApiFp(this.configuration).getRosters(archived, date, id, organId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

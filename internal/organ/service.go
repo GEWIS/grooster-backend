@@ -10,6 +10,7 @@ type Service interface {
 	GetMembersSettings(organID uint) ([]*models.UserOrgan, error)
 	GetMemberSettings(organID uint, userID uint) (*models.UserOrgan, error)
 	UpdateMemberSettings(organID uint, userID uint, params *UpdateMemberSettingsParams) (*models.UserOrgan, error)
+	UpdateMemberRole(organID uint, userID uint, params UpdateMemberRoleParams) (*models.UserOrgan, error)
 }
 
 type service struct {
@@ -66,6 +67,30 @@ func (o *service) UpdateMemberSettings(organID uint, userID uint, params *Update
 	err := o.db.Model(&models.UserOrgan{}).
 		Where("organ_id = ? AND user_id = ?", organID, userID).
 		Updates(updates).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	var updatedRecord models.UserOrgan
+	err = o.db.Where("organ_id = ? AND user_id = ?", organID, userID).
+		First(&updatedRecord).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedRecord, nil
+}
+
+func (o *service) UpdateMemberRole(organID uint, userID uint, params UpdateMemberRoleParams) (*models.UserOrgan, error) {
+	update := make(map[string]interface{})
+
+	update["role"] = params.Role
+
+	err := o.db.Model(&models.UserOrgan{}).
+		Where("organ_id = ? AND user_id = ?", organID, userID).
+		Updates(update).Error
 
 	if err != nil {
 		return nil, err
