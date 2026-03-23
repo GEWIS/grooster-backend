@@ -70,6 +70,21 @@ export interface AnswerUpdateRequest {
 /**
  * 
  * @export
+ * @enum {number}
+ */
+
+export const GEWISRoosterInternalModelsGroupPriority = {
+    Low: 1,
+    Default: 2,
+    High: 3
+} as const;
+
+export type GEWISRoosterInternalModelsGroupPriority = typeof GEWISRoosterInternalModelsGroupPriority[keyof typeof GEWISRoosterInternalModelsGroupPriority];
+
+
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -80,6 +95,27 @@ export const GEWISRoosterInternalModelsOrganRole = {
 } as const;
 
 export type GEWISRoosterInternalModelsOrganRole = typeof GEWISRoosterInternalModelsOrganRole[keyof typeof GEWISRoosterInternalModelsOrganRole];
+
+
+/**
+ * 
+ * @export
+ * @interface GroupUpdatePriorityParam
+ */
+export interface GroupUpdatePriorityParam {
+    /**
+     * 
+     * @type {GEWISRoosterInternalModelsGroupPriority}
+     * @memberof GroupUpdatePriorityParam
+     */
+    'priority': GEWISRoosterInternalModelsGroupPriority;
+    /**
+     * 
+     * @type {number}
+     * @memberof GroupUpdatePriorityParam
+     */
+    'userId': number;
+}
 
 
 /**
@@ -671,6 +707,51 @@ export interface ShiftGroupCreateRequest {
 /**
  * 
  * @export
+ * @interface ShiftGroupPriority
+ */
+export interface ShiftGroupPriority {
+    /**
+     * 
+     * @type {string}
+     * @memberof ShiftGroupPriority
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftGroupPriority
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {GEWISRoosterInternalModelsGroupPriority}
+     * @memberof ShiftGroupPriority
+     */
+    'priority'?: GEWISRoosterInternalModelsGroupPriority;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftGroupPriority
+     */
+    'shiftGroupId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ShiftGroupPriority
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShiftGroupPriority
+     */
+    'userId'?: number;
+}
+
+
+/**
+ * 
+ * @export
  * @interface ShiftUpdateRequest
  */
 export interface ShiftUpdateRequest {
@@ -793,7 +874,7 @@ export interface UpdateMemberRoleParams {
      * @type {GEWISRoosterInternalModelsOrganRole}
      * @memberof UpdateMemberRoleParams
      */
-    'role'?: GEWISRoosterInternalModelsOrganRole;
+    'role': GEWISRoosterInternalModelsOrganRole;
 }
 
 
@@ -3630,6 +3711,49 @@ export const ShiftGroupApiAxiosParamCreator = function (configuration?: Configur
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Update a shift group priority
+         * @param {number} id ShiftGroup ID
+         * @param {GroupUpdatePriorityParam} updateParams Update parameters
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateShiftGroupPriority: async (id: number, updateParams: GroupUpdatePriorityParam, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateShiftGroupPriority', 'id', id)
+            // verify required parameter 'updateParams' is not null or undefined
+            assertParamExists('updateShiftGroupPriority', 'updateParams', updateParams)
+            const localVarPath = `/roster/shift-groups/{id}/priority`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -3679,6 +3803,20 @@ export const ShiftGroupApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['ShiftGroupApi.getShiftGroups']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @summary Update a shift group priority
+         * @param {number} id ShiftGroup ID
+         * @param {GroupUpdatePriorityParam} updateParams Update parameters
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateShiftGroupPriority(id: number, updateParams: GroupUpdatePriorityParam, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ShiftGroupPriority>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateShiftGroupPriority(id, updateParams, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ShiftGroupApi.updateShiftGroupPriority']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -3718,6 +3856,17 @@ export const ShiftGroupApiFactory = function (configuration?: Configuration, bas
          */
         getShiftGroups(organId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<ShiftGroup>> {
             return localVarFp.getShiftGroups(organId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update a shift group priority
+         * @param {number} id ShiftGroup ID
+         * @param {GroupUpdatePriorityParam} updateParams Update parameters
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateShiftGroupPriority(id: number, updateParams: GroupUpdatePriorityParam, options?: RawAxiosRequestConfig): AxiosPromise<ShiftGroupPriority> {
+            return localVarFp.updateShiftGroupPriority(id, updateParams, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -3763,6 +3912,19 @@ export class ShiftGroupApi extends BaseAPI {
      */
     public getShiftGroups(organId: number, options?: RawAxiosRequestConfig) {
         return ShiftGroupApiFp(this.configuration).getShiftGroups(organId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update a shift group priority
+     * @param {number} id ShiftGroup ID
+     * @param {GroupUpdatePriorityParam} updateParams Update parameters
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ShiftGroupApi
+     */
+    public updateShiftGroupPriority(id: number, updateParams: GroupUpdatePriorityParam, options?: RawAxiosRequestConfig) {
+        return ShiftGroupApiFp(this.configuration).updateShiftGroupPriority(id, updateParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
