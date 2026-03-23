@@ -24,6 +24,8 @@ type Service interface {
 	CreateShiftGroup(ShiftGroupCreateRequest) (*models.ShiftGroup, error)
 	GetShiftGroups(ShiftGroupFilterParams) (*[]models.ShiftGroup, error)
 	GetShiftGroup(uint) (*models.ShiftGroup, error)
+
+	UpdateShiftGroupPriority(groupID uint, params GroupUpdatePriorityParam) (*models.ShiftGroupPriority, error)
 }
 
 type UserProvider interface {
@@ -228,6 +230,31 @@ func (s *service) GetShiftGroup(ID uint) (*models.ShiftGroup, error) {
 	return &shiftGroup, nil
 }
 
+func (s *service) UpdateShiftGroupPriority(groupID uint, params GroupUpdatePriorityParam) (*models.ShiftGroupPriority, error) {
+	newRecord := models.ShiftGroupPriority{
+		UserID:       params.UserID,
+		ShiftGroupID: groupID,
+		Priority:     params.Priority,
+	}
+
+	err := s.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "user_id"}, {Name: "shift_group_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"priority", "updated_at"}),
+	}).Create(&newRecord).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.db.Where("user_id = ? AND shift_group_id = ?", params.UserID, groupID).First(&newRecord).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &newRecord, err
+}
+
 func (s *service) createSavedShift(rID uint, shift *models.RosterShift) error {
 	var savedShift = models.SavedShift{
 		RosterID:    rID,
@@ -258,9 +285,16 @@ func (s *service) getSavedShiftOrdering(savedShifts []*models.SavedShift) ([]*mo
 		// Get the latest shift from users to check when they were last assigned
 		// It first checks by groups and if no group is assigned it checks on name
 		err := s.db.Table("users AS u").
-			Select("u.*, MAX(r.date) AS last_date").
+			Select(`
+				u.*, 
+				MAX(r.date) AS last_date, 
+				COALESCE(MAX(sgp.priority), 1) AS group_priority
+    		`).
 			Joins("JOIN user_organs AS uo ON u.id = uo.user_id").
 			Joins("JOIN roster_shifts AS target_rs ON target_rs.name = ?", savedShift.RosterShift.Name).
+			Joins(`LEFT JOIN shift_group_priorities AS sgp ON 
+				sgp.user_id = u.id AND 
+				sgp.shift_group_id = target_rs.shift_group_id`).
 			Joins(`LEFT JOIN roster_shifts AS rs ON (
 				(target_rs.shift_group_id IS NOT NULL AND rs.shift_group_id = target_rs.shift_group_id) OR 
 				(target_rs.shift_group_id IS NULL AND rs.name = target_rs.name)
@@ -270,7 +304,7 @@ func (s *service) getSavedShiftOrdering(savedShifts []*models.SavedShift) ([]*mo
 			Joins("LEFT JOIN rosters AS r ON r.id = ss.roster_id").
 			Where("uo.organ_id = ?", organID).
 			Group("u.id").
-			Order("last_date ASC"). // Removed NULLS FIRST for MariaDB compatibility
+			Order("group_priority DESC, last_date ASC").
 			Scan(&users).Error
 
 		if err != nil {

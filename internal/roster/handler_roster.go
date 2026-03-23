@@ -221,3 +221,21 @@ func requireRosterOrganRoleBody(db *gorm.DB, minRole models.OrganRole) gin.Handl
 		checkAccess(c, db, body.OrganID, minRole)
 	}
 }
+
+func requireShiftGroupOrganRoleParams(db *gorm.DB, minRole models.OrganRole) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		groupID := c.Param("id")
+		if groupID == "" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+			return
+		}
+
+		var shiftGroup models.ShiftGroup
+		if err := db.First(&shiftGroup, "id = ?", groupID).Error; err != nil {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Shift group not found"})
+			return
+		}
+
+		checkAccess(c, db, shiftGroup.OrganID, minRole)
+	}
+}

@@ -127,3 +127,23 @@ type ShiftGroup struct {
 
 	Name string `json:"name" gorm:"type:varchar(255);uniqueIndex:organ_shift_group"`
 } // @name ShiftGroup
+
+type GroupPriority int
+
+const (
+	Low     GroupPriority = 1
+	Default GroupPriority = 2
+	High    GroupPriority = 3
+)
+
+type ShiftGroupPriority struct {
+	BaseModel
+
+	ShiftGroupID uint       `json:"shiftGroupId" gorm:"uniqueIndex:idx_shift_group;not null"`
+	ShiftGroup   ShiftGroup `json:"-" gorm:"foreignKey:ShiftGroupID;constraint:OnDelete:CASCADE;"`
+
+	UserID uint `json:"userId" gorm:"uniqueIndex:idx_shift_group;not null"`
+	User   User `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+
+	Priority GroupPriority `json:"priority" gorm:"type:smallint;default:2"`
+} // @name ShiftGroupPriority

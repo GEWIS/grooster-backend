@@ -33,6 +33,8 @@ func NewRosterHandler(rosterService Service, rg *gin.RouterGroup, db *gorm.DB) *
 	g.GET("/shift-groups", h.GetShiftGroups)
 	g.GET("/shift-groups/:id", h.GetShiftGroup)
 
+	g.PUT("/shift-groups/:id/priority", requireShiftGroupOrganRoleParams(db, models.RoleAdmin))
+
 	return h
 }
 
@@ -258,4 +260,41 @@ func (h *Handler) GetShiftGroup(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, group)
+}
+
+// UpdateShiftGroupPriority
+//
+//	@Summary	Update a shift group priority
+//	@Security	BearerAuth
+//	@Tags		ShiftGroup
+//	@Accept		json
+//	@Produce	json
+//	@Param		id				path		int								true	"ShiftGroup ID"
+//	@Param		updateParams	body		GroupUpdatePriorityParam	true	"Update parameters"
+//	@Success	200				{object}	models.ShiftGroupPriority
+//	@Failure	400				{string}	string	"Invalid request"
+//	@Failure	404				{string}	string	"SavedShift not found"
+//	@ID			updateShiftGroupPriority
+//	@Router    /roster/shift-groups/{id}/priority [put]
+func (h *Handler) UpdateShiftGroupPriority(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	var params GroupUpdatePriorityParam
+	if err := c.ShouldBindJSON(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	groupPriority, err := h.rosterService.UpdateShiftGroupPriority(uint(id), params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, groupPriority)
 }

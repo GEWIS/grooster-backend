@@ -119,3 +119,9 @@ type ShiftGroupCreateRequest struct {
 type ShiftGroupFilterParams struct {
 	OrganID uint `form:"organ_id" binding:"required"`
 }
+
+type GroupUpdatePriorityParam struct {
+	UserID uint `json:"userId" binding:"required"`
+
+	Priority models.GroupPriority `json:"priority" binding:"required"`
+} // @name GroupUpdatePriorityParam
