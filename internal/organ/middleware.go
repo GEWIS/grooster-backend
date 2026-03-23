@@ -15,10 +15,15 @@ func requireRosterOrganMemberRoleParam(db *gorm.DB, minRole models.OrganRole) gi
 			return
 		}
 
-		userID := c.Param("userId")
+		val, exists := c.Get("userID")
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "user not authenticated"})
+			return
+		}
 
-		if userID == "" {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "userId" + " is required"})
+		userID, ok := val.(uint)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid user id type"})
 			return
 		}
 
