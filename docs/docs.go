@@ -878,6 +878,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/roster/shift-groups/{id}/priority": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ShiftGroup"
+                ],
+                "summary": "Update a shift group priority",
+                "operationId": "updateShiftGroupPriority",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ShiftGroup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update parameters",
+                        "name": "updateParams",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/GroupUpdatePriorityParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ShiftGroupPriority"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "SavedShift not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/roster/shift/{id}": {
             "delete": {
                 "security": [
@@ -1903,6 +1961,19 @@ const docTemplate = `{
                 }
             }
         },
+        "GEWIS-Rooster_internal_models.GroupPriority": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "Low",
+                "Default",
+                "High"
+            ]
+        },
         "GEWIS-Rooster_internal_models.OrganRole": {
             "type": "string",
             "enum": [
@@ -1915,6 +1986,21 @@ const docTemplate = `{
                 "RoleAdmin",
                 "RoleMember"
             ]
+        },
+        "GroupUpdatePriorityParam": {
+            "type": "object",
+            "required": [
+                "priority",
+                "userId"
+            ],
+            "properties": {
+                "priority": {
+                    "$ref": "#/definitions/GEWIS-Rooster_internal_models.GroupPriority"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
         },
         "Organ": {
             "description": "An organ that users can be part of.",
@@ -2273,6 +2359,29 @@ const docTemplate = `{
                 }
             }
         },
+        "ShiftGroupPriority": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "$ref": "#/definitions/GEWIS-Rooster_internal_models.GroupPriority"
+                },
+                "shiftGroupId": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
         "ShiftUpdateRequest": {
             "type": "object",
             "properties": {
@@ -2347,9 +2456,21 @@ const docTemplate = `{
         },
         "UpdateMemberRoleParams": {
             "type": "object",
+            "required": [
+                "role"
+            ],
             "properties": {
                 "role": {
-                    "$ref": "#/definitions/GEWIS-Rooster_internal_models.OrganRole"
+                    "enum": [
+                        "admin",
+                        "member",
+                        "owner"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/GEWIS-Rooster_internal_models.OrganRole"
+                        }
+                    ]
                 }
             }
         },

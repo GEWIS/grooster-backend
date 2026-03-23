@@ -15,6 +15,16 @@ definitions:
       value:
         type: string
     type: object
+  GEWIS-Rooster_internal_models.GroupPriority:
+    enum:
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - Low
+    - Default
+    - High
   GEWIS-Rooster_internal_models.OrganRole:
     enum:
     - owner
@@ -25,6 +35,16 @@ definitions:
     - RoleOwner
     - RoleAdmin
     - RoleMember
+  GroupUpdatePriorityParam:
+    properties:
+      priority:
+        $ref: '#/definitions/GEWIS-Rooster_internal_models.GroupPriority'
+      userId:
+        type: integer
+    required:
+    - priority
+    - userId
+    type: object
   Organ:
     description: An organ that users can be part of.
     properties:
@@ -259,6 +279,21 @@ definitions:
     - name
     - organId
     type: object
+  ShiftGroupPriority:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      priority:
+        $ref: '#/definitions/GEWIS-Rooster_internal_models.GroupPriority'
+      shiftGroupId:
+        type: integer
+      updatedAt:
+        type: string
+      userId:
+        type: integer
+    type: object
   ShiftUpdateRequest:
     properties:
       order:
@@ -308,7 +343,14 @@ definitions:
   UpdateMemberRoleParams:
     properties:
       role:
-        $ref: '#/definitions/GEWIS-Rooster_internal_models.OrganRole'
+        allOf:
+        - $ref: '#/definitions/GEWIS-Rooster_internal_models.OrganRole'
+        enum:
+        - admin
+        - member
+        - owner
+    required:
+    - role
     type: object
   UpdateMemberSettingsParams:
     properties:
@@ -1068,6 +1110,43 @@ paths:
       security:
       - BearerAuth: []
       summary: Get a specific shift group by ID
+      tags:
+      - ShiftGroup
+  /roster/shift-groups/{id}/priority:
+    put:
+      consumes:
+      - application/json
+      operationId: updateShiftGroupPriority
+      parameters:
+      - description: ShiftGroup ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update parameters
+        in: body
+        name: updateParams
+        required: true
+        schema:
+          $ref: '#/definitions/GroupUpdatePriorityParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ShiftGroupPriority'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: SavedShift not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update a shift group priority
       tags:
       - ShiftGroup
   /roster/shift/{id}:

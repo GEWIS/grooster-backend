@@ -8,7 +8,9 @@ docs/AnswerCreateRequest.md
 docs/AnswerUpdateRequest.md
 docs/AuthApi.md
 docs/ExportApi.md
+docs/GEWISRoosterInternalModelsGroupPriority.md
 docs/GEWISRoosterInternalModelsOrganRole.md
+docs/GroupUpdatePriorityParam.md
 docs/Organ.md
 docs/OrganApi.md
 docs/Roster.md
@@ -31,6 +33,7 @@ docs/ShiftCreateRequest.md
 docs/ShiftGroup.md
 docs/ShiftGroupApi.md
 docs/ShiftGroupCreateRequest.md
+docs/ShiftGroupPriority.md
 docs/ShiftUpdateRequest.md
 docs/TemplateCreateRequest.md
 docs/TemplateShiftPreferenceCreateRequest.md
