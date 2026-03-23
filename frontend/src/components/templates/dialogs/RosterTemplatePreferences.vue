@@ -57,7 +57,7 @@ const visible = computed({
 
 const displayShifts = computed(() => {
   return props.template.shifts.map((shift) => {
-    const pref = shiftPreferences.value[shift.id] || {
+    const pref = Object.values(shiftPreferences.value).find((p) => p.rosterTemplateShiftID === shift.id) || {
       id: null,
       rosterTemplateShiftID: shift.id,
       value: null,
