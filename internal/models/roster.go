@@ -107,11 +107,11 @@ type RosterTemplateShift struct {
 type RosterTemplateShiftPreference struct {
 	BaseModel
 
-	RosterTemplateShiftID uint `json:"rosterTemplateShiftID"`
+	RosterTemplateShiftID uint `json:"rosterTemplateShiftID" gorm:"uniqueIndex:idx_user_shift"`
 
 	RosterTemplateShift *RosterTemplateShift `json:"-" gorm:"foreignKey:RosterTemplateShiftID;constraint:OnDelete:CASCADE;"`
 
-	UserID uint `json:"userId"`
+	UserID uint `json:"userId" gorm:"uniqueIndex:idx_user_shift"`
 
 	User *User `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 
