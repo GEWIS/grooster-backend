@@ -17,6 +17,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"os"
+	"strings"
 )
 
 // @title						GRooster
@@ -53,8 +54,18 @@ func main() {
 
 	r := gin.Default()
 
+	rawOrigins := os.Getenv("ALLOWED_ORIGINS")
+	var origins []string
+	if rawOrigins != "" {
+		origins = strings.Split(rawOrigins, ",")
+	}
+
+	if len(origins) == 0 {
+		log.Fatal().Msg("No ORIGINS provided")
+	}
+
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true, // Frontend URL
+		AllowOrigins:     origins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true, // If you need to support cookies or authentication

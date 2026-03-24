@@ -24,6 +24,8 @@ Ensure `DEV_TYPE` is set to "local" in your `.env` file if you want to run the p
 
 Make sure to set the `JWT_SECRET`
 
+Set `ALLOWED_ORIGINS` to your locally run frontend
+
 ## Seeding the Database
 
 If you want to seed the database with initial data (users, organs, rosters), run:
