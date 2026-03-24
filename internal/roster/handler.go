@@ -35,7 +35,7 @@ func NewRosterHandler(rosterService Service, rg *gin.RouterGroup, db *gorm.DB) *
 	g.GET("/shift-groups/:id", h.GetShiftGroup)
 
 	g.GET("/shift-groups/:id/priority", requireShiftGroupOrganRoleParams(db, models.RoleAdmin), h.GetShiftGroupPriorities)
-	g.PUT("/shift-groups/:id/priority", requireShiftGroupOrganRoleParams(db, models.RoleAdmin))
+	g.PUT("/shift-groups/:id/priority", requireShiftGroupOrganRoleParams(db, models.RoleAdmin), h.UpdateShiftGroupPriority)
 
 	return h
 }
@@ -326,6 +326,6 @@ func (h *Handler) UpdateShiftGroupPriority(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
+	log.Print(groupPriority)
 	c.JSON(http.StatusOK, groupPriority)
 }
