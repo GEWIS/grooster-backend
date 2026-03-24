@@ -233,7 +233,7 @@ func (s *service) GetShiftGroup(ID uint) (*models.ShiftGroup, error) {
 
 func (s *service) GetShiftGroupPriorities(groupID uint) ([]*models.ShiftGroupPriority, error) {
 	var priorities []*models.ShiftGroupPriority
-	if err := s.db.Find(&priorities).Error; err != nil {
+	if err := s.db.Where("shift_group_id = ?", groupID).Find(&priorities).Error; err != nil {
 		return nil, err
 	}
 
@@ -262,7 +262,7 @@ func (s *service) UpdateShiftGroupPriority(groupID uint, params GroupPriorityUpd
 		return nil, err
 	}
 
-	return &newRecord, err
+	return &newRecord, nil
 }
 
 func (s *service) createSavedShift(rID uint, shift *models.RosterShift) error {
