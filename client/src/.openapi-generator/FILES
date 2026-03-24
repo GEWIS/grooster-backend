@@ -10,7 +10,7 @@ docs/AuthApi.md
 docs/ExportApi.md
 docs/GEWISRoosterInternalModelsGroupPriority.md
 docs/GEWISRoosterInternalModelsOrganRole.md
-docs/GroupUpdatePriorityParam.md
+docs/GroupPriorityUpdateParam.md
 docs/Organ.md
 docs/OrganApi.md
 docs/Roster.md

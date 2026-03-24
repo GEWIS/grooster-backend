@@ -25,7 +25,8 @@ type Service interface {
 	GetShiftGroups(ShiftGroupFilterParams) (*[]models.ShiftGroup, error)
 	GetShiftGroup(uint) (*models.ShiftGroup, error)
 
-	UpdateShiftGroupPriority(groupID uint, params GroupUpdatePriorityParam) (*models.ShiftGroupPriority, error)
+	GetShiftGroupPriorities(groupID uint) ([]*models.ShiftGroupPriority, error)
+	UpdateShiftGroupPriority(groupID uint, params GroupPriorityUpdateParam) (*models.ShiftGroupPriority, error)
 }
 
 type UserProvider interface {
@@ -230,7 +231,16 @@ func (s *service) GetShiftGroup(ID uint) (*models.ShiftGroup, error) {
 	return &shiftGroup, nil
 }
 
-func (s *service) UpdateShiftGroupPriority(groupID uint, params GroupUpdatePriorityParam) (*models.ShiftGroupPriority, error) {
+func (s *service) GetShiftGroupPriorities(groupID uint) ([]*models.ShiftGroupPriority, error) {
+	var priorities []*models.ShiftGroupPriority
+	if err := s.db.Find(&priorities).Error; err != nil {
+		return nil, err
+	}
+
+	return priorities, nil
+}
+
+func (s *service) UpdateShiftGroupPriority(groupID uint, params GroupPriorityUpdateParam) (*models.ShiftGroupPriority, error) {
 	newRecord := models.ShiftGroupPriority{
 		UserID:       params.UserID,
 		ShiftGroupID: groupID,

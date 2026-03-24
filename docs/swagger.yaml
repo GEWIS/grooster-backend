@@ -35,7 +35,7 @@ definitions:
     - RoleOwner
     - RoleAdmin
     - RoleMember
-  GroupUpdatePriorityParam:
+  GroupPriorityUpdateParam:
     properties:
       priority:
         $ref: '#/definitions/GEWIS-Rooster_internal_models.GroupPriority'
@@ -1113,6 +1113,34 @@ paths:
       tags:
       - ShiftGroup
   /roster/shift-groups/{id}/priority:
+    get:
+      consumes:
+      - application/json
+      operationId: getShiftGroupPriorities
+      parameters:
+      - description: ShiftGroup ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ShiftGroupPriority'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get a shift group priorities for a shift group
+      tags:
+      - ShiftGroup
     put:
       consumes:
       - application/json
@@ -1128,7 +1156,7 @@ paths:
         name: updateParams
         required: true
         schema:
-          $ref: '#/definitions/GroupUpdatePriorityParam'
+          $ref: '#/definitions/GroupPriorityUpdateParam'
       produces:
       - application/json
       responses:

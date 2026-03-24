@@ -879,6 +879,50 @@ const docTemplate = `{
             }
         },
         "/roster/shift-groups/{id}/priority": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ShiftGroup"
+                ],
+                "summary": "Get a shift group priorities for a shift group",
+                "operationId": "getShiftGroupPriorities",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ShiftGroup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ShiftGroupPriority"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "put": {
                 "security": [
                     {
@@ -910,7 +954,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/GroupUpdatePriorityParam"
+                            "$ref": "#/definitions/GroupPriorityUpdateParam"
                         }
                     }
                 ],
@@ -1987,7 +2031,7 @@ const docTemplate = `{
                 "RoleMember"
             ]
         },
-        "GroupUpdatePriorityParam": {
+        "GroupPriorityUpdateParam": {
             "type": "object",
             "required": [
                 "priority",

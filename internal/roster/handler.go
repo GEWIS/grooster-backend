@@ -5,6 +5,7 @@ import (
 	_ "GEWIS-Rooster/internal/models"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"net/http"
@@ -33,6 +34,7 @@ func NewRosterHandler(rosterService Service, rg *gin.RouterGroup, db *gorm.DB) *
 	g.GET("/shift-groups", h.GetShiftGroups)
 	g.GET("/shift-groups/:id", h.GetShiftGroup)
 
+	g.GET("/shift-groups/:id/priority", requireShiftGroupOrganRoleParams(db, models.RoleAdmin), h.GetShiftGroupPriorities)
 	g.PUT("/shift-groups/:id/priority", requireShiftGroupOrganRoleParams(db, models.RoleAdmin))
 
 	return h
@@ -192,7 +194,7 @@ func (h *Handler) GetSavedRoster(c *gin.Context) {
 //	@Router    /roster/shift-groups [post]
 func (h *Handler) CreateShiftGroup(c *gin.Context) {
 	var params ShiftGroupCreateRequest
-	if err := c.ShouldBindJSON(&params); err != nil {
+	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -262,6 +264,35 @@ func (h *Handler) GetShiftGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, group)
 }
 
+// GetShiftGroupPriorities
+//
+//	@Summary	Get a shift group priorities for a shift group
+//	@Security	BearerAuth
+//	@Tags		ShiftGroup
+//	@Accept		json
+//	@Produce	json
+//	@Param		id				path		int								true	"ShiftGroup ID"
+//	@Success	200				{array}	models.ShiftGroupPriority
+//	@Failure	400				{string}	string	"Invalid request"
+//	@ID			getShiftGroupPriorities
+//	@Router    /roster/shift-groups/{id}/priority [get]
+func (h *Handler) GetShiftGroupPriorities(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	shiftPriorities, err := h.rosterService.GetShiftGroupPriorities(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, shiftPriorities)
+}
+
 // UpdateShiftGroupPriority
 //
 //	@Summary	Update a shift group priority
@@ -270,7 +301,7 @@ func (h *Handler) GetShiftGroup(c *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		id				path		int								true	"ShiftGroup ID"
-//	@Param		updateParams	body		GroupUpdatePriorityParam	true	"Update parameters"
+//	@Param		updateParams	body		GroupPriorityUpdateParam	true	"Update parameters"
 //	@Success	200				{object}	models.ShiftGroupPriority
 //	@Failure	400				{string}	string	"Invalid request"
 //	@Failure	404				{string}	string	"SavedShift not found"
@@ -284,7 +315,7 @@ func (h *Handler) UpdateShiftGroupPriority(c *gin.Context) {
 		return
 	}
 
-	var params GroupUpdatePriorityParam
+	var params GroupPriorityUpdateParam
 	if err := c.ShouldBindJSON(&params); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
