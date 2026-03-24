@@ -100,19 +100,19 @@ export type GEWISRoosterInternalModelsOrganRole = typeof GEWISRoosterInternalMod
 /**
  * 
  * @export
- * @interface GroupUpdatePriorityParam
+ * @interface GroupPriorityUpdateParam
  */
-export interface GroupUpdatePriorityParam {
+export interface GroupPriorityUpdateParam {
     /**
      * 
      * @type {GEWISRoosterInternalModelsGroupPriority}
-     * @memberof GroupUpdatePriorityParam
+     * @memberof GroupPriorityUpdateParam
      */
     'priority': GEWISRoosterInternalModelsGroupPriority;
     /**
      * 
      * @type {number}
-     * @memberof GroupUpdatePriorityParam
+     * @memberof GroupPriorityUpdateParam
      */
     'userId': number;
 }
@@ -3673,6 +3673,43 @@ export const ShiftGroupApiAxiosParamCreator = function (configuration?: Configur
         },
         /**
          * 
+         * @summary Get a shift group priorities for a shift group
+         * @param {number} id ShiftGroup ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getShiftGroupPriorities: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getShiftGroupPriorities', 'id', id)
+            const localVarPath = `/roster/shift-groups/{id}/priority`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get all shift groups for an organ
          * @param {number} organId Organ ID
          * @param {*} [options] Override http request option.
@@ -3715,11 +3752,11 @@ export const ShiftGroupApiAxiosParamCreator = function (configuration?: Configur
          * 
          * @summary Update a shift group priority
          * @param {number} id ShiftGroup ID
-         * @param {GroupUpdatePriorityParam} updateParams Update parameters
+         * @param {GroupPriorityUpdateParam} updateParams Update parameters
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateShiftGroupPriority: async (id: number, updateParams: GroupUpdatePriorityParam, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateShiftGroupPriority: async (id: number, updateParams: GroupPriorityUpdateParam, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('updateShiftGroupPriority', 'id', id)
             // verify required parameter 'updateParams' is not null or undefined
@@ -3792,6 +3829,19 @@ export const ShiftGroupApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get a shift group priorities for a shift group
+         * @param {number} id ShiftGroup ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getShiftGroupPriorities(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ShiftGroupPriority>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getShiftGroupPriorities(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ShiftGroupApi.getShiftGroupPriorities']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get all shift groups for an organ
          * @param {number} organId Organ ID
          * @param {*} [options] Override http request option.
@@ -3807,11 +3857,11 @@ export const ShiftGroupApiFp = function(configuration?: Configuration) {
          * 
          * @summary Update a shift group priority
          * @param {number} id ShiftGroup ID
-         * @param {GroupUpdatePriorityParam} updateParams Update parameters
+         * @param {GroupPriorityUpdateParam} updateParams Update parameters
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateShiftGroupPriority(id: number, updateParams: GroupUpdatePriorityParam, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ShiftGroupPriority>> {
+        async updateShiftGroupPriority(id: number, updateParams: GroupPriorityUpdateParam, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ShiftGroupPriority>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateShiftGroupPriority(id, updateParams, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ShiftGroupApi.updateShiftGroupPriority']?.[localVarOperationServerIndex]?.url;
@@ -3849,6 +3899,16 @@ export const ShiftGroupApiFactory = function (configuration?: Configuration, bas
         },
         /**
          * 
+         * @summary Get a shift group priorities for a shift group
+         * @param {number} id ShiftGroup ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getShiftGroupPriorities(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<ShiftGroupPriority>> {
+            return localVarFp.getShiftGroupPriorities(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get all shift groups for an organ
          * @param {number} organId Organ ID
          * @param {*} [options] Override http request option.
@@ -3861,11 +3921,11 @@ export const ShiftGroupApiFactory = function (configuration?: Configuration, bas
          * 
          * @summary Update a shift group priority
          * @param {number} id ShiftGroup ID
-         * @param {GroupUpdatePriorityParam} updateParams Update parameters
+         * @param {GroupPriorityUpdateParam} updateParams Update parameters
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateShiftGroupPriority(id: number, updateParams: GroupUpdatePriorityParam, options?: RawAxiosRequestConfig): AxiosPromise<ShiftGroupPriority> {
+        updateShiftGroupPriority(id: number, updateParams: GroupPriorityUpdateParam, options?: RawAxiosRequestConfig): AxiosPromise<ShiftGroupPriority> {
             return localVarFp.updateShiftGroupPriority(id, updateParams, options).then((request) => request(axios, basePath));
         },
     };
@@ -3904,6 +3964,18 @@ export class ShiftGroupApi extends BaseAPI {
 
     /**
      * 
+     * @summary Get a shift group priorities for a shift group
+     * @param {number} id ShiftGroup ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ShiftGroupApi
+     */
+    public getShiftGroupPriorities(id: number, options?: RawAxiosRequestConfig) {
+        return ShiftGroupApiFp(this.configuration).getShiftGroupPriorities(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get all shift groups for an organ
      * @param {number} organId Organ ID
      * @param {*} [options] Override http request option.
@@ -3918,12 +3990,12 @@ export class ShiftGroupApi extends BaseAPI {
      * 
      * @summary Update a shift group priority
      * @param {number} id ShiftGroup ID
-     * @param {GroupUpdatePriorityParam} updateParams Update parameters
+     * @param {GroupPriorityUpdateParam} updateParams Update parameters
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ShiftGroupApi
      */
-    public updateShiftGroupPriority(id: number, updateParams: GroupUpdatePriorityParam, options?: RawAxiosRequestConfig) {
+    public updateShiftGroupPriority(id: number, updateParams: GroupPriorityUpdateParam, options?: RawAxiosRequestConfig) {
         return ShiftGroupApiFp(this.configuration).updateShiftGroupPriority(id, updateParams, options).then((request) => request(this.axios, this.basePath));
     }
 }

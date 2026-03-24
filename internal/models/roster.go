@@ -128,6 +128,8 @@ type ShiftGroup struct {
 	Name string `json:"name" gorm:"type:varchar(255);uniqueIndex:organ_shift_group"`
 } // @name ShiftGroup
 
+// GroupPriority represents the priority level of a shift group.
+// @name GroupPriority
 type GroupPriority int
 
 const (

@@ -6,6 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**createShiftGroup**](#createshiftgroup) | **POST** /roster/shift-groups | Create a new shift group|
 |[**getShiftGroup**](#getshiftgroup) | **GET** /roster/shift-groups/{id} | Get a specific shift group by ID|
+|[**getShiftGroupPriorities**](#getshiftgrouppriorities) | **GET** /roster/shift-groups/{id}/priority | Get a shift group priorities for a shift group|
 |[**getShiftGroups**](#getshiftgroups) | **GET** /roster/shift-groups | Get all shift groups for an organ|
 |[**updateShiftGroupPriority**](#updateshiftgrouppriority) | **PUT** /roster/shift-groups/{id}/priority | Update a shift group priority|
 
@@ -112,6 +113,57 @@ const { status, data } = await apiInstance.getShiftGroup(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getShiftGroupPriorities**
+> Array<ShiftGroupPriority> getShiftGroupPriorities()
+
+
+### Example
+
+```typescript
+import {
+    ShiftGroupApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new ShiftGroupApi(configuration);
+
+let id: number; //ShiftGroup ID (default to undefined)
+
+const { status, data } = await apiInstance.getShiftGroupPriorities(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | ShiftGroup ID | defaults to undefined|
+
+
+### Return type
+
+**Array<ShiftGroupPriority>**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Invalid request |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getShiftGroups**
 > Array<ShiftGroup> getShiftGroups()
 
@@ -173,14 +225,14 @@ const { status, data } = await apiInstance.getShiftGroups(
 import {
     ShiftGroupApi,
     Configuration,
-    GroupUpdatePriorityParam
+    GroupPriorityUpdateParam
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new ShiftGroupApi(configuration);
 
 let id: number; //ShiftGroup ID (default to undefined)
-let updateParams: GroupUpdatePriorityParam; //Update parameters
+let updateParams: GroupPriorityUpdateParam; //Update parameters
 
 const { status, data } = await apiInstance.updateShiftGroupPriority(
     id,
@@ -192,7 +244,7 @@ const { status, data } = await apiInstance.updateShiftGroupPriority(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **updateParams** | **GroupUpdatePriorityParam**| Update parameters | |
+| **updateParams** | **GroupPriorityUpdateParam**| Update parameters | |
 | **id** | [**number**] | ShiftGroup ID | defaults to undefined|
 
 
