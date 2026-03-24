@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import {
-  ModelsRosterTemplateShiftPreference,
+  RosterTemplateShiftPreference,
   RosterTemplate,
   TemplateShiftPreferenceCreateRequest,
   TemplateShiftPreferenceUpdateRequest,
@@ -22,7 +22,7 @@ const props = withDefaults(
 const emit = defineEmits(['close']);
 
 const userStore = useUserStore();
-const shiftPreferences = ref<Record<number, ModelsRosterTemplateShiftPreference>>({});
+const shiftPreferences = ref<Record<number, RosterTemplateShiftPreference>>({});
 const options = ['J', 'N', 'X', 'L'];
 
 onMounted(async () => {
@@ -32,10 +32,10 @@ onMounted(async () => {
       props.template.id,
     );
 
-    const prefMap: Record<number, ModelsRosterTemplateShiftPreference> = {};
+    const prefMap: Record<number, RosterTemplateShiftPreference> = {};
 
     props.template.shifts.forEach((shift) => {
-      const existingPref = preferences.find((p) => p.id === shift.id);
+      const existingPref = preferences.find((p) => p.rosterTemplateShiftID === shift.id);
 
       if (existingPref) {
         prefMap[shift.id] = existingPref;
