@@ -22,12 +22,12 @@ INSERT INTO shift_group_priorities (user_id, shift_group_id, priority, created_a
 SELECT
     u.id as user_id,
     sg.id as shift_group_id,
-    2 AS priority,
+    1 AS priority,
     NOW(),
     NOW()
 FROM users u
 CROSS JOIN shift_groups sg
 WHERE NOT EXISTS (
-    SELECT 2 FROM shift_group_priorities sgp
+    SELECT 1 FROM shift_group_priorities sgp
     WHERE sgp.user_id = u.id AND sgp.shift_group_id = sg.id
 );
