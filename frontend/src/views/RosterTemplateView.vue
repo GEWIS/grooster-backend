@@ -5,11 +5,11 @@ import RosterTemplate from '@/components/templates/RosterTemplate.vue';
 import { useOrganStore } from '@/stores/organ.store';
 import RosterTemplateAdd from '@/components/templates/dialogs/RosterTemplateAdd.vue';
 import { useTemplateStore } from '@/stores/template.store';
-import ShiftGroupAdd from '@/components/templates/dialogs/ShiftGroupAdd.vue';
 import ApiService from '@/services/ApiService';
 import { Role, useAuthStore } from '@/stores/auth.store';
+import ShiftGroupsSection from '@/components/templates/ShiftGroupsSection.vue';
 
-type Dialogs = 'AddTemplate' | 'AddGroup' | 'None';
+type Dialogs = 'AddTemplate' | 'None';
 
 const organStore = useOrganStore();
 const templateStore = useTemplateStore();
@@ -29,11 +29,6 @@ const fetchGroups = async () => {
   }
 };
 
-const handleGroupClose = async () => {
-  openDialog.value = 'None';
-  await fetchGroups();
-};
-
 onMounted(async () => {
   await templateStore.fetchTemplates(organStore.organ);
   await fetchGroups();
@@ -45,16 +40,9 @@ onMounted(async () => {
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
       <div>
         <h1 class="text-2xl font-bold text-gray-800">Roster Management</h1>
-        <p class="text-gray-500">Manage and deploy your recurring shift schedules and groups.</p>
+        <p class="text-gray-500">Manage and deploy your recurring shift schedules.</p>
       </div>
       <div class="flex gap-2">
-        <Button
-          v-if="authStore.can([Role.Admin, Role.Owner])"
-          class="p-button-outlined"
-          icon="pi pi-users"
-          label="Add shift group"
-          @click="openDialog = 'AddGroup'"
-        />
         <Button
           v-if="authStore.can([Role.Admin, Role.Owner])"
           class="p-button-raised shadow-md"
@@ -87,29 +75,10 @@ onMounted(async () => {
 
     <hr class="border-gray-100 mb-12" />
 
-    <section>
-      <h2 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-        <i class="pi pi-users text-primary"></i> Shift Groups
-      </h2>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div
-          v-for="group in shiftGroups"
-          :key="group.id"
-          class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer flex items-center justify-between"
-        >
-          <div class="flex items-center gap-3">
-            <div>
-              <p class="font-bold text-gray-800">{{ group.name }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <ShiftGroupsSection @update:groups="(val: ShiftGroup[]) => (shiftGroups = val)" />
   </div>
 
   <RosterTemplateAdd :open="openDialog === 'AddTemplate'" @close="openDialog = 'None'" />
-  <ShiftGroupAdd :open="openDialog === 'AddGroup'" @close="handleGroupClose" />
 </template>
 
 <style scoped></style>
