@@ -26,8 +26,6 @@ jobs:
     uses: GEWIS/actions/.github/workflows/lint-and-build-npm.yml@v1
     with:
       node-version: "^22.0.0"
-      lint: true
-      format: true
       build: true
       test: false
       working-directory: './client'
