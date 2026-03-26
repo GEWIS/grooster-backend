@@ -2,33 +2,20 @@ package main
 
 import (
 	"GEWIS-Rooster/cmd/seeder/seeder"
-	"GEWIS-Rooster/internal/models"
-	"GEWIS-Rooster/internal/platform/database"
-	"database/sql"
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	"os"
 )
 
 func main() {
-	db := database.ConnectDB(os.Getenv("DATABASE"))
-	sqlDB, _ := db.DB()
-
-	err := seeder.WipeAllTables(db)
-	if err != nil {
-		log.Panic().Err(err).Msg("")
-	}
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Print("failed to close database connection", err)
+	if _, err := os.Stat(".env"); err == nil {
+		log.Print("Loading .env file")
+		if err := godotenv.Load(); err != nil {
+			log.Fatal().Msgf("Error loading .env file: %v", err)
 		}
-	}(sqlDB)
-
-	err = db.AutoMigrate(&models.User{}, &models.Roster{}, &models.RosterShift{}, &models.RosterAnswer{}, &models.SavedShift{}, &models.Organ{}, &models.RosterTemplate{}, &models.RosterTemplateShift{})
-	if err != nil {
-		return
 	}
+
+	db := os.Getenv("DATABASE")
 
 	seeder.Seeder(db)
 }

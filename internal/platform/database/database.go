@@ -34,7 +34,7 @@ func ConnectDB(name string) *gorm.DB {
 
 		mysqlDsn := "mysql://" + dsn
 
-		runDBMigrations(mysqlDsn)
+		RunDBMigrations(mysqlDsn)
 	} else {
 		dsn = "sqlite3://" + name
 		db, err = gorm.Open(sqlite.Open(name), &gorm.Config{})
@@ -65,7 +65,7 @@ func ConnectDB(name string) *gorm.DB {
 	return db
 }
 
-func runDBMigrations(dsn string) {
+func RunDBMigrations(dsn string) {
 	d, err := iofs.New(migrationFS, "migrations")
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create migration source")
