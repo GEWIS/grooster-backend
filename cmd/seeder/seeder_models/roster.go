@@ -5,15 +5,24 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
+	"math/rand"
 	"strconv"
 	"time"
 )
 
 func SeedRosters(db *gorm.DB, count int) {
+	shiftGroups := seedShiftGroups(db)
+	seedGroupPriorities(db, shiftGroups)
+
+	templates := rosterTemplates(db, count, shiftGroups)
+	seedTemplatePreferences(db, templates)
+
 	rosters := roster(db, count)
-	rosterShift(db, rosters)
+
+	shifts := rosterShift(db, rosters, shiftGroups)
+
 	rosterAnswer(db, rosters)
-	rosterTemplates(db, count)
+	seedSavedShifts(db, rosters, shifts)
 }
 
 func roster(db *gorm.DB, count int) []*models.Roster {
@@ -49,18 +58,23 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 	return rosters
 }
 
-func rosterShift(db *gorm.DB, roster []*models.Roster) {
-	for _, roster := range roster {
-		shifts := []models.RosterShift{
-			{Name: "Shift A", RosterID: roster.ID, Order: 0},
-			{Name: "Shift B", RosterID: roster.ID, Order: 1},
-			{Name: "Shift C", RosterID: roster.ID, Order: 2},
+func rosterShift(db *gorm.DB, rosters []*models.Roster, groups []models.ShiftGroup) []models.RosterShift {
+	var allShifts []models.RosterShift
+	for _, r := range rosters {
+		var groupID *uint
+		if len(groups) > 0 {
+			id := groups[rand.Intn(len(groups))].ID
+			groupID = &id
 		}
 
-		if err := db.Create(&shifts).Error; err != nil {
-			log.Error().Err(err).Msg("Failed to create roster shifts")
+		shifts := []models.RosterShift{
+			{Name: "Shift A", RosterID: r.ID, Order: 0, ShiftGroupID: groupID},
+			{Name: "Shift B", RosterID: r.ID, Order: 1, ShiftGroupID: groupID},
 		}
+		db.Create(&shifts)
+		allShifts = append(allShifts, shifts...)
 	}
+	return allShifts
 }
 
 func rosterAnswer(db *gorm.DB, roster []*models.Roster) {
@@ -104,30 +118,106 @@ func rosterAnswer(db *gorm.DB, roster []*models.Roster) {
 	}
 }
 
-func rosterTemplates(db *gorm.DB, count int) {
-	var newOrgan models.Organ
-	if err := db.First(&newOrgan).Error; err != nil {
-		log.Error().Err(err).Msg("No organ found for seeding")
-		return
-	}
+func rosterTemplates(db *gorm.DB, count int, groups []models.ShiftGroup) []models.RosterTemplate {
+	var organ models.Organ
+	db.First(&organ)
+
+	var createdTemplates []models.RosterTemplate
 
 	for i := 0; i < count; i++ {
-		shiftName := fmt.Sprintf("Shift %d", i)
-
-		templateShifts := []models.RosterTemplateShift{
-			{
-				ShiftName: shiftName,
-			},
+		var groupID *uint
+		if len(groups) > 0 {
+			id := groups[rand.Intn(len(groups))].ID
+			groupID = &id
 		}
 
 		template := models.RosterTemplate{
-			OrganID: newOrgan.ID,
+			OrganID: organ.ID,
 			Name:    fmt.Sprintf("Template %d", i),
-			Shifts:  templateShifts,
+			Shifts: []models.RosterTemplateShift{
+				{ShiftName: "Morning", ShiftGroupID: groupID},
+				{ShiftName: "Evening", ShiftGroupID: groupID},
+			},
 		}
+		db.Create(&template)
+		createdTemplates = append(createdTemplates, template)
+	}
+	return createdTemplates
+}
 
-		if err := db.Create(&template).Error; err != nil {
-			log.Error().Err(err).Msg("Failed to create roster templates")
+func seedShiftGroups(db *gorm.DB) []models.ShiftGroup {
+	var organs []models.Organ
+	db.Find(&organs)
+
+	var groups []models.ShiftGroup
+	for _, organ := range organs {
+		for i := 1; i <= 2; i++ {
+			group := models.ShiftGroup{
+				OrganID: organ.ID,
+				Name:    fmt.Sprintf("%s Group %d", organ.Name, i),
+			}
+			db.FirstOrCreate(&group, models.ShiftGroup{OrganID: organ.ID, Name: group.Name})
+			groups = append(groups, group)
+		}
+	}
+	return groups
+}
+
+func seedGroupPriorities(db *gorm.DB, groups []models.ShiftGroup) {
+	var users []models.User
+	db.Find(&users)
+
+	priorities := []models.GroupPriority{models.Low, models.Default, models.High}
+
+	var entries []models.ShiftGroupPriority
+	for _, group := range groups {
+		for _, user := range users {
+			entries = append(entries, models.ShiftGroupPriority{
+				ShiftGroupID: group.ID,
+				UserID:       user.ID,
+				Priority:     priorities[rand.Intn(len(priorities))],
+			})
+		}
+	}
+	db.Create(&entries)
+}
+
+func seedTemplatePreferences(db *gorm.DB, templates []models.RosterTemplate) {
+	var users []models.User
+	db.Find(&users)
+	prefs := []string{"High", "Medium", "Low", "None"}
+
+	var allPrefs []models.RosterTemplateShiftPreference
+	for _, t := range templates {
+		for _, shift := range t.Shifts {
+			for _, user := range users {
+				allPrefs = append(allPrefs, models.RosterTemplateShiftPreference{
+					RosterTemplateShiftID: shift.ID,
+					UserID:                user.ID,
+					Preference:            prefs[rand.Intn(len(prefs))],
+				})
+			}
+		}
+	}
+	db.CreateInBatches(&allPrefs, 100)
+}
+
+func seedSavedShifts(db *gorm.DB, rosters []*models.Roster, shifts []models.RosterShift) {
+	for _, r := range rosters {
+		for _, s := range shifts {
+			if s.RosterID == r.ID {
+				var users []models.User
+				db.Limit(2).Find(&users)
+
+				saved := models.SavedShift{
+					RosterID:      r.ID,
+					RosterShiftID: s.ID,
+					Users:         nil,
+				}
+				db.Create(&saved)
+				db.Model(&saved).Association("Users").Append(users)
+
+			}
 		}
 	}
 }
