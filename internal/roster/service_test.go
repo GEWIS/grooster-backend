@@ -22,6 +22,8 @@ func (suite *TestRosterSuite) SetupTest() {
 	suite.service = service{db: db}
 }
 
+// service_roster.go test cases
+
 func (suite *TestRosterSuite) TestCreateRoster_ValidInput() {
 	params := CreateRequest{
 		Name:    "Valid Name",
@@ -345,6 +347,8 @@ func (suite *TestRosterSuite) TestDeleteRoster_Valid() {
 	assert.NoError(suite.T(), err)
 	assert.Empty(suite.T(), rosters)
 }
+
+// service_shift.go test cases
 
 func (suite *TestRosterSuite) TestCreateRosterShift_Valid() {
 	roster := models.Roster{

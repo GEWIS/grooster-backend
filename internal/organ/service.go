@@ -23,7 +23,7 @@ func NewOrganService(db *gorm.DB) Service {
 
 func (o *service) GetMembersSettings(organID uint) ([]*models.UserOrgan, error) {
 	var membersSettings []*models.UserOrgan
-	err := o.db.Where("organ_id = ?", organID).Find(&membersSettings).Error
+	err := o.db.Preload("User").Where("organ_id = ?", organID).Find(&membersSettings).Error
 
 	if err != nil {
 		return nil, err
