@@ -22,6 +22,56 @@ func (suite *TestRosterSuite) SetupTest() {
 	suite.service = service{db: db}
 }
 
+// service.go test cases
+
+func (suite *TestRosterSuite) TestFillRosterPreferences_Success() {
+	var roster models.Roster
+	err := suite.db.Where("template_id IS NOT NULL").First(&roster).Error
+	assert.Nil(suite.T(), err)
+
+	answers, err := suite.service.FillRosterPreferences(roster.ID)
+
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), answers)
+
+	var count int64
+	suite.db.Model(&models.RosterAnswer{}).Where("roster_id = ?", roster.ID).Count(&count)
+	assert.True(suite.T(), count > 0)
+}
+
+func (suite *TestRosterSuite) TestFillRosterPreferences_ExistingAnswers() {
+	var roster models.Roster
+	suite.db.First(&roster)
+
+	_, err := suite.service.FillRosterPreferences(roster.ID)
+	assert.NoError(suite.T(), err)
+
+	answers, err := suite.service.FillRosterPreferences(roster.ID)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), answers)
+}
+
+func (suite *TestRosterSuite) TestFillRosterPreferences_RosterNotFound() {
+	_, err := suite.service.FillRosterPreferences(999999)
+
+	assert.Error(suite.T(), err)
+	assert.Equal(suite.T(), "only one roster should be found", err.Error())
+}
+
+func (suite *TestRosterSuite) TestFillRosterPreferences_NoTemplate() {
+	// Create or Find a roster where TemplateID is nil
+	roster := models.Roster{TemplateID: nil, OrganID: 1}
+	suite.db.Create(&roster)
+
+	answers, err := suite.service.FillRosterPreferences(roster.ID)
+
+	assert.Nil(suite.T(), answers)
+	assert.Error(suite.T(), err)
+	assert.Contains(suite.T(), err.Error(), "no linked template")
+}
+
+// service_roster.go test cases
+
 func (suite *TestRosterSuite) TestCreateRoster_ValidInput() {
 	params := CreateRequest{
 		Name:    "Valid Name",
@@ -345,6 +395,8 @@ func (suite *TestRosterSuite) TestDeleteRoster_Valid() {
 	assert.NoError(suite.T(), err)
 	assert.Empty(suite.T(), rosters)
 }
+
+// service_shift.go test cases
 
 func (suite *TestRosterSuite) TestCreateRosterShift_Valid() {
 	roster := models.Roster{

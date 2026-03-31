@@ -3,7 +3,6 @@ package user
 import (
 	"GEWIS-Rooster/internal/models"
 	"errors"
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -48,7 +47,7 @@ func (s *service) Create(createParams *CreateRequest) (*models.User, error) {
 
 func (s *service) Get(filters *FilterParams) ([]*models.User, error) {
 	db := s.db.Model(&models.User{}).Preload("Organs")
-	log.Print(filters)
+
 	if filters != nil {
 		if filters.ID != nil {
 			db = db.Where("id = ?", *filters.ID)

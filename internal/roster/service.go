@@ -60,7 +60,7 @@ func (s *service) FillRosterPreferences(rosterID uint) ([]*models.RosterAnswer, 
 	toFillRoster := rosters[0]
 
 	if toFillRoster.TemplateID == nil {
-		return nil, errors.New("roster shift has no linked template")
+		return nil, errors.New("roster has no linked template")
 	}
 
 	userFilter := user.FilterParams{
