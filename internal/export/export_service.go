@@ -3,13 +3,23 @@ package export
 import (
 	"GEWIS-Rooster/internal/models"
 	"bytes"
+	_ "embed"
 	"fmt"
-	"github.com/fogleman/gg"
-	"github.com/rs/zerolog/log"
-	"gorm.io/gorm"
 	"image/png"
 	"strings"
+
+	"github.com/fogleman/gg"
+	"github.com/golang/freetype/truetype"
+	"github.com/rs/zerolog/log"
+	"golang.org/x/image/font"
+	"gorm.io/gorm"
 )
+
+//go:embed static/fonts/arial.ttf
+var ArialRegular []byte
+
+//go:embed static/fonts/arial-bold.ttf
+var ArialBold []byte
 
 type Service interface {
 	AssignmentsToPng(rosterID uint) ([]byte, error)
@@ -52,19 +62,11 @@ func (e *service) AssignmentsToPng(rosterID uint) ([]byte, error) {
 		return nil, err
 	}
 
-	tempDc := gg.NewContext(0, 0)
-	normalFont, err := gg.LoadFontFace("static/fonts/arial.ttf", PngImage.FontSize)
+	normalFont, boldFont, err := loadFonts()
 	if err != nil {
-		log.Err(err).Msg("failed to load font")
+		log.Err(err).Msg("failed to load embedded fonts")
 		return nil, err
 	}
-	boldFont, err := gg.LoadFontFace("static/fonts/arial-bold.ttf", PngImage.FontSize)
-	if err != nil {
-		log.Err(err).Msg("failed to load font")
-		return nil, err
-	}
-
-	tempDc.SetFontFace(normalFont)
 
 	if len(savedShifts) == 0 {
 		return nil, fmt.Errorf("roster %d contains no shifts", rosterID)
@@ -80,43 +82,60 @@ func (e *service) AssignmentsToPng(rosterID uint) ([]byte, error) {
 		return nil, err
 	}
 
-	// 2. Calculate the required width for the Users column
+	userNicknames := make(map[uint]string)
+	for _, uo := range memberSettings {
+		if uo.Username != "" {
+			userNicknames[uo.UserID] = uo.Username
+		}
+	}
+
+	tempDc := gg.NewContext(0, 0)
+	tempDc.SetFontFace(normalFont)
+
 	maxUserWidth := PngImage.ColWidthUsers
 	for _, shift := range savedShifts {
-		names := []string{}
-		for _, u := range shift.Users {
-			names = append(names, u.Name)
+		var rowTextW float64
+		for i, u := range shift.Users {
+			var textToMeasure string
+			if nickname, exists := userNicknames[u.ID]; exists {
+				tempDc.SetFontFace(normalFont)
+				textToMeasure = nickname
+			} else {
+				tempDc.SetFontFace(boldFont)
+				parts := strings.Split(strings.TrimSpace(u.Name), " ")
+				if len(parts) > 0 {
+					textToMeasure = parts[0]
+				}
+			}
+
+			w, _ := tempDc.MeasureString(textToMeasure)
+			rowTextW += w
+
+			if i < len(shift.Users)-1 {
+				tempDc.SetFontFace(normalFont)
+				cw, _ := tempDc.MeasureString(", ")
+				rowTextW += cw
+			}
 		}
-		userText := strings.Join(names, ", ")
 
-		// Measure how wide this specific string is in pixels
-		textW, _ := tempDc.MeasureString(userText)
-
-		// Add padding to the measurement
-		totalRowTextWidth := textW + (PngImage.Padding * 2)
-
+		totalRowTextWidth := rowTextW + (PngImage.Padding * 2)
 		if totalRowTextWidth > maxUserWidth {
 			maxUserWidth = totalRowTextWidth
 		}
 	}
 
-	// 3. Final Image Dimensions
 	width := int(PngImage.ColWidthShift + maxUserWidth)
 	height := (len(savedShifts) + 1) * int(PngImage.RowHeight)
 
 	dc := gg.NewContext(width, height)
-
-	dc.SetFontFace(normalFont)
-
-	// --- Drawing Logic ---
 	dc.SetRGB(1, 1, 1)
 	dc.Clear()
 
-	// Header
 	dc.SetHexColor("#f3f4f6")
 	dc.DrawRectangle(0, 0, float64(width), PngImage.RowHeight)
 	dc.Fill()
 
+	dc.SetFontFace(normalFont)
 	dc.SetHexColor("#374151")
 	dc.DrawStringAnchored("SHIFT", PngImage.Padding, PngImage.RowHeight/2, 0, 0.5)
 	dc.DrawStringAnchored("ASSIGNED USERS", PngImage.ColWidthShift+PngImage.Padding, PngImage.RowHeight/2, 0, 0.5)
@@ -130,38 +149,27 @@ func (e *service) AssignmentsToPng(rosterID uint) ([]byte, error) {
 			dc.Fill()
 		}
 
-		// Bottom Border
 		dc.SetHexColor("#e5e7eb")
 		dc.DrawLine(0, y+PngImage.RowHeight, float64(width), y+PngImage.RowHeight)
 		dc.Stroke()
 
-		// Shift Name
 		dc.SetFontFace(boldFont)
 		dc.SetHexColor("#111827")
 		dc.DrawStringAnchored(shift.RosterShift.Name, PngImage.Padding, y+(PngImage.RowHeight/2), 0, 0.5)
 
-		// Users List
-		userNicknames := make(map[uint]string)
-		for _, uo := range memberSettings {
-			if uo.Username != "" {
-				userNicknames[uo.UserID] = uo.Username
-			}
-		}
-
 		currentX := PngImage.ColWidthShift + PngImage.Padding
 		centerY := y + (PngImage.RowHeight / 2)
 
-		for i, u := range shift.Users {
+		for j, u := range shift.Users {
 			parts := strings.Split(strings.TrimSpace(u.Name), " ")
 			if len(parts) == 0 {
 				continue
 			}
 
 			if nickname, exists := userNicknames[u.ID]; exists {
-				dc.SetFontFace(normalFont)
+				dc.SetFontFace(boldFont)
 				dc.SetHexColor("#4b5563")
 				dc.DrawStringAnchored(nickname, currentX, centerY, 0, 0.5)
-
 				nw, _ := dc.MeasureString(nickname)
 				currentX += nw
 			} else {
@@ -169,16 +177,15 @@ func (e *service) AssignmentsToPng(rosterID uint) ([]byte, error) {
 				dc.SetFontFace(boldFont)
 				dc.SetHexColor("#4b5563")
 				dc.DrawStringAnchored(firstName, currentX, centerY, 0, 0.5)
-
 				fw, _ := dc.MeasureString(firstName)
 				currentX += fw
 			}
 
-			if i < len(shift.Users)-1 {
+			if j < len(shift.Users)-1 {
 				comma := ", "
-				dc.SetFontFace(normalFont)
+				dc.SetFontFace(boldFont)
+				dc.SetHexColor("#4b5563")
 				dc.DrawStringAnchored(comma, currentX, centerY, 0, 0.5)
-
 				cw, _ := dc.MeasureString(comma)
 				currentX += cw
 			}
@@ -190,4 +197,27 @@ func (e *service) AssignmentsToPng(rosterID uint) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+func loadFonts() (font.Face, font.Face, error) {
+	fReg, err := truetype.Parse(ArialRegular)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	fBold, err := truetype.Parse(ArialBold)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	normalFont := truetype.NewFace(fReg, &truetype.Options{
+		Size:    PngImage.FontSize,
+		Hinting: font.HintingFull,
+	})
+	boldFont := truetype.NewFace(fBold, &truetype.Options{
+		Size:    PngImage.FontSize,
+		Hinting: font.HintingFull,
+	})
+
+	return normalFont, boldFont, nil
 }
