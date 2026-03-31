@@ -27,6 +27,8 @@ var RoleWeights = map[OrganRole]int{
 type UserOrgan struct {
 	UserID uint `json:"userId"  gorm:"primaryKey"`
 
+	User User `json:"-" gorm:"foreignKey:UserID"`
+
 	OrganID uint `json:"organId"  gorm:"primaryKey"`
 
 	Username string `json:"username" gorm:"size:25"`
