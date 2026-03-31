@@ -4,6 +4,7 @@ import (
 	"GEWIS-Rooster/internal/models"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
@@ -39,14 +40,14 @@ func (h *Handler) registerTemplateRoutes(g *gin.RouterGroup, db *gorm.DB) {
 //	@ID			createRosterTemplate
 //	@Router		/roster/template [post]
 func (h *Handler) CreateRosterTemplate(c *gin.Context) {
-	var param *TemplateCreateRequest
+	var param TemplateCreateRequest
 
-	if err := c.ShouldBindJSON(&param); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	if err := c.ShouldBindBodyWith(&param, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request" + err.Error()})
 		return
 	}
 
-	createdTemplate, err := h.rosterService.CreateRosterTemplate(param)
+	createdTemplate, err := h.rosterService.CreateRosterTemplate(&param)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
