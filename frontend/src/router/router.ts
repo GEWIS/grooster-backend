@@ -47,7 +47,7 @@ router.beforeEach(async (to, from) => {
     rosterStore.clearRosters();
   }
 
-  if (to.path === '/home') {
+  if (to.path === '/home' || to.path === '/') {
     organStore.clearOrgan();
   }
 
@@ -96,14 +96,23 @@ async function handleOrganAccess(
   from: RouteLocationNormalizedGeneric,
   next: NavigationGuardNext,
 ) {
-  const store = useOrganStore();
+  const organStore = useOrganStore();
+  const userStore = useUserStore();
+
   const id = parseInt(to.params.id as string);
 
   if (isNaN(id)) {
     return next('/');
   }
 
-  store.setOrgan(id);
+  const user = userStore.getUser;
+
+  if (!user) {
+    next('/');
+  }
+
+  const organName = user.organs.find((org) => org.id === id).name;
+  organStore.setOrgan(id, organName);
 
   if (await canAccessOrgan(id)) {
     next();

@@ -22,10 +22,14 @@ async function loadUser() {
 
   user.value = response.data[0];
   organs.value = user.value.organs;
+
+  if (organs.value.length === 1) {
+    await onSelect(organs.value[0].id);
+  }
 }
 
-const onSelect = async () => {
-  await router.push({ name: 'rosters', params: { id: selectedOrgan.value } });
+const onSelect = async (organId: number) => {
+  await router.push({ name: 'rosters', params: { id: organId } });
 };
 </script>
 
@@ -37,7 +41,7 @@ const onSelect = async () => {
       option-value="id"
       :options="organs"
       placeholder="Select an organ"
-      @change="onSelect"
+      @change="onSelect(selectedOrgan)"
     />
   </div>
   <div v-else>
