@@ -13,7 +13,6 @@ import (
 )
 
 func Seeder(name string) *gorm.DB {
-
 	devType := os.Getenv("DATABASE_TYPE")
 
 	var db *gorm.DB
@@ -29,26 +28,24 @@ func Seeder(name string) *gorm.DB {
 		}
 
 		err := WipeAllTables(db)
-
 		if err != nil {
 			panic(err)
 		}
 
 		mysqlDsn := "mysql://" + dsn
-
 		database.RunDBMigrations(mysqlDsn)
 	} else {
-		dsn = "sqlite3://" + name
 		db, err = gorm.Open(sqlite.Open(name), &gorm.Config{})
 
 		if err != nil {
 			log.Fatal().Msgf("Failed to connect database: %v", err)
 		}
 
-		err := WipeAllTables(db)
-
-		if err != nil {
-			panic(err)
+		if name != ":memory:" {
+			err := WipeAllTables(db)
+			if err != nil {
+				panic(err)
+			}
 		}
 
 		db.Exec("PRAGMA foreign_keys = ON")
@@ -65,6 +62,7 @@ func Seeder(name string) *gorm.DB {
 			&models.RosterTemplateShift{},
 			&models.RosterTemplateShiftPreference{},
 			&models.ShiftGroup{},
+			&models.ShiftGroupPriority{},
 		); err != nil {
 			panic(err)
 		}
@@ -75,7 +73,6 @@ func Seeder(name string) *gorm.DB {
 	db.Model(&models.Organ{}).Count(&organCount)
 	log.Info().Msgf("Organs in DB: %d", organCount)
 
-	// 4. Seed Users
 	seeder_models.SeedUser(db, 10)
 	var userCount int64
 	db.Model(&models.User{}).Count(&userCount)
