@@ -29,6 +29,7 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 	var users []*models.User
 	var organs []*models.Organ
 	var rosters []*models.Roster
+	var templates []*models.RosterTemplate
 	var values = models.Values{"Ja", "X", "L", "Nee"}
 
 	if err := db.Find(&users).Error; err != nil {
@@ -39,19 +40,49 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 		log.Printf("Could not get organs: %v\n", err)
 	}
 
+	if err := db.Find(&templates).Error; err != nil {
+		log.Printf("Could not get templates: %v\n", err)
+	}
+
 	for i := 0; i < count; i++ {
-		r := &models.Roster{
-			Name:    "Roster" + strconv.Itoa(i),
-			Values:  values,
-			OrganID: organs[i].ID,
-			Organ:   *organs[i],
-			Date:    time.Now(),
-			Saved:   false,
+		var templateID *uint
+
+		if len(templates) > 0 && rand.Float32() < 0.6 {
+			randomIdx := rand.Intn(len(templates))
+			templateID = &templates[randomIdx].ID
 		}
+
+		r := &models.Roster{
+			Name:       "Roster" + strconv.Itoa(i),
+			Values:     values,
+			OrganID:    organs[i].ID,
+			Organ:      *organs[i],
+			TemplateID: templateID,
+			Date:       time.Now(),
+			Saved:      false,
+		}
+
 		if err := db.Create(r).Error; err != nil {
 			log.Printf("Seeder Error: %v", err)
-		} else {
-			rosters = append(rosters, r)
+			continue
+		}
+
+		rosters = append(rosters, r)
+
+		if templateID != nil {
+			var templateShifts []*models.RosterTemplateShift
+			if err := db.Where("template_id = ?", templateID).Find(&templateShifts).Error; err == nil {
+				for _, ts := range templateShifts {
+					shift := &models.RosterShift{
+						RosterID: r.ID,
+						Name:     ts.ShiftName,
+						Order:    1,
+					}
+					if err := db.Create(shift).Error; err != nil {
+						log.Printf("Failed to create shift from template: %v", err)
+					}
+				}
+			}
 		}
 	}
 
@@ -61,6 +92,10 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 func rosterShift(db *gorm.DB, rosters []*models.Roster, groups []models.ShiftGroup) []models.RosterShift {
 	var allShifts []models.RosterShift
 	for _, r := range rosters {
+		if r.TemplateID != nil {
+			continue
+		}
+
 		var groupID *uint
 		if len(groups) > 0 {
 			id := groups[rand.Intn(len(groups))].ID
