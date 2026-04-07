@@ -2,6 +2,9 @@
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
 import { useOrganStore } from '@/stores/organ.store.js';
+import { Role, useAuthStore } from '@/stores/auth.store';
+
+const authStore = useAuthStore();
 
 const route = useRoute();
 const organStore = useOrganStore();
@@ -59,7 +62,7 @@ const isActive = (path) => route.path === path;
       </div>
 
       <div class="flex items-center gap-2">
-        <div class="hidden md:flex items-center">
+        <div v-if="authStore.can([Role.Admin, Role.Owner])" class="hidden md:flex items-center">
           <template v-if="route.path !== '/' && organStore.organ">
             <RouterLink
               v-if="organStore.organ"
