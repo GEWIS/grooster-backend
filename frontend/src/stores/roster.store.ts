@@ -249,6 +249,7 @@ export const useRosterStore = defineStore('roster', {
         const answerMap = new Map(existingAnswers.map((ans) => [ans.id, ans]));
 
         newAnswers.forEach((answer) => {
+          if (answer == null) return;
           answerMap.set(answer.id, answer);
         });
 
