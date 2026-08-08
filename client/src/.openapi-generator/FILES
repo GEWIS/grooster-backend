@@ -7,6 +7,7 @@ configuration.ts
 docs/AnswerCreateRequest.md
 docs/AnswerUpdateRequest.md
 docs/AuthApi.md
+docs/CommentCreateRequest.md
 docs/ExportApi.md
 docs/GEWISRoosterInternalModelsGroupPriority.md
 docs/GEWISRoosterInternalModelsOrganRole.md
@@ -17,6 +18,8 @@ docs/Roster.md
 docs/RosterAnswer.md
 docs/RosterAnswerApi.md
 docs/RosterApi.md
+docs/RosterComment.md
+docs/RosterCommentApi.md
 docs/RosterCreateRequest.md
 docs/RosterShift.md
 docs/RosterShiftApi.md

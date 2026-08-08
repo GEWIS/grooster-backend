@@ -70,6 +70,31 @@ export interface AnswerUpdateRequest {
 /**
  * 
  * @export
+ * @interface CommentCreateRequest
+ */
+export interface CommentCreateRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CommentCreateRequest
+     */
+    'comment'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommentCreateRequest
+     */
+    'rosterId'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommentCreateRequest
+     */
+    'userId'?: number;
+}
+/**
+ * 
+ * @export
  * @enum {number}
  */
 
@@ -282,6 +307,49 @@ export interface RosterAnswer {
      * @memberof RosterAnswer
      */
     'value'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface RosterComment
+ */
+export interface RosterComment {
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterComment
+     */
+    'comment'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterComment
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterComment
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterComment
+     */
+    'rosterId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterComment
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterComment
+     */
+    'userId'?: number;
 }
 /**
  * 
@@ -3054,6 +3122,194 @@ export class RosterAnswerApi extends BaseAPI {
      */
     public updateRosterAnswer(id: number, updateParams: AnswerUpdateRequest, options?: RawAxiosRequestConfig) {
         return RosterAnswerApiFp(this.configuration).updateRosterAnswer(id, updateParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * RosterCommentApi - axios parameter creator
+ * @export
+ */
+export const RosterCommentApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Create a new roster comment
+         * @param {CommentCreateRequest} createParams Roster comment input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRosterComment: async (createParams: CommentCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createParams' is not null or undefined
+            assertParamExists('createRosterComment', 'createParams', createParams)
+            const localVarPath = `/roster/comment`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all comments for a roster
+         * @param {number} rosterId Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRosterComments: async (rosterId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rosterId' is not null or undefined
+            assertParamExists('getRosterComments', 'rosterId', rosterId)
+            const localVarPath = `/roster/comment`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (rosterId !== undefined) {
+                localVarQueryParameter['rosterId'] = rosterId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RosterCommentApi - functional programming interface
+ * @export
+ */
+export const RosterCommentApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RosterCommentApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Create a new roster comment
+         * @param {CommentCreateRequest} createParams Roster comment input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createRosterComment(createParams: CommentCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterComment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createRosterComment(createParams, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterCommentApi.createRosterComment']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get all comments for a roster
+         * @param {number} rosterId Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRosterComments(rosterId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RosterComment>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRosterComments(rosterId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterCommentApi.getRosterComments']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * RosterCommentApi - factory interface
+ * @export
+ */
+export const RosterCommentApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RosterCommentApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Create a new roster comment
+         * @param {CommentCreateRequest} createParams Roster comment input
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRosterComment(createParams: CommentCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterComment> {
+            return localVarFp.createRosterComment(createParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all comments for a roster
+         * @param {number} rosterId Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRosterComments(rosterId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<RosterComment>> {
+            return localVarFp.getRosterComments(rosterId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RosterCommentApi - object-oriented interface
+ * @export
+ * @class RosterCommentApi
+ * @extends {BaseAPI}
+ */
+export class RosterCommentApi extends BaseAPI {
+    /**
+     * 
+     * @summary Create a new roster comment
+     * @param {CommentCreateRequest} createParams Roster comment input
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterCommentApi
+     */
+    public createRosterComment(createParams: CommentCreateRequest, options?: RawAxiosRequestConfig) {
+        return RosterCommentApiFp(this.configuration).createRosterComment(createParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all comments for a roster
+     * @param {number} rosterId Roster ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterCommentApi
+     */
+    public getRosterComments(rosterId: number, options?: RawAxiosRequestConfig) {
+        return RosterCommentApiFp(this.configuration).getRosterComments(rosterId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
