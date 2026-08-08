@@ -28,14 +28,14 @@ const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
 app.use(PrimeVue, {
-  theme: {
-    preset: Aura,
-    options: {
-      prefix: 'p',
-      darkModeSelector: false,
-      cssLayer: false,
+    theme: {
+        preset: Aura,
+        options: {
+            prefix: 'p',
+            darkModeSelector: false,
+            cssLayer: false,
+        },
     },
-  },
 });
 
 // Components
