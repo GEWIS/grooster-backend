@@ -51,6 +51,14 @@ type AnswerUpdateRequest struct {
 	Value string `json:"value"`
 } // @name AnswerUpdateRequest
 
+type CommentCreateRequest struct {
+	RosterID uint `json:"rosterId"`
+
+	UserID uint `json:"userId"`
+
+	Comment string `json:"comment"`
+} // @name CommentCreateRequest
+
 type SavedShiftUpdateRequest struct {
 	UserIDs []uint `json:"users"`
 } // @name SavedShiftUpdateRequest

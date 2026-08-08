@@ -23,6 +23,7 @@ func NewRosterHandler(rosterService Service, rg *gin.RouterGroup, db *gorm.DB) *
 	h.registerRosterRoutes(g, db)
 	h.registerShiftRoutes(g, db)
 	h.registerTemplateRoutes(g, db)
+	h.registerCommentRoutes(g, db)
 
 	g.POST("/:id/fill", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.FillRosterPreferences)
 

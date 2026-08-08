@@ -149,3 +149,15 @@ type ShiftGroupPriority struct {
 
 	Priority GroupPriority `json:"priority" gorm:"type:smallint;default:2"`
 } // @name ShiftGroupPriority
+
+type RosterComment struct {
+	BaseModel
+
+	RosterID uint `json:"rosterId" gorm:"not null"`
+	Roster   Roster `json:"-" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
+
+	UserID uint `json:"userId" gorm:"not null"`
+	User   User `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+
+	Comment string `json:"comment" gorm:"type:text"`
+} // @name RosterComment
