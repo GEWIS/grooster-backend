@@ -63,6 +63,7 @@ func Seeder(name string) *gorm.DB {
 			&models.RosterTemplateShiftPreference{},
 			&models.ShiftGroup{},
 			&models.ShiftGroupPriority{},
+			&models.RosterComment{},
 		); err != nil {
 			panic(err)
 		}

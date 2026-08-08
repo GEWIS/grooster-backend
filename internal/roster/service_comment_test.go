@@ -1,0 +1,112 @@
+package roster
+
+import (
+	"GEWIS-Rooster/internal/models"
+	"github.com/stretchr/testify/assert"
+)
+
+func (suite *TestRosterSuite) TestCreateRosterComment_Valid() {
+	roster := models.Roster{
+		Name:    "Test Roster",
+		Values:  []string{"yes", "no"},
+		OrganID: uint(1),
+	}
+	suite.db.Create(&roster)
+
+	shift := models.RosterShift{
+		RosterID: roster.ID,
+	}
+	suite.db.Create(&shift)
+
+	answer := models.RosterAnswer{
+		UserID:        1,
+		RosterID:      roster.ID,
+		RosterShiftID: shift.ID,
+		Value:         "yes",
+	}
+	suite.db.Create(&answer)
+
+	createParams := &CommentCreateRequest{
+		RosterID: roster.ID,
+		UserID:   1,
+		Comment:  "I can't work this shift",
+	}
+
+	comment, err := suite.service.CreateRosterComment(createParams)
+
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), comment)
+	assert.Equal(suite.T(), createParams.Comment, comment.Comment)
+	assert.Equal(suite.T(), createParams.UserID, comment.UserID)
+	assert.Equal(suite.T(), roster.ID, comment.RosterID)
+}
+
+func (suite *TestRosterSuite) TestCreateRosterComment_UserNotInRoster() {
+	roster := models.Roster{
+		Name:    "Test Roster",
+		Values:  []string{"yes", "no"},
+		OrganID: uint(1),
+	}
+	suite.db.Create(&roster)
+
+	createParams := &CommentCreateRequest{
+		RosterID: roster.ID,
+		UserID:   1,
+		Comment:  "I can't work this shift",
+	}
+
+	comment, err := suite.service.CreateRosterComment(createParams)
+
+	assert.Error(suite.T(), err)
+	assert.Nil(suite.T(), comment)
+	assert.Contains(suite.T(), err.Error(), "not part of this roster")
+}
+
+func (suite *TestRosterSuite) TestCreateRosterComment_RosterNotFound() {
+	createParams := &CommentCreateRequest{
+		RosterID: 9999,
+		UserID:   1,
+		Comment:  "I can't work this shift",
+	}
+
+	comment, err := suite.service.CreateRosterComment(createParams)
+
+	assert.Error(suite.T(), err)
+	assert.Nil(suite.T(), comment)
+	assert.Contains(suite.T(), err.Error(), "roster not found")
+}
+
+func (suite *TestRosterSuite) TestGetRosterComments_FiltersByRoster() {
+	rosterOne := models.Roster{
+		Name:    "Roster One",
+		Values:  []string{"yes", "no"},
+		OrganID: uint(1),
+	}
+	suite.db.Create(&rosterOne)
+
+	rosterTwo := models.Roster{
+		Name:    "Roster Two",
+		Values:  []string{"yes", "no"},
+		OrganID: uint(1),
+	}
+	suite.db.Create(&rosterTwo)
+
+	shiftOne := models.RosterShift{RosterID: rosterOne.ID}
+	suite.db.Create(&shiftOne)
+	shiftTwo := models.RosterShift{RosterID: rosterTwo.ID}
+	suite.db.Create(&shiftTwo)
+
+	suite.db.Create(&models.RosterAnswer{UserID: 1, RosterID: rosterOne.ID, RosterShiftID: shiftOne.ID, Value: "yes"})
+	suite.db.Create(&models.RosterAnswer{UserID: 1, RosterID: rosterTwo.ID, RosterShiftID: shiftTwo.ID, Value: "yes"})
+
+	_, err := suite.service.CreateRosterComment(&CommentCreateRequest{RosterID: rosterOne.ID, UserID: 1, Comment: "comment one"})
+	assert.NoError(suite.T(), err)
+	_, err = suite.service.CreateRosterComment(&CommentCreateRequest{RosterID: rosterTwo.ID, UserID: 1, Comment: "comment two"})
+	assert.NoError(suite.T(), err)
+
+	comments, err := suite.service.GetRosterComments(rosterOne.ID)
+
+	assert.NoError(suite.T(), err)
+	assert.Len(suite.T(), comments, 1)
+	assert.Equal(suite.T(), "comment one", comments[0].Comment)
+}

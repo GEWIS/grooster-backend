@@ -14,6 +14,7 @@ type Service interface {
 	RosterManager
 	ShiftManager
 	TemplateManager
+	CommentManager
 
 	FillRosterPreferences(uint) ([]*models.RosterAnswer, error)
 
