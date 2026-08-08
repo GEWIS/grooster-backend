@@ -15,6 +15,15 @@ definitions:
       value:
         type: string
     type: object
+  CommentCreateRequest:
+    properties:
+      comment:
+        type: string
+      rosterId:
+        type: integer
+      userId:
+        type: integer
+    type: object
   GEWIS-Rooster_internal_models.GroupPriority:
     enum:
     - 1
@@ -112,6 +121,21 @@ definitions:
         type: integer
       value:
         type: string
+    type: object
+  RosterComment:
+    properties:
+      comment:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      rosterId:
+        type: integer
+      updatedAt:
+        type: string
+      userId:
+        type: integer
     type: object
   RosterCreateRequest:
     properties:
@@ -938,6 +962,74 @@ paths:
       summary: Updates a roster answer with the new value
       tags:
       - Roster Answer
+  /roster/comment:
+    get:
+      consumes:
+      - application/json
+      operationId: getRosterComments
+      parameters:
+      - description: Roster ID
+        in: query
+        name: rosterId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/RosterComment'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get all comments for a roster
+      tags:
+      - Roster Comment
+    post:
+      consumes:
+      - application/json
+      operationId: createRosterComment
+      parameters:
+      - description: Roster comment input
+        in: body
+        name: createParams
+        required: true
+        schema:
+          $ref: '#/definitions/CommentCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/RosterComment'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create a new roster comment
+      tags:
+      - Roster Comment
   /roster/saved-shift/{id}:
     get:
       consumes:
