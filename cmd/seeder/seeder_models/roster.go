@@ -30,7 +30,7 @@ func roster(db *gorm.DB, count int) []*models.Roster {
 	var organs []*models.Organ
 	var rosters []*models.Roster
 	var templates []*models.RosterTemplate
-	var values = models.Values{"Ja", "X", "L", "Nee"}
+	var values = models.Values{"J", "X", "L", "N"}
 
 	if err := db.Find(&users).Error; err != nil {
 		log.Printf("Could not get users: %v\n", err)
