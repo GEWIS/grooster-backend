@@ -36,7 +36,10 @@ onMounted(async () => {
   await fetchRosters();
 
   if (!rosterStore.selectedRosterId && rosters.value.length > 0) {
-    selectedRoster.value = rosters.value[0];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const futureRosters = rosters.value.filter((roster) => new Date(roster.date) >= today);
+    selectedRoster.value = futureRosters.length > 0 ? futureRosters[0] : rosters.value[0];
   }
 });
 
