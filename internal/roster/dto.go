@@ -56,7 +56,7 @@ type CommentCreateRequest struct {
 
 	UserID uint `json:"userId"`
 
-	Comment string `json:"comment"`
+	Comment  string `json:"comment" binding:"required,max=250"`
 } // @name CommentCreateRequest
 
 type SavedShiftUpdateRequest struct {
