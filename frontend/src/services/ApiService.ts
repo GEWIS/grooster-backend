@@ -9,11 +9,14 @@ import {
     ExportApi,
     OrganApi,
     ShiftGroupApi,
+    RosterCommentApi,
 } from '@gewis/grooster-backend-ts';
 import { getTokenFromStorage } from '@/helpers/TokenHelper';
 
 class ApiService {
     private readonly _rosterApi: RosterApi;
+
+    private readonly _rosterCommentApi: RosterCommentApi;
 
     private readonly _rosterAnswerApi: RosterAnswerApi;
 
@@ -41,6 +44,7 @@ class ApiService {
         });
 
         this._rosterApi = new RosterApi(config);
+        this._rosterCommentApi = new RosterCommentApi(config);
         this._rosterAnswerApi = new RosterAnswerApi(config);
         this._rosterShiftApi = new RosterShiftApi(config);
         this._savedShiftApi = new SavedShiftApi(config);
@@ -53,6 +57,10 @@ class ApiService {
 
     get roster(): RosterApi {
         return this._rosterApi;
+    }
+
+    get rosterComment(): RosterCommentApi {
+        return this._rosterCommentApi;
     }
 
     get rosterAnswer(): RosterAnswerApi {

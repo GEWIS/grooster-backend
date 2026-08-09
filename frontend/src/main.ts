@@ -20,6 +20,8 @@ import DatePicker from 'primevue/datepicker';
 import { Form } from '@primevue/forms';
 import Chip from 'primevue/chip';
 import { Divider } from 'primevue';
+import Popover from 'primevue/popover';
+import Textarea from 'primevue/textarea';
 import App from './App.vue';
 import router from '@/router/router';
 
@@ -50,6 +52,8 @@ app.component('DatePicker', DatePicker);
 app.component('Form', Form);
 app.component('Chip', Chip);
 app.component('Divider', Divider);
+app.component('Popover', Popover);
+app.component('Textarea', Textarea);
 
 app.use(pinia);
 app.use(router);

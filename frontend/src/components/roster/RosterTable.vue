@@ -53,13 +53,45 @@ const loadUsers = async () => {
     });
 };
 
-onMounted(loadUsers);
+onMounted(() => {
+    void loadUsers();
+    void rosterStore.fetchComments(props.id);
+});
 
 const rosterValues = computed(() => Object.values(roster.value.values || {}));
 
 const shiftAnswers = reactive({});
 const visible = ref(false);
 const shiftName = ref('');
+
+const commentPopover = ref();
+const activeCommentUser = ref<UserWithNickname | null>(null);
+const commentDraft = ref('');
+
+const getUserComment = (userId: number) =>
+    rosterStore.getComments(props.id).find((comment) => comment.userId === userId)?.comment ?? '';
+
+function openCommentPopover(event: Event, user: UserWithNickname) {
+    activeCommentUser.value = user;
+    commentDraft.value = getUserComment(user.id);
+    commentPopover.value?.toggle(event);
+}
+
+async function saveComment() {
+    if (!activeCommentUser.value) return;
+
+    try {
+        await rosterStore.updateComment({
+            rosterId: props.id,
+            userId: activeCommentUser.value.id,
+            comment: commentDraft.value,
+        });
+
+        commentPopover.value?.hide();
+    } catch (error) {
+        console.error('Failed to save comment:', error);
+    }
+}
 
 watch(
     [() => roster.value, () => users.value],
@@ -287,6 +319,14 @@ const getStatusColorClass = (value: string) => {
                                 "
                             >
                                 {{ user.displayName || user.name }}
+                                <Button
+                                    class="p-0! w-6! h-6!"
+                                    icon="pi pi-comment"
+                                    rounded
+                                    size="small"
+                                    text
+                                    @click="openCommentPopover($event, user)"
+                                />
                             </div>
                         </td>
 
@@ -374,6 +414,34 @@ const getStatusColorClass = (value: string) => {
                 </div>
             </template>
         </Dialog>
+
+        <Popover ref="commentPopover" class="w-72">
+            <div v-if="activeCommentUser" class="flex flex-col gap-2">
+                <span class="text-sm font-medium text-gray-700">
+                    {{ activeCommentUser.displayName || activeCommentUser.name }}
+                </span>
+
+                <template v-if="activeCommentUser.gewis_id === getGEWISId()">
+                    <Textarea
+                        v-model="commentDraft"
+                        auto-resize
+                        class="w-full"
+                        maxlength="250"
+                        placeholder="Add a comment..."
+                        rows="3"
+                    />
+                    <span v-if="commentDraft.length >= 250" class="text-xs text-rose-600">
+                        Maximum length of 250 characters reached.
+                    </span>
+                    <Button label="Save" size="small" @click="saveComment" />
+                </template>
+                <template v-else>
+                    <p class="text-sm text-gray-600 whitespace-pre-wrap">
+                        {{ getUserComment(activeCommentUser.id) || 'No comment yet.' }}
+                    </p>
+                </template>
+            </div>
+        </Popover>
     </div>
 </template>
 

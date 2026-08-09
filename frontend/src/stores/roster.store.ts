@@ -2,7 +2,9 @@ import { defineStore } from 'pinia';
 import type {
     AnswerCreateRequest,
     AnswerUpdateRequest,
+    CommentCreateRequest,
     Roster,
+    RosterComment,
     RosterCreateRequest,
     RosterUpdateRequest,
     SavedShiftResponse,
@@ -16,6 +18,7 @@ export const useRosterStore = defineStore('roster', {
     state: () => ({
         rosters: {} as Record<number, Roster>,
         savedRoster: {} as Record<number, SavedShiftResponse>,
+        comments: {} as Record<number, RosterComment[]>,
         selectedRosterId: null as number | null,
     }),
     persist: true,
@@ -28,6 +31,9 @@ export const useRosterStore = defineStore('roster', {
         },
         getSavedRoster: (state) => {
             return (rosterId: number) => state.savedRoster[rosterId];
+        },
+        getComments: (state) => {
+            return (rosterId: number) => state.comments[rosterId] ?? [];
         },
         selectedRoster: (state) => {
             return state.selectedRosterId ? state.rosters[state.selectedRosterId] : null;
@@ -139,6 +145,47 @@ export const useRosterStore = defineStore('roster', {
                 }
             } catch (error) {
                 console.error('Failed to update roster answer:', error);
+            }
+        },
+        async fetchComments(rosterId: number) {
+            try {
+                const response = await ApiService.rosterComment.getRosterComments(rosterId);
+
+                this.comments = {
+                    ...this.comments,
+                    [rosterId]: response.data,
+                };
+            } catch (error) {
+                console.error('Failed to fetch roster comments:', error);
+            }
+        },
+        async updateComment(params: CommentCreateRequest) {
+            try {
+                const response = await ApiService.rosterComment.createRosterComment(params);
+                const rosterId = response.data?.rosterId;
+
+                if (!rosterId) return response.data;
+
+                const existingComments = this.comments[rosterId] ?? [];
+                const commentIndex = existingComments.findIndex((comment) => comment.userId === params.userId);
+
+                const updatedComments =
+                    commentIndex !== -1
+                        ? [
+                              ...existingComments.slice(0, commentIndex),
+                              response.data,
+                              ...existingComments.slice(commentIndex + 1),
+                          ]
+                        : [...existingComments, response.data];
+
+                this.comments = {
+                    ...this.comments,
+                    [rosterId]: updatedComments,
+                };
+
+                return response.data;
+            } catch (error) {
+                console.error('Failed to save roster comment:', error);
             }
         },
         async createShift(params: ShiftCreateRequest) {
