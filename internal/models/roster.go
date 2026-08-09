@@ -153,10 +153,10 @@ type ShiftGroupPriority struct {
 type RosterComment struct {
 	BaseModel
 
-	RosterID uint `json:"rosterId" gorm:"not null"`
+	RosterID uint `json:"rosterId" gorm:"not null;uniqueIndex:idx_roster_comment_user"`
 	Roster   Roster `json:"-" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
 
-	UserID uint `json:"userId" gorm:"not null"`
+	UserID uint `json:"userId" gorm:"not null;uniqueIndex:idx_roster_comment_user"`
 	User   User `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 
 	Comment string `json:"comment" gorm:"type:text"`

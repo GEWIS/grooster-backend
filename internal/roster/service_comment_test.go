@@ -41,6 +41,50 @@ func (suite *TestRosterSuite) TestCreateRosterComment_Valid() {
 	assert.Equal(suite.T(), roster.ID, comment.RosterID)
 }
 
+func (suite *TestRosterSuite) TestCreateRosterComment_UpdatesExisting() {
+	roster := models.Roster{
+		Name:    "Test Roster",
+		Values:  []string{"yes", "no"},
+		OrganID: uint(1),
+	}
+	suite.db.Create(&roster)
+
+	shift := models.RosterShift{
+		RosterID: roster.ID,
+	}
+	suite.db.Create(&shift)
+
+	suite.db.Create(&models.RosterAnswer{
+		UserID:        1,
+		RosterID:      roster.ID,
+		RosterShiftID: shift.ID,
+		Value:         "yes",
+	})
+
+	first, err := suite.service.CreateRosterComment(&CommentCreateRequest{
+		RosterID: roster.ID,
+		UserID:   1,
+		Comment:  "first comment",
+	})
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), first)
+
+	second, err := suite.service.CreateRosterComment(&CommentCreateRequest{
+		RosterID: roster.ID,
+		UserID:   1,
+		Comment:  "updated comment",
+	})
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), second)
+
+	assert.Equal(suite.T(), first.ID, second.ID, "expected the existing comment to be updated, not duplicated")
+	assert.Equal(suite.T(), "updated comment", second.Comment)
+
+	comments, err := suite.service.GetRosterComments(roster.ID)
+	assert.NoError(suite.T(), err)
+	assert.Len(suite.T(), comments, 1, "expected only one comment to remain for this user+roster")
+}
+
 func (suite *TestRosterSuite) TestCreateRosterComment_UserNotInRoster() {
 	roster := models.Roster{
 		Name:    "Test Roster",
