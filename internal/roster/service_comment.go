@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CommentManager interface {
@@ -32,7 +33,17 @@ func (s *service) CreateRosterComment(params *CommentCreateRequest) (*models.Ros
 		Comment:  params.Comment,
 	}
 
-	if err := s.db.Create(&comment).Error; err != nil {
+	// A user may only have one comment per roster, so re-submitting updates
+	// the existing comment in place instead of creating a duplicate.
+	err := s.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "roster_id"}, {Name: "user_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"comment", "updated_at"}),
+	}).Create(&comment).Error
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.db.Where("roster_id = ? AND user_id = ?", roster.ID, params.UserID).First(&comment).Error; err != nil {
 		return nil, err
 	}
 
