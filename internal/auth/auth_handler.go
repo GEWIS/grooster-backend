@@ -93,7 +93,7 @@ func (h *Handler) AuthCallback(c *gin.Context) {
 		return
 	}
 
-	jwtToken, err := h.service.ProcessUserInfo(oauth2Token)
+	jwtToken, err := h.service.ProcessUserInfo(c.Request.Context(), oauth2Token)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not process user info"})
