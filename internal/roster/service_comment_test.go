@@ -85,11 +85,14 @@ func (suite *TestRosterSuite) TestCreateRosterComment_UpdatesExisting() {
 	assert.Len(suite.T(), comments, 1, "expected only one comment to remain for this user+roster")
 }
 
-func (suite *TestRosterSuite) TestCreateRosterComment_UserNotInRoster() {
+func (suite *TestRosterSuite) TestCreateRosterComment_UserNotInOrgan() {
+	organ := models.Organ{Name: "Unlinked Organ"}
+	suite.db.Create(&organ)
+
 	roster := models.Roster{
 		Name:    "Test Roster",
 		Values:  []string{"yes", "no"},
-		OrganID: uint(1),
+		OrganID: organ.ID,
 	}
 	suite.db.Create(&roster)
 
@@ -103,7 +106,7 @@ func (suite *TestRosterSuite) TestCreateRosterComment_UserNotInRoster() {
 
 	assert.Error(suite.T(), err)
 	assert.Nil(suite.T(), comment)
-	assert.Contains(suite.T(), err.Error(), "not part of this roster")
+	assert.Contains(suite.T(), err.Error(), "not part of this organ")
 }
 
 func (suite *TestRosterSuite) TestCreateRosterComment_RosterNotFound() {
@@ -134,14 +137,6 @@ func (suite *TestRosterSuite) TestGetRosterComments_FiltersByRoster() {
 		OrganID: uint(1),
 	}
 	suite.db.Create(&rosterTwo)
-
-	shiftOne := models.RosterShift{RosterID: rosterOne.ID}
-	suite.db.Create(&shiftOne)
-	shiftTwo := models.RosterShift{RosterID: rosterTwo.ID}
-	suite.db.Create(&shiftTwo)
-
-	suite.db.Create(&models.RosterAnswer{UserID: 1, RosterID: rosterOne.ID, RosterShiftID: shiftOne.ID, Value: "yes"})
-	suite.db.Create(&models.RosterAnswer{UserID: 1, RosterID: rosterTwo.ID, RosterShiftID: shiftTwo.ID, Value: "yes"})
 
 	_, err := suite.service.CreateRosterComment(&CommentCreateRequest{RosterID: rosterOne.ID, UserID: 1, Comment: "comment one"})
 	assert.NoError(suite.T(), err)
