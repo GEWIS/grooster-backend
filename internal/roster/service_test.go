@@ -3,6 +3,7 @@ package roster
 import (
 	"GEWIS-Rooster/cmd/seeder/seeder"
 	"GEWIS-Rooster/internal/models"
+	"GEWIS-Rooster/internal/user"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
@@ -19,7 +20,7 @@ type TestRosterSuite struct {
 func (suite *TestRosterSuite) SetupTest() {
 	db := seeder.Seeder(":memory:")
 	suite.db = db
-	suite.service = service{db: db}
+	suite.service = service{db: db, u: user.NewUserService(db)}
 }
 
 // service_roster.go test cases

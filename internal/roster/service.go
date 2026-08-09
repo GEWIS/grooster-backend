@@ -32,6 +32,7 @@ type Service interface {
 
 type UserProvider interface {
 	Get(*user.FilterParams) ([]*models.User, error)
+	IsUserInOrgan(user *models.User, organID uint) (bool, error)
 }
 
 type service struct {

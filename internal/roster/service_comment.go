@@ -4,7 +4,6 @@ import (
 	"GEWIS-Rooster/internal/models"
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -18,13 +17,17 @@ func (s *service) CreateRosterComment(params *CommentCreateRequest) (*models.Ros
 	if err := s.db.First(&roster, params.RosterID).Error; err != nil {
 		return nil, fmt.Errorf("roster not found: %w", err)
 	}
+	var user *models.User
+	if err := s.db.First(&user, params.UserID).Error; err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
 
-	var answer models.RosterAnswer
-	if err := s.db.Where("user_id = ? AND roster_id = ?", params.UserID, params.RosterID).First(&answer).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("user is not part of this roster")
-		}
+	inOrgan, err := s.u.IsUserInOrgan(user, roster.OrganID)
+	if err != nil {
 		return nil, err
+	}
+	if !inOrgan {
+		return nil, errors.New("user is not part of this organ")
 	}
 
 	comment := models.RosterComment{
@@ -35,7 +38,7 @@ func (s *service) CreateRosterComment(params *CommentCreateRequest) (*models.Ros
 
 	// A user may only have one comment per roster, so re-submitting updates
 	// the existing comment in place instead of creating a duplicate.
-	err := s.db.Clauses(clause.OnConflict{
+	err = s.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "roster_id"}, {Name: "user_id"}},
 		DoUpdates: clause.AssignmentColumns([]string{"comment", "updated_at"}),
 	}).Create(&comment).Error

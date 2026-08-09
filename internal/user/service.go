@@ -11,6 +11,7 @@ type Service interface {
 	Create(*CreateRequest) (*models.User, error)
 	Get(*FilterParams) ([]*models.User, error)
 	Delete(uint) error
+	IsUserInOrgan(user *models.User, organID uint) (bool, error)
 }
 
 type service struct {
@@ -82,4 +83,20 @@ func (s *service) Delete(ID uint) error {
 	}
 
 	return nil
+}
+
+// IsUserInOrgan checks organ membership via the user_organs join table directly,
+// rather than the user's Organs association, since callers may not have preloaded it.
+func (s *service) IsUserInOrgan(u *models.User, organID uint) (bool, error) {
+	err := s.db.Where("user_id = ? AND organ_id = ?", u.ID, organID).
+		First(&models.UserOrgan{}).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
 }
