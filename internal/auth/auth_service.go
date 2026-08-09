@@ -3,27 +3,29 @@ package auth
 import (
 	"GEWIS-Rooster/internal/models"
 	"GEWIS-Rooster/internal/user"
+	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/rs/zerolog/log"
-	"golang.org/x/oauth2"
-	"gorm.io/gorm"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/rs/zerolog/log"
+	"golang.org/x/oauth2"
+	"gorm.io/gorm"
 )
 
 type Service interface {
 	SetCallBackCookie(*gin.Context, string)
 	RandString(int) (string, error)
-	ProcessUserInfo(*oauth2.Token) (string, error)
+	ProcessUserInfo(ctx context.Context, token *oauth2.Token) (string, error)
 	GetOrgans(claims map[string]interface{}) ([]models.Organ, error)
 	HandleLocalAuthentication(ctx *gin.Context) (string, error)
 	CreateInternalToken(user *models.User) (string, error)
@@ -34,12 +36,13 @@ type UserProvider interface {
 }
 
 type service struct {
-	u  UserProvider
-	db *gorm.DB
+	u        UserProvider
+	db       *gorm.DB
+	verifier *oidc.IDTokenVerifier
 }
 
-func NewAuthService(u UserProvider, db *gorm.DB) Service {
-	return &service{u, db}
+func NewAuthService(u UserProvider, db *gorm.DB, verifier *oidc.IDTokenVerifier) Service {
+	return &service{u, db, verifier}
 }
 
 func (s *service) SetCallBackCookie(c *gin.Context, value string) {
@@ -83,22 +86,21 @@ func (s *service) HandleLocalAuthentication(ctx *gin.Context) (string, error) {
 	return jwtToken, nil
 }
 
-func (s *service) ProcessUserInfo(OAuth2Token *oauth2.Token) (string, error) {
-	token := OAuth2Token.AccessToken
-	infoString := strings.Split(token, ".")[1]
+func (s *service) ProcessUserInfo(ctx context.Context, OAuth2Token *oauth2.Token) (string, error) {
+	rawIDToken, ok := OAuth2Token.Extra("id_token").(string)
+	if !ok {
+		return "", errors.New("id_token not found in OAuth2Token")
+	}
 
-	// Decode the payload (second part)
-	payloadBytes, err := base64.RawURLEncoding.DecodeString(infoString)
+	idToken, err := s.verifier.Verify(ctx, rawIDToken)
 	if err != nil {
-		log.Error().Msg(err.Error())
+		log.Error().Err(err).Msg("id_token verification failed")
 		return "", err
 	}
 
-	// Unmarshal JSON into a map
 	var claims map[string]interface{}
-	err = json.Unmarshal(payloadBytes, &claims)
-	if err != nil {
-		log.Error().Msg(err.Error())
+	if err := idToken.Claims(&claims); err != nil {
+		log.Error().Err(err).Msg("Failed to parse id_token claims")
 		return "", err
 	}
 

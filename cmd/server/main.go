@@ -10,14 +10,16 @@ import (
 	"GEWIS-Rooster/internal/roster"
 	"GEWIS-Rooster/internal/user"
 	"database/sql"
+	"os"
+	"strings"
+
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"os"
-	"strings"
 )
 
 // @title						GRooster
@@ -81,7 +83,9 @@ func main() {
 	m := middleware.AuthMiddleware{}
 	provider, config := m.SetupOIDC()
 
-	authService := auth.NewAuthService(userService, db)
+	authVerifier := provider.Verifier(&oidc.Config{ClientID: os.Getenv("CLIENT_ID"), SkipClientIDCheck: true})
+	authService := auth.NewAuthService(userService, db, authVerifier)
+
 	authMiddle := middleware.NewAuthMiddleware(authService, userService)
 
 	// Auth routes (no authentication required)
