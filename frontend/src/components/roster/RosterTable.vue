@@ -322,6 +322,9 @@ const getStatusColorClass = (value: string) => {
                                 <Button
                                     class="p-0! w-6! h-6!"
                                     icon="pi pi-comment"
+                                    :pt="{
+                                        icon: { class: getUserComment(user.id) ? 'text-yellow-400' : '' },
+                                    }"
                                     rounded
                                     size="small"
                                     text
