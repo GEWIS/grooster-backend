@@ -4,6 +4,7 @@ import TopNavbar from '@/components/TopNavbar.vue';
 
 <template>
     <div class="flex flex-col min-h-screen">
+        <Toast />
         <TopNavbar />
         <div class="flex-1 p-4">
             <RouterView />

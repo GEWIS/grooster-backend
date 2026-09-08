@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 import RosterTable from '@/components/roster/RosterTable.vue';
 import RosterAssignment from '@/components/roster/RosterAssignment.vue';
 import { useRosterStore } from '@/stores/roster.store.js';
 import AddDialog from '@/components/roster/dialogs/AddDialog.vue';
-import ApiService from '@/services/ApiService';
 import DeleteDialog from '@/components/roster/dialogs/DeleteDialog.vue';
 import EditDialog from '@/components/roster/dialogs/EditDialog.vue';
 import { Role, useAuthStore } from '@/stores/auth.store';
@@ -14,10 +14,10 @@ type DialogType = 'add' | 'edit' | 'delete';
 
 const route = useRoute();
 const authStore = useAuthStore();
+const toast = useToast();
 
 const rosterStore = useRosterStore();
 const rosters = computed(() => Object.values(rosterStore.rosters));
-const users = ref();
 
 const activeDialog = ref<DialogType>(null);
 
@@ -45,13 +45,15 @@ onMounted(async () => {
 
 async function fetchRosters() {
     try {
-        rosterStore.clearRosters();
         await rosterStore.fetchRosters(parseInt(route.params.id as string));
-
-        const response = await ApiService.user.userGet(parseInt(route.params.id as string));
-        users.value = response.data;
     } catch (e) {
         console.error(e);
+        toast.add({
+            severity: 'error',
+            summary: 'Failed to load rosters',
+            detail: 'Could not load the rosters for this organ. Please reload the page to try again.',
+            life: 5000,
+        });
     }
 }
 

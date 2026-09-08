@@ -3,7 +3,6 @@ import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNorma
 import RosterView from '@/views/RosterView.vue';
 import OrganView from '@/views/OrganView.vue';
 import { getGEWISId, isAuthenticated, loginRedirect } from '@/helpers/TokenHelper';
-import ApiService from '@/services/ApiService';
 import RosterTemplateView from '@/views/RosterTemplateView.vue';
 import { useOrganStore } from '@/stores/organ.store';
 import { useRosterStore } from '@/stores/roster.store';
@@ -71,27 +70,10 @@ router.beforeEach(async (to, from) => {
     }
 });
 
-async function canAccessOrgan(id: number): Promise<boolean> {
-    try {
-        const gewisId = getGEWISId();
-        if (!gewisId) return false;
-
-        const response = await ApiService.user.userGet(undefined, gewisId);
-        const user = response.data?.[0];
-
-        if (!user?.organs?.length) return false;
-
-        return user.organs.some((organ) => organ.id === id);
-    } catch (error) {
-        console.warn(`Failed to check organ access for ID ${id}:`, error);
-        return false;
-    }
-}
-
 /**
  * Reusable guard to ensure the organ store is set and user has access
  */
-async function handleOrganAccess(
+function handleOrganAccess(
     to: RouteLocationNormalizedGeneric,
     from: RouteLocationNormalizedGeneric,
     next: NavigationGuardNext,
@@ -108,17 +90,17 @@ async function handleOrganAccess(
     const user = userStore.getUser;
 
     if (!user) {
-        next('/');
+        return next('/');
     }
 
-    const organName = user.organs.find((org) => org.id === id).name;
-    organStore.setOrgan(id, organName);
+    const organ = user.organs.find((org) => org.id === id);
 
-    if (await canAccessOrgan(id)) {
-        next();
-    } else {
-        next('/');
+    if (!organ) {
+        return next('/');
     }
+
+    organStore.setOrgan(id, organ.name);
+    next();
 }
 
 export default router;

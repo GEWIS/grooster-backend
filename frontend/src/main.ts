@@ -22,6 +22,8 @@ import Chip from 'primevue/chip';
 import { Divider } from 'primevue';
 import Popover from 'primevue/popover';
 import Textarea from 'primevue/textarea';
+import ToastService from 'primevue/toastservice';
+import Toast from 'primevue/toast';
 import App from './App.vue';
 import router from '@/router/router';
 
@@ -39,6 +41,7 @@ app.use(PrimeVue, {
         },
     },
 });
+app.use(ToastService);
 
 // Components
 app.component('Button', Button);
@@ -54,6 +57,7 @@ app.component('Chip', Chip);
 app.component('Divider', Divider);
 app.component('Popover', Popover);
 app.component('Textarea', Textarea);
+app.component('Toast', Toast);
 
 app.use(pinia);
 app.use(router);

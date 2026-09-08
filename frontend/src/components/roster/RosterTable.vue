@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { AnswerCreateRequest, AnswerUpdateRequest, Roster, RosterAnswer, User } from '@gewis/grooster-backend-ts';
 import { useRoute } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 import { useRosterStore } from '@/stores/roster.store';
 import { getGEWISId } from '@/helpers/TokenHelper';
 import ApiService from '@/services/ApiService';
@@ -9,6 +10,7 @@ import { Role, useAuthStore } from '@/stores/auth.store';
 
 const route = useRoute();
 const authStore = useAuthStore();
+const toast = useToast();
 
 const props = defineProps<{
     id: number;
@@ -20,37 +22,47 @@ const roster = computed<Roster | undefined>(() => rosterStore.getRoster(props.id
 type UserWithNickname = User & { displayName: string };
 const users = ref<UserWithNickname[]>();
 const loadUsers = async () => {
-    const userId = parseInt(route.params.id as string);
+    try {
+        const userId = parseInt(route.params.id as string);
 
-    const [userResponse, organResponse] = await Promise.all([
-        ApiService.user.userGet(userId),
-        ApiService.organ.getMembersSettings(userId),
-    ]);
+        const [userResponse, organResponse] = await Promise.all([
+            ApiService.user.userGet(userId),
+            ApiService.organ.getMembersSettings(userId),
+        ]);
 
-    const rawUsers = userResponse.data;
-    const memberSettings = organResponse.data;
+        const rawUsers = userResponse.data;
+        const memberSettings = organResponse.data;
 
-    const nicknameMap = new Map(memberSettings.map((setting) => [setting.userId, setting.username]));
+        const nicknameMap = new Map(memberSettings.map((setting) => [setting.userId, setting.username]));
 
-    users.value = rawUsers.map((user) => {
-        const nickname = nicknameMap.get(user.id) || '';
-        let displayName = user.name;
+        users.value = rawUsers.map((user) => {
+            const nickname = nicknameMap.get(user.id) || '';
+            let displayName = user.name;
 
-        if (nickname) {
-            const nameParts = user.name.split(' ');
+            if (nickname) {
+                const nameParts = user.name.split(' ');
 
-            if (nameParts.length > 1) {
-                displayName = `${nameParts[0]} (${nickname}) ${nameParts.slice(1).join(' ')}`;
-            } else {
-                displayName = `${user.name} (${nickname})`;
+                if (nameParts.length > 1) {
+                    displayName = `${nameParts[0]} (${nickname}) ${nameParts.slice(1).join(' ')}`;
+                } else {
+                    displayName = `${user.name} (${nickname})`;
+                }
             }
-        }
 
-        return {
-            ...user,
-            displayName: displayName,
-        };
-    });
+            return {
+                ...user,
+                displayName: displayName,
+            };
+        });
+    } catch (error) {
+        console.error('Failed to load users:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Failed to load users',
+            detail: 'Could not load the users for this roster. Please reload the page to try again.',
+            life: 5000,
+        });
+    }
 };
 
 onMounted(() => {
