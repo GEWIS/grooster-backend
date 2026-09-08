@@ -162,7 +162,17 @@ func (s *service) GetSavedRoster(ID uint) ([]*models.SavedShift, []*models.Saved
 		return nil, nil, err
 	}
 
-	savedShiftOrdering, err := s.getSavedShiftOrdering(savedShifts)
+	var organID uint
+	if len(savedShifts) > 0 {
+		if err := s.db.Model(&models.Roster{}).
+			Select("organ_id").
+			Where("id = ?", ID).
+			Scan(&organID).Error; err != nil {
+			return nil, nil, err
+		}
+	}
+
+	savedShiftOrdering, err := s.getSavedShiftOrdering(savedShifts, organID)
 
 	if err != nil {
 		return nil, nil, err
@@ -280,39 +290,33 @@ func (s *service) createSavedShift(rID uint, shift *models.RosterShift) error {
 	return nil
 }
 
-func (s *service) getSavedShiftOrdering(savedShifts []*models.SavedShift) ([]*models.SavedShiftOrdering, error) {
+func (s *service) getSavedShiftOrdering(savedShifts []*models.SavedShift, organID uint) ([]*models.SavedShiftOrdering, error) {
 	var orderings []*models.SavedShiftOrdering
 
 	for _, savedShift := range savedShifts {
 		var users []*models.User
 
-		var organID uint
-		if err := s.db.Model(&models.Roster{}).
-			Select("organ_id").
-			Where("id = ?", savedShift.RosterID).
-			Scan(&organID).Error; err != nil {
-			return nil, err
-		}
+		shiftGroupID := savedShift.RosterShift.ShiftGroupID
+		shiftName := savedShift.RosterShift.Name
 
 		// Get the latest shift from users to check when they were last assigned
 		// It first checks by groups and if no group is assigned it checks on name
 		err := s.db.Table("users AS u").
 			Select(`
-				u.*, 
-				MAX(r.date) AS last_date, 
+				u.*,
+				MAX(r.date) AS last_date,
 				COALESCE(MAX(sgp.priority), 1) AS group_priority
     		`).
 			Joins("JOIN user_organs AS uo ON u.id = uo.user_id").
-			Joins("JOIN roster_shifts AS target_rs ON target_rs.name = ?", savedShift.RosterShift.Name).
-			Joins(`LEFT JOIN shift_group_priorities AS sgp ON 
-				sgp.user_id = u.id AND 
-				sgp.shift_group_id = target_rs.shift_group_id`).
+			Joins(`LEFT JOIN shift_group_priorities AS sgp ON
+				sgp.user_id = u.id AND
+				sgp.shift_group_id = ?`, shiftGroupID).
 			Joins(`LEFT JOIN roster_shifts AS rs ON (
-				(target_rs.shift_group_id IS NOT NULL AND rs.shift_group_id = target_rs.shift_group_id) OR 
-				(target_rs.shift_group_id IS NULL AND rs.name = target_rs.name)
-			)`).
-			Joins("LEFT JOIN user_shift_saved AS uss ON uss.user_id = u.id").
-			Joins("LEFT JOIN saved_shifts AS ss ON ss.roster_shift_id = rs.id AND ss.id = uss.saved_shift_id").
+				(? IS NOT NULL AND rs.shift_group_id = ?) OR
+				(? IS NULL AND rs.name = ?)
+			)`, shiftGroupID, shiftGroupID, shiftGroupID, shiftName).
+			Joins("LEFT JOIN saved_shifts AS ss ON ss.roster_shift_id = rs.id").
+			Joins("LEFT JOIN user_shift_saved AS uss ON uss.saved_shift_id = ss.id AND uss.user_id = u.id").
 			Joins("LEFT JOIN rosters AS r ON r.id = ss.roster_id").
 			Where("uo.organ_id = ?", organID).
 			Group("u.id").
