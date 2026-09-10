@@ -150,6 +150,21 @@ type ShiftGroupPriority struct {
 	Priority GroupPriority `json:"priority" gorm:"type:smallint;default:2"`
 } // @name ShiftGroupPriority
 
+// ShiftOrderingOverride records a manual admin action that pushes a user to
+// the bottom of a shift group's ordering, as if they had just been assigned
+// a shift in that group.
+type ShiftOrderingOverride struct {
+	BaseModel
+
+	UserID uint `json:"userId"`
+	User   User `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+
+	ShiftGroupID uint       `json:"shiftGroupId" gorm:"not null"`
+	ShiftGroup   ShiftGroup `json:"-" gorm:"foreignKey:ShiftGroupID;constraint:OnDelete:CASCADE;"`
+
+	SetAt time.Time `json:"setAt"`
+} // @name ShiftOrderingOverride
+
 type RosterComment struct {
 	BaseModel
 

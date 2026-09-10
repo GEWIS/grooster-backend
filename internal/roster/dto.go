@@ -133,3 +133,7 @@ type GroupPriorityUpdateParam struct {
 
 	Priority models.GroupPriority `json:"priority" binding:"required"`
 } // @name GroupPriorityUpdateParam
+
+type PushToBottomRequest struct {
+	UserID uint `json:"userId" binding:"required"`
+} // @name PushToBottomRequest

@@ -37,6 +37,7 @@ func NewRosterHandler(rosterService Service, rg *gin.RouterGroup, db *gorm.DB) *
 
 	g.GET("/shift-groups/:id/priority", requireShiftGroupOrganRoleParams(db, models.RoleAdmin), h.GetShiftGroupPriorities)
 	g.PUT("/shift-groups/:id/priority", requireShiftGroupOrganRoleParams(db, models.RoleAdmin), h.UpdateShiftGroupPriority)
+	g.POST("/shift-groups/:id/push-to-bottom", requireShiftGroupOrganRoleParams(db, models.RoleAdmin), h.PushUserToBottom)
 
 	return h
 }
@@ -179,6 +180,41 @@ func (h *Handler) GetSavedRoster(c *gin.Context) {
 	log.Debug().Interface("response", response).Msg("Sending saved roster response")
 
 	c.JSON(http.StatusOK, response)
+}
+
+// PushUserToBottom
+//
+//	@Summary	Manually push a user to the bottom of a shift group's ordering, as if just assigned
+//	@Security	BearerAuth
+//	@Tags		ShiftGroup
+//	@Accept		json
+//	@Produce	json
+//	@Param		id		path		int					true	"Shift Group ID"
+//	@Param		params	body		PushToBottomRequest	true	"User to push to the bottom"
+//	@Success	200	{string}	string
+//	@Failure	400	{string}	string				"Invalid request"
+//	@ID			pushUserToBottom
+//	@Router		/roster/shift-groups/{id}/push-to-bottom [post]
+func (h *Handler) PushUserToBottom(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid shift group ID"})
+		return
+	}
+
+	var params PushToBottomRequest
+	if err := c.ShouldBindJSON(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON: " + err.Error()})
+		return
+	}
+
+	if err := h.rosterService.PushUserToBottom(uint(id), params.UserID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
 // CreateShiftGroup
