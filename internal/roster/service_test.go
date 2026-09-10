@@ -609,6 +609,47 @@ func (suite *TestRosterSuite) TestUpdateSavedShift_UserLoadFailure() {
 	assert.Len(suite.T(), users, 0)
 }
 
+func (suite *TestRosterSuite) TestPushUserToBottom_Success() {
+	roster := models.Roster{
+		Name:    "Push To Bottom Roster",
+		OrganID: 1,
+	}
+	suite.db.Create(&roster)
+
+	shiftGroup := models.ShiftGroup{OrganID: 1, Name: "Push To Bottom Group"}
+	suite.db.Create(&shiftGroup)
+
+	shift := models.RosterShift{RosterID: roster.ID, Name: "Push Shift", ShiftGroupID: &shiftGroup.ID}
+	suite.db.Create(&shift)
+
+	err := suite.service.SaveRoster(roster.ID)
+	assert.NoError(suite.T(), err)
+
+	var users []models.User
+	suite.db.Order("id").Find(&users)
+	assert.GreaterOrEqual(suite.T(), len(users), 2)
+	targetUser := users[0]
+
+	_, ordering, err := suite.service.GetSavedRoster(roster.ID)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), ordering[0].Users)
+
+	err = suite.service.PushUserToBottom(shiftGroup.ID, targetUser.ID)
+	assert.NoError(suite.T(), err)
+
+	_, orderingAfter, err := suite.service.GetSavedRoster(roster.ID)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), orderingAfter[0].Users)
+
+	lastUser := orderingAfter[0].Users[len(orderingAfter[0].Users)-1]
+	assert.Equal(suite.T(), targetUser.ID, lastUser.ID)
+}
+
+func (suite *TestRosterSuite) TestPushUserToBottom_ShiftGroupNotFound() {
+	err := suite.service.PushUserToBottom(99999, 1)
+	assert.Error(suite.T(), err)
+}
+
 func (suite *TestRosterSuite) TestRosterTemplateCreate_Valid() {
 	var organ models.Organ
 	suite.db.First(&organ)

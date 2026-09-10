@@ -58,6 +58,7 @@ func ConnectDB(name string) *gorm.DB {
 			&models.RosterTemplateShiftPreference{},
 			&models.ShiftGroup{},
 			&models.RosterComment{},
+			&models.ShiftOrderingOverride{},
 		); err != nil {
 			panic(err)
 		}

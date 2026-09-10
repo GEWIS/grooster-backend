@@ -21,6 +21,7 @@ type Service interface {
 	SaveRoster(uint) error
 	UpdateSavedShift(uint, *SavedShiftUpdateRequest) (*models.SavedShift, error)
 	GetSavedRoster(uint) ([]*models.SavedShift, []*models.SavedShiftOrdering, error)
+	PushUserToBottom(shiftGroupID uint, userID uint) error
 
 	CreateShiftGroup(ShiftGroupCreateRequest) (*models.ShiftGroup, error)
 	GetShiftGroups(ShiftGroupFilterParams) (*[]models.ShiftGroup, error)
@@ -181,6 +182,19 @@ func (s *service) GetSavedRoster(ID uint) ([]*models.SavedShift, []*models.Saved
 	return savedShifts, savedShiftOrdering, nil
 }
 
+// PushUserToBottom pushes the given user to the bottom of the shift ordering
+// for shiftGroupID, as if they had just been assigned a shift in that group
+// right now, without creating a real assignment.
+func (s *service) PushUserToBottom(shiftGroupID uint, userID uint) error {
+	override := models.ShiftOrderingOverride{
+		UserID:       userID,
+		ShiftGroupID: shiftGroupID,
+		SetAt:        time.Now(),
+	}
+
+	return s.db.Create(&override).Error
+}
+
 func (s *service) UpdateSavedShift(ID uint, updateParams *SavedShiftUpdateRequest) (*models.SavedShift, error) {
 	var saved *models.SavedShift
 	if err := s.db.Preload("Users").First(&saved, ID).Error; err != nil {
@@ -300,11 +314,17 @@ func (s *service) getSavedShiftOrdering(savedShifts []*models.SavedShift, organI
 		shiftName := savedShift.RosterShift.Name
 
 		// Get the latest shift from users to check when they were last assigned
-		// It first checks by groups and if no group is assigned it checks on name
+		// It first checks by groups and if no group is assigned it checks on name.
+		// Manual "push to bottom" overrides (grouped shifts only) are folded into
+		// last_date, so a pushed user sorts as if they'd just been assigned now.
 		err := s.db.Table("users AS u").
 			Select(`
 				u.*,
-				MAX(r.date) AS last_date,
+				CASE
+					WHEN COALESCE(MAX(r.date), '1970-01-01') > COALESCE(MAX(soo.set_at), '1970-01-01')
+					THEN COALESCE(MAX(r.date), '1970-01-01')
+					ELSE COALESCE(MAX(soo.set_at), '1970-01-01')
+				END AS last_date,
 				COALESCE(MAX(sgp.priority), 1) AS group_priority
     		`).
 			Joins("JOIN user_organs AS uo ON u.id = uo.user_id").
@@ -318,6 +338,8 @@ func (s *service) getSavedShiftOrdering(savedShifts []*models.SavedShift, organI
 			Joins("LEFT JOIN saved_shifts AS ss ON ss.roster_shift_id = rs.id").
 			Joins("LEFT JOIN user_shift_saved AS uss ON uss.saved_shift_id = ss.id AND uss.user_id = u.id").
 			Joins("LEFT JOIN rosters AS r ON r.id = ss.roster_id").
+			Joins(`LEFT JOIN shift_ordering_overrides AS soo ON
+				soo.user_id = u.id AND soo.shift_group_id = ?`, shiftGroupID).
 			Where("uo.organ_id = ?", organID).
 			Group("u.id").
 			Order("group_priority DESC, last_date ASC").
