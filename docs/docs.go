@@ -1087,6 +1087,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/roster/shift-groups/{id}/push-to-bottom": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ShiftGroup"
+                ],
+                "summary": "Manually push a user to the bottom of a shift group's ordering, as if just assigned",
+                "operationId": "pushUserToBottom",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Shift Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User to push to the bottom",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PushToBottomRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/roster/shift/{id}": {
             "delete": {
                 "security": [
@@ -2114,9 +2166,13 @@ const docTemplate = `{
         },
         "CommentCreateRequest": {
             "type": "object",
+            "required": [
+                "comment"
+            ],
             "properties": {
                 "comment": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 250
                 },
                 "rosterId": {
                     "type": "integer"
@@ -2188,6 +2244,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/User"
                     }
+                }
+            }
+        },
+        "PushToBottomRequest": {
+            "type": "object",
+            "required": [
+                "userId"
+            ],
+            "properties": {
+                "userId": {
+                    "type": "integer"
                 }
             }
         },

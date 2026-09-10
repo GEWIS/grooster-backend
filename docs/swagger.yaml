@@ -18,11 +18,14 @@ definitions:
   CommentCreateRequest:
     properties:
       comment:
+        maxLength: 250
         type: string
       rosterId:
         type: integer
       userId:
         type: integer
+    required:
+    - comment
     type: object
   GEWIS-Rooster_internal_models.GroupPriority:
     enum:
@@ -69,6 +72,13 @@ definitions:
         items:
           $ref: '#/definitions/User'
         type: array
+    type: object
+  PushToBottomRequest:
+    properties:
+      userId:
+        type: integer
+    required:
+    - userId
     type: object
   Roster:
     properties:
@@ -1267,6 +1277,40 @@ paths:
       security:
       - BearerAuth: []
       summary: Update a shift group priority
+      tags:
+      - ShiftGroup
+  /roster/shift-groups/{id}/push-to-bottom:
+    post:
+      consumes:
+      - application/json
+      operationId: pushUserToBottom
+      parameters:
+      - description: Shift Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User to push to the bottom
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/PushToBottomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Manually push a user to the bottom of a shift group's ordering, as
+        if just assigned
       tags:
       - ShiftGroup
   /roster/shift/{id}:

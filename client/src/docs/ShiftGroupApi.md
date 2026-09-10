@@ -8,6 +8,7 @@ All URIs are relative to *http://localhost*
 |[**getShiftGroup**](#getshiftgroup) | **GET** /roster/shift-groups/{id} | Get a specific shift group by ID|
 |[**getShiftGroupPriorities**](#getshiftgrouppriorities) | **GET** /roster/shift-groups/{id}/priority | Get a shift group priorities for a shift group|
 |[**getShiftGroups**](#getshiftgroups) | **GET** /roster/shift-groups | Get all shift groups for an organ|
+|[**pushUserToBottom**](#pushusertobottom) | **POST** /roster/shift-groups/{id}/push-to-bottom | Manually push a user to the bottom of a shift group\&#39;s ordering, as if just assigned|
 |[**updateShiftGroupPriority**](#updateshiftgrouppriority) | **PUT** /roster/shift-groups/{id}/priority | Update a shift group priority|
 
 # **createShiftGroup**
@@ -212,6 +213,61 @@ const { status, data } = await apiInstance.getShiftGroups(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**400** | Bad Request |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **pushUserToBottom**
+> string pushUserToBottom(params)
+
+
+### Example
+
+```typescript
+import {
+    ShiftGroupApi,
+    Configuration,
+    PushToBottomRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new ShiftGroupApi(configuration);
+
+let id: number; //Shift Group ID (default to undefined)
+let params: PushToBottomRequest; //User to push to the bottom
+
+const { status, data } = await apiInstance.pushUserToBottom(
+    id,
+    params
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **params** | **PushToBottomRequest**| User to push to the bottom | |
+| **id** | [**number**] | Shift Group ID | defaults to undefined|
+
+
+### Return type
+
+**string**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Invalid request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
