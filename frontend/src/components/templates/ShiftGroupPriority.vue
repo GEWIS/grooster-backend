@@ -3,9 +3,11 @@ import {
     GEWISRoosterInternalModelsGroupPriority,
     GroupPriorityUpdateParam,
     ShiftGroupPriority,
+    PushToBottomRequest,
     User,
 } from '@gewis/grooster-backend-ts';
 import { computed, onMounted, ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
 import { useOrganStore } from '@/stores/organ.store';
 import ApiService from '@/services/ApiService';
 
@@ -22,10 +24,12 @@ const props = defineProps<{
 }>();
 
 const organStore = useOrganStore();
+const toast = useToast();
 const users = ref<User[]>([]);
 
 const userGroupPriorities = ref<ShiftGroupPriority[]>([]);
 const selectedUser = ref<User | null>(null);
+const isPushingToBottom = ref(false);
 
 const currentPriority = computed(() => getUserPriority(selectedUser.value.id));
 
@@ -78,6 +82,37 @@ const handlePriorityUpdate = async (priority: GroupPriority, userId: number) => 
     }
 };
 
+const pushUserToBottom = async (userId: number) => {
+    const userName = selectedUser.value?.name;
+    isPushingToBottom.value = true;
+
+    try {
+        const request: PushToBottomRequest = {
+            userId: userId,
+        };
+
+        await ApiService.shiftGroupApi.pushUserToBottom(props.groupId, request);
+        await fetchUserPriorities();
+
+        toast.add({
+            severity: 'success',
+            summary: 'Pushed to bottom',
+            detail: `${userName} was moved to the bottom of the group.`,
+            life: 3000,
+        });
+    } catch (e) {
+        console.error(e);
+        toast.add({
+            severity: 'error',
+            summary: 'Failed to push user to bottom',
+            detail: 'Something went wrong while updating the shift group order. Please try again.',
+            life: 5000,
+        });
+    } finally {
+        isPushingToBottom.value = false;
+    }
+};
+
 onMounted(fetchUsers);
 onMounted(fetchUserPriorities);
 </script>
@@ -100,6 +135,16 @@ onMounted(fetchUserPriorities);
 
         <div class="w-2/3 p-6 flex flex-col justify-center items-center text-center">
             <div v-if="selectedUser" class="space-y-4 w-full">
+                <div>
+                    <Button
+                        :disabled="isPushingToBottom"
+                        icon="pi pi-arrow-circle-down"
+                        label="Push to bottom"
+                        :loading="isPushingToBottom"
+                        severity="secondary"
+                        @click="pushUserToBottom(selectedUser.id)"
+                    />
+                </div>
                 <div>
                     <h3 class="font-bold text-gray-900">{{ selectedUser.name }}</h3>
                     <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">
