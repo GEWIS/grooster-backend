@@ -78,7 +78,7 @@ export interface CommentCreateRequest {
      * @type {string}
      * @memberof CommentCreateRequest
      */
-    'comment'?: string;
+    'comment': string;
     /**
      * 
      * @type {number}
@@ -179,6 +179,19 @@ export interface Organ {
      * @memberof Organ
      */
     'users'?: Array<User>;
+}
+/**
+ * 
+ * @export
+ * @interface PushToBottomRequest
+ */
+export interface PushToBottomRequest {
+    /**
+     * 
+     * @type {number}
+     * @memberof PushToBottomRequest
+     */
+    'userId': number;
 }
 /**
  * 
@@ -4006,6 +4019,49 @@ export const ShiftGroupApiAxiosParamCreator = function (configuration?: Configur
         },
         /**
          * 
+         * @summary Manually push a user to the bottom of a shift group\'s ordering, as if just assigned
+         * @param {number} id Shift Group ID
+         * @param {PushToBottomRequest} params User to push to the bottom
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pushUserToBottom: async (id: number, params: PushToBottomRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('pushUserToBottom', 'id', id)
+            // verify required parameter 'params' is not null or undefined
+            assertParamExists('pushUserToBottom', 'params', params)
+            const localVarPath = `/roster/shift-groups/{id}/push-to-bottom`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(params, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Update a shift group priority
          * @param {number} id ShiftGroup ID
          * @param {GroupPriorityUpdateParam} updateParams Update parameters
@@ -4111,6 +4167,20 @@ export const ShiftGroupApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Manually push a user to the bottom of a shift group\'s ordering, as if just assigned
+         * @param {number} id Shift Group ID
+         * @param {PushToBottomRequest} params User to push to the bottom
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async pushUserToBottom(id: number, params: PushToBottomRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.pushUserToBottom(id, params, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ShiftGroupApi.pushUserToBottom']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Update a shift group priority
          * @param {number} id ShiftGroup ID
          * @param {GroupPriorityUpdateParam} updateParams Update parameters
@@ -4172,6 +4242,17 @@ export const ShiftGroupApiFactory = function (configuration?: Configuration, bas
          */
         getShiftGroups(organId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<ShiftGroup>> {
             return localVarFp.getShiftGroups(organId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Manually push a user to the bottom of a shift group\'s ordering, as if just assigned
+         * @param {number} id Shift Group ID
+         * @param {PushToBottomRequest} params User to push to the bottom
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pushUserToBottom(id: number, params: PushToBottomRequest, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.pushUserToBottom(id, params, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4240,6 +4321,19 @@ export class ShiftGroupApi extends BaseAPI {
      */
     public getShiftGroups(organId: number, options?: RawAxiosRequestConfig) {
         return ShiftGroupApiFp(this.configuration).getShiftGroups(organId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Manually push a user to the bottom of a shift group\'s ordering, as if just assigned
+     * @param {number} id Shift Group ID
+     * @param {PushToBottomRequest} params User to push to the bottom
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ShiftGroupApi
+     */
+    public pushUserToBottom(id: number, params: PushToBottomRequest, options?: RawAxiosRequestConfig) {
+        return ShiftGroupApiFp(this.configuration).pushUserToBottom(id, params, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

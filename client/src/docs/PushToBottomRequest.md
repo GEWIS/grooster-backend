@@ -1,22 +1,18 @@
-# CommentCreateRequest
+# PushToBottomRequest
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**comment** | **string** |  | [default to undefined]
-**rosterId** | **number** |  | [optional] [default to undefined]
-**userId** | **number** |  | [optional] [default to undefined]
+**userId** | **number** |  | [default to undefined]
 
 ## Example
 
 ```typescript
-import { CommentCreateRequest } from './api';
+import { PushToBottomRequest } from './api';
 
-const instance: CommentCreateRequest = {
-    comment,
-    rosterId,
+const instance: PushToBottomRequest = {
     userId,
 };
 ```
