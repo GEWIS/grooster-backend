@@ -6,6 +6,7 @@ import type {
     Roster,
     RosterComment,
     RosterCreateRequest,
+    RosterResponsible,
     RosterUpdateRequest,
     SavedShiftResponse,
     SavedShiftUpdateRequest,
@@ -19,6 +20,7 @@ export const useRosterStore = defineStore('roster', {
         rosters: {} as Record<number, Roster>,
         savedRoster: {} as Record<number, SavedShiftResponse>,
         comments: {} as Record<number, RosterComment[]>,
+        responsibles: {} as Record<number, RosterResponsible[]>,
         selectedRosterId: null as number | null,
     }),
     persist: true,
@@ -35,6 +37,9 @@ export const useRosterStore = defineStore('roster', {
         getComments: (state) => {
             return (rosterId: number) => state.comments[rosterId] ?? [];
         },
+        getResponsibles: (state) => {
+            return (rosterId: number) => state.responsibles[rosterId] ?? [];
+        },
         selectedRoster: (state) => {
             return state.selectedRosterId ? state.rosters[state.selectedRosterId] : null;
         },
@@ -46,6 +51,7 @@ export const useRosterStore = defineStore('roster', {
         clearRosters() {
             this.rosters = {};
             this.savedRoster = {};
+            this.responsibles = {};
             this.selectedRosterId = null;
         },
         async fetchRosters(organId: number) {
@@ -187,6 +193,38 @@ export const useRosterStore = defineStore('roster', {
             } catch (error) {
                 console.error('Failed to save roster comment:', error);
             }
+        },
+        async fetchResponsibles(rosterId: number) {
+            try {
+                const response = await ApiService.roster.getRosterResponsibles(rosterId);
+
+                this.responsibles = {
+                    ...this.responsibles,
+                    [rosterId]: response.data,
+                };
+            } catch (error) {
+                console.error('Failed to fetch roster responsibles:', error);
+            }
+        },
+        async addResponsible(rosterId: number, userId: number) {
+            const response = await ApiService.roster.createRosterResponsible(rosterId, { userId });
+            const existing = this.responsibles[rosterId] ?? [];
+
+            this.responsibles = {
+                ...this.responsibles,
+                [rosterId]: [...existing, response.data],
+            };
+
+            return response.data;
+        },
+        async removeResponsible(rosterId: number, userId: number) {
+            await ApiService.roster.deleteRosterResponsible(rosterId, userId);
+            const existing = this.responsibles[rosterId] ?? [];
+
+            this.responsibles = {
+                ...this.responsibles,
+                [rosterId]: existing.filter((responsible) => responsible.userId !== userId),
+            };
         },
         async createShift(params: ShiftCreateRequest) {
             await ApiService.rosterShift.createRosterShift(params).then((res) => {

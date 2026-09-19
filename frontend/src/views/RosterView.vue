@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import RosterTable from '@/components/roster/RosterTable.vue';
 import RosterAssignment from '@/components/roster/RosterAssignment.vue';
+import RosterResponsibles from '@/components/roster/RosterResponsibles.vue';
 import { useRosterStore } from '@/stores/roster.store.js';
 import AddDialog from '@/components/roster/dialogs/AddDialog.vue';
 import DeleteDialog from '@/components/roster/dialogs/DeleteDialog.vue';
@@ -116,6 +117,7 @@ const closeDialog = () => {
                 </div>
                 <div v-if="selectedRoster?.id" class="flex flex-col gap-5 flex-1">
                     <RosterTable :id="selectedRoster.id" />
+                    <RosterResponsibles :id="selectedRoster.id" />
                     <RosterAssignment v-if="selectedRoster.saved" :id="selectedRoster.id" />
                 </div>
             </div>
