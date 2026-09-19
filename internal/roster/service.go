@@ -29,6 +29,10 @@ type Service interface {
 
 	GetShiftGroupPriorities(groupID uint) ([]*models.ShiftGroupPriority, error)
 	UpdateShiftGroupPriority(groupID uint, params GroupPriorityUpdateParam) (*models.ShiftGroupPriority, error)
+
+	GetRosterResponsibles(rosterID uint) ([]*models.RosterResponsible, error) 
+	CreateRosterResponsible(rosterID uint, userID uint) (*models.RosterResponsible, error)
+	DeleteRosterResponsible(rosterID uint, userID uint) error
 }
 
 type UserProvider interface {
@@ -289,6 +293,38 @@ func (s *service) UpdateShiftGroupPriority(groupID uint, params GroupPriorityUpd
 	}
 
 	return &newRecord, nil
+}
+
+func (s *service) GetRosterResponsibles(rosterID uint) ([]*models.RosterResponsible, error) {
+	var responsibles []*models.RosterResponsible
+	err := s.db.Where("roster_id = ?", rosterID).Find(&responsibles).Error
+	if err != nil {
+		return nil, err
+	}
+	return responsibles, nil
+}
+
+func (s *service) CreateRosterResponsible(rosterID uint, userID uint) (*models.RosterResponsible, error) {
+	var responsible = models.RosterResponsible{
+		RosterID: rosterID,
+		UserID:   userID,
+	}
+	err := s.db.Create(&responsible).Error
+	if err != nil {
+		return nil, err
+	}
+	return &responsible, nil
+}
+
+func (s *service) DeleteRosterResponsible(rosterID uint, userID uint) error {
+	result := s.db.Where("roster_id = ? AND user_id = ?", rosterID, userID).Delete(&models.RosterResponsible{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (s *service) createSavedShift(rID uint, shift *models.RosterShift) error {

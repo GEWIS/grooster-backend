@@ -25,6 +25,10 @@ func NewRosterHandler(rosterService Service, rg *gin.RouterGroup, db *gorm.DB) *
 	h.registerTemplateRoutes(g, db)
 	h.registerCommentRoutes(g, db)
 
+	g.GET("/:id/responsibles", requireRosterOrganRoleParam(db, "id", models.RoleMember), h.GetRosterResponsibles)
+	g.POST("/:id/responsibles", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.CreateRosterResponsible)
+	g.DELETE("/:id/responsibles/:userId", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.DeleteRosterResponsible)
+
 	g.POST("/:id/fill", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.FillRosterPreferences)
 
 	g.POST("/:id/save", requireRosterOrganRoleParam(db, "id", models.RoleAdmin), h.SaveRoster)
@@ -365,4 +369,115 @@ func (h *Handler) UpdateShiftGroupPriority(c *gin.Context) {
 	}
 	log.Print(groupPriority)
 	c.JSON(http.StatusOK, groupPriority)
+}
+
+// GetRosterResponsibles
+//
+//	@Summary		Get roster responsibles
+//	@Description	Returns the responsibles for a given roster. Callable by any member of the roster's organ.
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"Roster ID"
+//	@Success	200	{array}		models.RosterResponsible
+//	@Failure	400	{string}	string	"Invalid roster ID"
+//	@Failure	403	{string}	string	"Insufficient organ permissions"
+//	@Failure	404	{string}	string	"Roster not found"
+//	@ID			getRosterResponsibles
+//	@Router		/roster/{id}/responsibles [get]
+func (h *Handler) GetRosterResponsibles(c *gin.Context) {
+	rosterID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid roster ID format"})
+		return
+	}
+
+	responsibles, err := h.rosterService.GetRosterResponsibles(uint(rosterID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, responsibles)
+}
+
+// CreateRosterResponsible
+//
+//	@Summary		Create a roster responsible
+//	@Description	Assigns a user as responsible for a given roster. Requires admin level or higher in the roster's organ.
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		id		path		int								true	"Roster ID"
+//	@Param		params	body		RosterResponsibleCreateRequest	true	"User to assign as responsible"
+//	@Success	201		{object}	models.RosterResponsible
+//	@Failure	400		{string}	string	"Invalid request"
+//	@Failure	403		{string}	string	"Insufficient organ permissions"
+//	@Failure	404		{string}	string	"Roster not found"
+//	@ID			createRosterResponsible
+//	@Router		/roster/{id}/responsibles [post]
+func (h *Handler) CreateRosterResponsible(c *gin.Context) {
+	rosterID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid roster ID format"})
+		return
+	}
+
+	var params RosterResponsibleCreateRequest
+	if err := c.ShouldBindJSON(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON: " + err.Error()})
+		return
+	}
+
+	responsible, err := h.rosterService.CreateRosterResponsible(uint(rosterID), params.UserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, responsible)
+}
+
+// DeleteRosterResponsible
+//
+//	@Summary		Delete a roster responsible
+//	@Description	Removes a user's responsible assignment for a given roster. Requires admin level or higher in the roster's organ.
+//	@Security	BearerAuth
+//	@Tags		Roster
+//	@Accept		json
+//	@Produce	json
+//	@Param		id		path		int	true	"Roster ID"
+//	@Param		userId	path		int	true	"User ID"
+//	@Success	200		{object}	map[string]string
+//	@Failure	400		{string}	string	"Invalid request"
+//	@Failure	403		{string}	string	"Insufficient organ permissions"
+//	@Failure	404		{string}	string	"Responsible not found"
+//	@ID			deleteRosterResponsible
+//	@Router		/roster/{id}/responsibles/{userId} [delete]
+func (h *Handler) DeleteRosterResponsible(c *gin.Context) {
+	rosterID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid roster ID format"})
+		return
+	}
+
+	userID, err := strconv.ParseUint(c.Param("userId"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	err = h.rosterService.DeleteRosterResponsible(uint(rosterID), uint(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Responsible not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Responsible deleted successfully"})
 }

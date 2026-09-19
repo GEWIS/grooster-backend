@@ -137,3 +137,7 @@ type GroupPriorityUpdateParam struct {
 type PushToBottomRequest struct {
 	UserID uint `json:"userId" binding:"required"`
 } // @name PushToBottomRequest
+
+type RosterResponsibleCreateRequest struct {
+	UserID uint `json:"userId" binding:"required"`
+} // @name RosterResponsibleCreateRequest

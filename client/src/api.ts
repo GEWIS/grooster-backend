@@ -404,6 +404,56 @@ export interface RosterCreateRequest {
 /**
  * 
  * @export
+ * @interface RosterResponsible
+ */
+export interface RosterResponsible {
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterResponsible
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterResponsible
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterResponsible
+     */
+    'rosterId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RosterResponsible
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterResponsible
+     */
+    'userId'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface RosterResponsibleCreateRequest
+ */
+export interface RosterResponsibleCreateRequest {
+    /**
+     * 
+     * @type {number}
+     * @memberof RosterResponsibleCreateRequest
+     */
+    'userId': number;
+}
+/**
+ * 
+ * @export
  * @interface RosterShift
  */
 export interface RosterShift {
@@ -1796,6 +1846,49 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Assigns a user as responsible for a given roster. Requires admin level or higher in the roster\'s organ.
+         * @summary Create a roster responsible
+         * @param {number} id Roster ID
+         * @param {RosterResponsibleCreateRequest} params User to assign as responsible
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRosterResponsible: async (id: number, params: RosterResponsibleCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('createRosterResponsible', 'id', id)
+            // verify required parameter 'params' is not null or undefined
+            assertParamExists('createRosterResponsible', 'params', params)
+            const localVarPath = `/roster/{id}/responsibles`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(params, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Creates a template of a roster by defining the name of the shifts
          * @param {TemplateCreateRequest} [params] Template Params
@@ -1909,6 +2002,47 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Removes a user\'s responsible assignment for a given roster. Requires admin level or higher in the roster\'s organ.
+         * @summary Delete a roster responsible
+         * @param {number} id Roster ID
+         * @param {number} userId User ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRosterResponsible: async (id: number, userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteRosterResponsible', 'id', id)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('deleteRosterResponsible', 'userId', userId)
+            const localVarPath = `/roster/{id}/responsibles/{userId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Deletes a roster template by ID
          * @param {number} id Template ID
@@ -1993,6 +2127,43 @@ export const RosterApiAxiosParamCreator = function (configuration?: Configuratio
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getRoster', 'id', id)
             const localVarPath = `/roster/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns the responsibles for a given roster. Callable by any member of the roster\'s organ.
+         * @summary Get roster responsibles
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRosterResponsibles: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getRosterResponsibles', 'id', id)
+            const localVarPath = `/roster/{id}/responsibles`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2388,6 +2559,20 @@ export const RosterApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Assigns a user as responsible for a given roster. Requires admin level or higher in the roster\'s organ.
+         * @summary Create a roster responsible
+         * @param {number} id Roster ID
+         * @param {RosterResponsibleCreateRequest} params User to assign as responsible
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createRosterResponsible(id: number, params: RosterResponsibleCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RosterResponsible>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createRosterResponsible(id, params, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterApi.createRosterResponsible']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary Creates a template of a roster by defining the name of the shifts
          * @param {TemplateCreateRequest} [params] Template Params
@@ -2427,6 +2612,20 @@ export const RosterApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Removes a user\'s responsible assignment for a given roster. Requires admin level or higher in the roster\'s organ.
+         * @summary Delete a roster responsible
+         * @param {number} id Roster ID
+         * @param {number} userId User ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteRosterResponsible(id: number, userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: string; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteRosterResponsible(id, userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterApi.deleteRosterResponsible']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary Deletes a roster template by ID
          * @param {number} id Template ID
@@ -2463,6 +2662,19 @@ export const RosterApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRoster(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RosterApi.getRoster']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Returns the responsibles for a given roster. Callable by any member of the roster\'s organ.
+         * @summary Get roster responsibles
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRosterResponsibles(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RosterResponsible>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRosterResponsibles(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RosterApi.getRosterResponsibles']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2598,6 +2810,17 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.createRoster(createParams, options).then((request) => request(axios, basePath));
         },
         /**
+         * Assigns a user as responsible for a given roster. Requires admin level or higher in the roster\'s organ.
+         * @summary Create a roster responsible
+         * @param {number} id Roster ID
+         * @param {RosterResponsibleCreateRequest} params User to assign as responsible
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRosterResponsible(id: number, params: RosterResponsibleCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<RosterResponsible> {
+            return localVarFp.createRosterResponsible(id, params, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Creates a template of a roster by defining the name of the shifts
          * @param {TemplateCreateRequest} [params] Template Params
@@ -2628,6 +2851,17 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.deleteRoster(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * Removes a user\'s responsible assignment for a given roster. Requires admin level or higher in the roster\'s organ.
+         * @summary Delete a roster responsible
+         * @param {number} id Roster ID
+         * @param {number} userId User ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRosterResponsible(id: number, userId: number, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: string; }> {
+            return localVarFp.deleteRosterResponsible(id, userId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Deletes a roster template by ID
          * @param {number} id Template ID
@@ -2656,6 +2890,16 @@ export const RosterApiFactory = function (configuration?: Configuration, basePat
          */
         getRoster(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Roster> {
             return localVarFp.getRoster(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns the responsibles for a given roster. Callable by any member of the roster\'s organ.
+         * @summary Get roster responsibles
+         * @param {number} id Roster ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRosterResponsibles(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<RosterResponsible>> {
+            return localVarFp.getRosterResponsibles(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2768,6 +3012,19 @@ export class RosterApi extends BaseAPI {
     }
 
     /**
+     * Assigns a user as responsible for a given roster. Requires admin level or higher in the roster\'s organ.
+     * @summary Create a roster responsible
+     * @param {number} id Roster ID
+     * @param {RosterResponsibleCreateRequest} params User to assign as responsible
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterApi
+     */
+    public createRosterResponsible(id: number, params: RosterResponsibleCreateRequest, options?: RawAxiosRequestConfig) {
+        return RosterApiFp(this.configuration).createRosterResponsible(id, params, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary Creates a template of a roster by defining the name of the shifts
      * @param {TemplateCreateRequest} [params] Template Params
@@ -2804,6 +3061,19 @@ export class RosterApi extends BaseAPI {
     }
 
     /**
+     * Removes a user\'s responsible assignment for a given roster. Requires admin level or higher in the roster\'s organ.
+     * @summary Delete a roster responsible
+     * @param {number} id Roster ID
+     * @param {number} userId User ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterApi
+     */
+    public deleteRosterResponsible(id: number, userId: number, options?: RawAxiosRequestConfig) {
+        return RosterApiFp(this.configuration).deleteRosterResponsible(id, userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary Deletes a roster template by ID
      * @param {number} id Template ID
@@ -2837,6 +3107,18 @@ export class RosterApi extends BaseAPI {
      */
     public getRoster(id: number, options?: RawAxiosRequestConfig) {
         return RosterApiFp(this.configuration).getRoster(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns the responsibles for a given roster. Callable by any member of the roster\'s organ.
+     * @summary Get roster responsibles
+     * @param {number} id Roster ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RosterApi
+     */
+    public getRosterResponsibles(id: number, options?: RawAxiosRequestConfig) {
+        return RosterApiFp(this.configuration).getRosterResponsibles(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
