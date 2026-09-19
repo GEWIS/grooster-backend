@@ -71,7 +71,7 @@ const removeResponsible = async (userId: number) => {
     <div class="space-y-3 border-b border-slate-200 pb-4">
         <div>
             <h2 class="text-xl font-bold text-slate-800">Responsibles</h2>
-            <p class="text-sm text-slate-500">Users responsible for managing this roster.</p>
+            <p class="text-sm text-slate-500">Users responsible for organising this activity.</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
