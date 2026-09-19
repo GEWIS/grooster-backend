@@ -15,7 +15,7 @@ type RosterManager interface {
 
 func (s *service) CreateRoster(params *CreateRequest) (*models.Roster, error) {
 	var users []models.User
-	var values = models.Values{"J", "X", "L", "N"} //TODO Change this to input values
+	var values = models.Values{"J", "X", "L", "N", "S", "B"} //TODO Change this to input values
 
 	err := s.db.Joins("JOIN user_organs ON user_organs.user_id = users.id").
 		Where("user_organs.organ_id = ?", params.OrganID).
