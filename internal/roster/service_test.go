@@ -811,6 +811,76 @@ func (suite *TestRosterSuite) TestRosterTemplateDelete_InValid() {
 	assert.Error(suite.T(), err)
 }
 
+func (suite *TestRosterSuite) TestRosterResponsibleCreate_Valid() {
+	var user *models.User
+	suite.db.First(&user)
+
+	var roster *models.Roster
+	suite.db.First(&roster)
+
+	// Seeding may already have made this user responsible for this roster;
+	// clear it so the create below exercises the "no existing row" path.
+	suite.db.Where("roster_id = ? AND user_id = ?", roster.ID, user.ID).Delete(&models.RosterResponsible{})
+
+	responsible, err := suite.service.CreateRosterResponsible(roster.ID, user.ID)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), roster.ID, responsible.RosterID)
+	assert.Equal(suite.T(), user.ID, responsible.UserID)
+}
+
+func (suite *TestRosterSuite) TestRosterResponsibleCreate_Invalid() {
+	rosterID := uint(9999)
+	userID := uint(9999)
+
+	_, err := suite.service.CreateRosterResponsible(rosterID, userID)
+	assert.Error(suite.T(), err)
+}
+
+func (suite *TestRosterSuite) TestRosterResponsibleCreate_Duplicate() {
+	var existing *models.RosterResponsible
+	suite.db.First(&existing)
+
+	_, err := suite.service.CreateRosterResponsible(existing.RosterID, existing.UserID)
+	assert.Error(suite.T(), err)
+}
+
+func (suite *TestRosterSuite) TestRosterResponsibleGet_Valid() {
+	var roster *models.Roster
+	suite.db.First(&roster)
+
+	responsibles, err := suite.service.GetRosterResponsibles(roster.ID)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), responsibles)
+	for _, r := range responsibles {
+		assert.Equal(suite.T(), roster.ID, r.RosterID)
+	}
+}
+
+func (suite *TestRosterSuite) TestRosterResponsibleGet_NoResponsibles() {
+	responsibles, err := suite.service.GetRosterResponsibles(uint(9999))
+	assert.NoError(suite.T(), err)
+	assert.Empty(suite.T(), responsibles)
+}
+
+func (suite *TestRosterSuite) TestRosterResponsibleDelete_Valid() {
+	var existing *models.RosterResponsible
+	suite.db.First(&existing)
+
+	err := suite.service.DeleteRosterResponsible(existing.RosterID, existing.UserID)
+	assert.NoError(suite.T(), err)
+
+	var count int64
+	suite.db.Model(&models.RosterResponsible{}).
+		Where("roster_id = ? AND user_id = ?", existing.RosterID, existing.UserID).
+		Count(&count)
+	assert.Equal(suite.T(), int64(0), count)
+}
+
+func (suite *TestRosterSuite) TestRosterResponsibleDelete_Invalid() {
+	err := suite.service.DeleteRosterResponsible(uint(9999), uint(9999))
+	assert.ErrorIs(suite.T(), err, gorm.ErrRecordNotFound)
+}
+
 func TestRosterService(t *testing.T) {
 	suite.Run(t, new(TestRosterSuite))
 }

@@ -176,3 +176,13 @@ type RosterComment struct {
 
 	Comment string `json:"comment" gorm:"type:text"`
 } // @name RosterComment
+
+type RosterResponsible struct {
+	BaseModel
+
+	RosterID uint `json:"rosterId" gorm:"not null;uniqueIndex:idx_roster_responsible"`
+	Roster   Roster `json:"-" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
+
+	UserID uint `json:"userId" gorm:"not null;uniqueIndex:idx_roster_responsible"`
+	User   User `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+} // @name RosterResponsible

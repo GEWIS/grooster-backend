@@ -22,6 +22,8 @@ docs/RosterApi.md
 docs/RosterComment.md
 docs/RosterCommentApi.md
 docs/RosterCreateRequest.md
+docs/RosterResponsible.md
+docs/RosterResponsibleCreateRequest.md
 docs/RosterShift.md
 docs/RosterShiftApi.md
 docs/RosterTemplate.md

@@ -23,6 +23,7 @@ func SeedRosters(db *gorm.DB, count int) {
 
 	rosterAnswer(db, rosters)
 	seedSavedShifts(db, rosters, shifts)
+	seedRosterResponsibles(db, rosters)
 }
 
 func roster(db *gorm.DB, count int) []*models.Roster {
@@ -235,6 +236,30 @@ func seedTemplatePreferences(db *gorm.DB, templates []models.RosterTemplate) {
 		}
 	}
 	db.CreateInBatches(&allPrefs, 100)
+}
+
+func seedRosterResponsibles(db *gorm.DB, rosters []*models.Roster) {
+	for _, r := range rosters {
+		var users []models.User
+		if err := db.Table("users AS u").
+			Joins("JOIN user_organs AS uo ON uo.user_id = u.id").
+			Where("uo.organ_id = ?", r.OrganID).
+			Limit(2).
+			Find(&users).Error; err != nil {
+			log.Error().Err(err).Msg("Could not get organ users for roster responsibles")
+			continue
+		}
+
+		for _, user := range users {
+			responsible := models.RosterResponsible{
+				RosterID: r.ID,
+				UserID:   user.ID,
+			}
+			if err := db.Create(&responsible).Error; err != nil {
+				log.Error().Err(err).Msg("Failed to create roster responsible")
+			}
+		}
+	}
 }
 
 func seedSavedShifts(db *gorm.DB, rosters []*models.Roster, shifts []models.RosterShift) {

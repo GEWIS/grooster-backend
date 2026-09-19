@@ -5,12 +5,15 @@ All URIs are relative to *http://localhost*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**createRoster**](#createroster) | **POST** /roster | CreateRoster a new roster|
+|[**createRosterResponsible**](#createrosterresponsible) | **POST** /roster/{id}/responsibles | Create a roster responsible|
 |[**createRosterTemplate**](#createrostertemplate) | **POST** /roster/template | Creates a template of a roster by defining the name of the shifts|
 |[**createRosterTemplateShiftPreference**](#createrostertemplateshiftpreference) | **POST** /roster/template/shift-preference | Creates a roster template shift preference|
 |[**deleteRoster**](#deleteroster) | **DELETE** /roster/{id} | DeleteRoster a roster|
+|[**deleteRosterResponsible**](#deleterosterresponsible) | **DELETE** /roster/{id}/responsibles/{userId} | Delete a roster responsible|
 |[**deleteRosterTemplate**](#deleterostertemplate) | **DELETE** /roster/template/{id} | Deletes a roster template by ID|
 |[**fillRoster**](#fillroster) | **POST** /roster/{id}/fill | Fills a roster with the linked user template preferences|
 |[**getRoster**](#getroster) | **GET** /roster/{id} | Get a specific roster by id|
+|[**getRosterResponsibles**](#getrosterresponsibles) | **GET** /roster/{id}/responsibles | Get roster responsibles|
 |[**getRosterTemplate**](#getrostertemplate) | **GET** /roster/template/{id} | Get a roster template by ID|
 |[**getRosterTemplateShiftPreferences**](#getrostertemplateshiftpreferences) | **GET** /roster/template/shift-preference | Gets shift preferences filtered by user and template|
 |[**getRosterTemplates**](#getrostertemplates) | **GET** /roster/template | Get all rosters templates or query by organ ID|
@@ -69,6 +72,64 @@ const { status, data } = await apiInstance.createRoster(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**400** | Bad Request |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createRosterResponsible**
+> RosterResponsible createRosterResponsible(params)
+
+Assigns a user as responsible for a given roster. Requires admin level or higher in the roster\'s organ.
+
+### Example
+
+```typescript
+import {
+    RosterApi,
+    Configuration,
+    RosterResponsibleCreateRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterApi(configuration);
+
+let id: number; //Roster ID (default to undefined)
+let params: RosterResponsibleCreateRequest; //User to assign as responsible
+
+const { status, data } = await apiInstance.createRosterResponsible(
+    id,
+    params
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **params** | **RosterResponsibleCreateRequest**| User to assign as responsible | |
+| **id** | [**number**] | Roster ID | defaults to undefined|
+
+
+### Return type
+
+**RosterResponsible**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**201** | Created |  -  |
+|**400** | Invalid request |  -  |
+|**403** | Insufficient organ permissions |  -  |
+|**404** | Roster not found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -228,6 +289,63 @@ const { status, data } = await apiInstance.deleteRoster(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteRosterResponsible**
+> { [key: string]: string; } deleteRosterResponsible()
+
+Removes a user\'s responsible assignment for a given roster. Requires admin level or higher in the roster\'s organ.
+
+### Example
+
+```typescript
+import {
+    RosterApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterApi(configuration);
+
+let id: number; //Roster ID (default to undefined)
+let userId: number; //User ID (default to undefined)
+
+const { status, data } = await apiInstance.deleteRosterResponsible(
+    id,
+    userId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | Roster ID | defaults to undefined|
+| **userId** | [**number**] | User ID | defaults to undefined|
+
+
+### Return type
+
+**{ [key: string]: string; }**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Invalid request |  -  |
+|**403** | Insufficient organ permissions |  -  |
+|**404** | Responsible not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **deleteRosterTemplate**
 > string deleteRosterTemplate()
 
@@ -381,6 +499,60 @@ const { status, data } = await apiInstance.getRoster(
 |**200** | OK |  -  |
 |**400** | Bad Request |  -  |
 |**404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getRosterResponsibles**
+> Array<RosterResponsible> getRosterResponsibles()
+
+Returns the responsibles for a given roster. Callable by any member of the roster\'s organ.
+
+### Example
+
+```typescript
+import {
+    RosterApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RosterApi(configuration);
+
+let id: number; //Roster ID (default to undefined)
+
+const { status, data } = await apiInstance.getRosterResponsibles(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | Roster ID | defaults to undefined|
+
+
+### Return type
+
+**Array<RosterResponsible>**
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**400** | Invalid roster ID |  -  |
+|**403** | Insufficient organ permissions |  -  |
+|**404** | Roster not found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
