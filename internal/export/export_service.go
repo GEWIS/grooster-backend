@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"fmt"
 	"image/png"
+	"sort"
 	"strings"
 
 	"github.com/fogleman/gg"
@@ -61,6 +62,14 @@ func (e *service) AssignmentsToPng(rosterID uint) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	sort.Slice(savedShifts, func(i, j int) bool {
+    	oi, oj := savedShifts[i].RosterShift.Order, savedShifts[j].RosterShift.Order
+    	if oi != oj {
+        	return oi < oj
+		}
+		return savedShifts[i].RosterShift.ID < savedShifts[j].RosterShift.ID
+	})
 
 	normalFont, boldFont, err := loadFonts()
 	if err != nil {
