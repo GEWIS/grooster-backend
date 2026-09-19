@@ -250,6 +250,12 @@ const getStatusColorClass = (value: string) => {
         // Purple -> Soft Lavender
         case 'L':
             return 'bg-purple-300 text-purple-900 font-semibold';
+        // Rainbow
+        case 'S':
+            return 'answer-rainbow font-semibold';
+        // Beer
+        case 'B':
+            return 'answer-beer font-semibold';
         default:
             return 'bg-transparent text-gray-400';
     }
@@ -532,5 +538,31 @@ const getStatusColorClass = (value: string) => {
 :deep(.p-select) {
     background-color: transparent !important;
     border: none !important;
+}
+
+@keyframes rainbow-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+.answer-rainbow {
+    background: linear-gradient(90deg, #ff0000, #ff9900, #ffee00, #33ff00, #00ffee, #0066ff, #cc00ff, #ff0000);
+    background-size: 200% 100%;
+    animation: rainbow-shift 3s linear infinite;
+}
+
+.answer-beer {
+    background: linear-gradient(to bottom, #fff8e1 0%, #fff8e1 22%, #f5a623 22%, #d9840d 100%);
+}
+
+:deep(.answer-rainbow .p-select-label),
+:deep(.answer-beer .p-select-label) {
+    color: white !important;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 </style>
