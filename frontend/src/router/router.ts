@@ -100,6 +100,8 @@ function handleOrganAccess(
     }
 
     organStore.setOrgan(id, organ.name);
+    const rosterStore = useRosterStore();
+    rosterStore.clearRosters();
     next();
 }
 
