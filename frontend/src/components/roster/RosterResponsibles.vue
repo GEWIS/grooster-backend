@@ -68,22 +68,22 @@ const removeResponsible = async (userId: number) => {
 </script>
 
 <template>
-    <div class="space-y-3 border-b border-slate-200 pb-4">
+    <div class="space-y-3 border-b border-surface pb-4">
         <div>
-            <h2 class="text-xl font-bold text-slate-800">Responsibles</h2>
-            <p class="text-sm text-slate-500">Users responsible for organising this activity.</p>
+            <h2 class="text-xl font-bold text-color">Responsibles</h2>
+            <p class="text-sm text-muted-color">Users responsible for organising this activity.</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
             <div
                 v-for="user in responsibleUsers"
                 :key="user.id"
-                class="group flex items-center bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-1 py-1 transition-colors hover:bg-slate-100"
+                class="group flex items-center bg-surface-50 dark:bg-surface-800 border border-surface rounded-lg pl-3 pr-1 py-1 transition-colors hover:bg-emphasis"
             >
-                <span class="text-sm font-medium text-slate-700">{{ user.name }}</span>
+                <span class="text-sm font-medium text-muted-color">{{ user.name }}</span>
                 <Button
                     v-if="authStore.can([Role.Admin, Role.Owner])"
-                    class="!p-0 !w-7 !h-7 !text-slate-400 group-hover:!text-red-500"
+                    class="!p-0 !w-7 !h-7 !text-surface-400 dark:!text-surface-500 group-hover:!text-red-500"
                     icon="pi pi-times"
                     rounded
                     text
@@ -91,12 +91,14 @@ const removeResponsible = async (userId: number) => {
                 />
             </div>
 
-            <p v-if="responsibleUsers.length === 0" class="text-sm text-slate-400">No responsibles assigned yet.</p>
+            <p v-if="responsibleUsers.length === 0" class="text-sm text-surface-400 dark:text-surface-500">
+                No responsibles assigned yet.
+            </p>
 
             <div v-if="authStore.can([Role.Admin, Role.Owner])" class="relative min-w-[180px]">
                 <Select
                     v-model="selectedUserId"
-                    class="!w-full !rounded-lg !border-dashed !border-slate-300 !bg-transparent hover:!border-indigo-400 transition-all !text-sm"
+                    class="!w-full !rounded-lg !border-dashed !border-surface !bg-transparent hover:!border-indigo-400 transition-all !text-sm"
                     option-label="name"
                     option-value="id"
                     :options="availableUsers"

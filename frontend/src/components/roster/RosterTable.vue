@@ -257,7 +257,7 @@ const getStatusColorClass = (value: string) => {
         case 'B':
             return 'answer-beer font-semibold';
         default:
-            return 'bg-transparent text-gray-400';
+            return 'bg-transparent text-surface-400 dark:text-surface-500';
     }
 };
 </script>
@@ -265,14 +265,14 @@ const getStatusColorClass = (value: string) => {
 <template>
     <div
         v-if="roster && Object.keys(shiftAnswers).length"
-        class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+        class="bg-surface-0 dark:bg-surface-900 rounded-xl shadow-sm border border-surface overflow-hidden"
     >
         <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full border-collapse">
                 <thead>
-                    <tr class="bg-gray-50 border-b border-gray-200">
+                    <tr class="bg-surface-50 dark:bg-surface-800 border-b border-surface">
                         <th
-                            class="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 min-w-[150px]"
+                            class="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-muted-color min-w-[150px]"
                         >
                             Users
                         </th>
@@ -281,10 +281,10 @@ const getStatusColorClass = (value: string) => {
                             <th
                                 v-for="(shift, index) in roster.rosterShift.sort((a, b) => a.order - b.order)"
                                 :key="shift.id"
-                                class="px-3 py-3 text-center min-w-[140px] border-l border-gray-100"
+                                class="px-3 py-3 text-center min-w-[140px] border-l border-surface"
                             >
                                 <div class="flex flex-col items-center gap-1.5">
-                                    <span class="text-sm font-semibold text-gray-700 leading-tight">{{
+                                    <span class="text-sm font-semibold text-muted-color leading-tight">{{
                                         shift.name
                                     }}</span>
 
@@ -327,15 +327,17 @@ const getStatusColorClass = (value: string) => {
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-gray-100">
-                    <tr v-for="user in sortedUsers" :key="user.id" class="hover:bg-blue-50/30 transition-colors">
-                        <td class="px-4 py-3 text-sm border-r border-gray-50">
+                <tbody class="divide-y divide-surface-200 dark:divide-surface-700">
+                    <tr
+                        v-for="user in sortedUsers"
+                        :key="user.id"
+                        class="hover:bg-blue-50/30 dark:hover:bg-blue-950/30 transition-colors"
+                    >
+                        <td class="px-4 py-3 text-sm border-r border-surface">
                             <div
                                 class="max-w-[200px] overflow-x-auto whitespace-nowrap"
                                 :class="
-                                    user.gewis_id === getGEWISId()
-                                        ? 'font-bold text-gray-900'
-                                        : 'font-medium text-gray-900'
+                                    user.gewis_id === getGEWISId() ? 'font-bold text-color' : 'font-medium text-color'
                                 "
                             >
                                 {{ user.displayName || user.name }}
@@ -376,7 +378,7 @@ const getStatusColorClass = (value: string) => {
         </div>
 
         <div
-            class="bg-gray-50 px-4 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4"
+            class="bg-surface-50 dark:bg-surface-800 px-4 py-4 border-t border-surface flex flex-col sm:flex-row items-center justify-between gap-4"
         >
             <Button
                 v-if="authStore.can([Role.Admin, Role.Owner])"
@@ -426,7 +428,7 @@ const getStatusColorClass = (value: string) => {
         <Dialog v-model:visible="visible" class="p-fluid" header="Add New Shift" modal :style="{ width: '24rem' }">
             <div class="flex flex-col gap-4 py-2">
                 <div class="flex flex-col gap-2">
-                    <label class="text-sm font-medium text-gray-700" for="shiftName">Shift Name</label>
+                    <label class="text-sm font-medium text-muted-color" for="shiftName">Shift Name</label>
                     <InputText id="shiftName" v-model="shiftName" autofocus placeholder="e.g. Evening Standby" />
                 </div>
             </div>
@@ -440,7 +442,7 @@ const getStatusColorClass = (value: string) => {
 
         <Popover ref="commentPopover" class="w-72">
             <div v-if="activeCommentUser" class="flex flex-col gap-2">
-                <span class="text-sm font-medium text-gray-700">
+                <span class="text-sm font-medium text-muted-color">
                     {{ activeCommentUser.displayName || activeCommentUser.name }}
                 </span>
 
@@ -459,7 +461,7 @@ const getStatusColorClass = (value: string) => {
                     <Button label="Save" size="small" @click="saveComment" />
                 </template>
                 <template v-else>
-                    <p class="text-sm text-gray-600 whitespace-pre-wrap">
+                    <p class="text-sm text-muted-color whitespace-pre-wrap">
                         {{ getUserComment(activeCommentUser.id) || 'No comment yet.' }}
                     </p>
                 </template>
@@ -475,16 +477,28 @@ const getStatusColorClass = (value: string) => {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--p-surface-100);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--p-surface-300);
     border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: var(--p-surface-400);
+}
+
+:global(.app-dark) .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--p-surface-800);
+}
+
+:global(.app-dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--p-surface-600);
+}
+
+:global(.app-dark) .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--p-surface-500);
 }
 
 .overflow-x-auto {

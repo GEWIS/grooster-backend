@@ -42,10 +42,10 @@ const getGroupName = (id: number) => {
 
 <template>
     <div class="p-2">
-        <Card class="overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <Card class="overflow-hidden border border-surface shadow-sm hover:shadow-md transition-shadow duration-300">
             <template #content>
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800 truncate">
+                    <h3 class="text-lg font-semibold text-color truncate">
                         {{ props.template.name }}
                     </h3>
                     <div class="flex gap-2">
@@ -72,7 +72,7 @@ const getGroupName = (id: number) => {
                 <Divider class="my-0" />
 
                 <div class="flex justify-between items-center mt-3">
-                    <div class="flex items-center text-sm text-gray-500">
+                    <div class="flex items-center text-sm text-muted-color">
                         <i class="pi pi-calendar mr-2"></i>
                         {{ props.template.shifts?.length || 0 }} Shifts
                     </div>
@@ -87,16 +87,16 @@ const getGroupName = (id: number) => {
                 </div>
 
                 <transition name="p-toggleable-content">
-                    <div v-if="showDetail" class="mt-4 pt-4 border-t border-dashed border-gray-200">
+                    <div v-if="showDetail" class="mt-4 pt-4 border-t border-dashed border-surface">
                         <ul class="space-y-2">
                             <li
                                 v-for="shift in props.template.shifts"
                                 :key="shift.id"
-                                class="flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-100 gap-3"
+                                class="flex items-center justify-between p-2 bg-surface-50 dark:bg-surface-800 rounded-md border border-surface gap-3"
                             >
                                 <div class="flex items-center min-w-0 flex-1 gap-1">
                                     <i class="pi pi-clock mr-2 text-blue-500 text-sm"></i>
-                                    <span class="text-sm font-medium text-gray-700 truncate">
+                                    <span class="text-sm font-medium text-muted-color truncate">
                                         {{ shift.shiftName }}
                                     </span>
                                 </div>
@@ -104,7 +104,7 @@ const getGroupName = (id: number) => {
                                 <div class="flex-shrink-0 w-40 h-8">
                                     <Select
                                         v-model="shift.shiftGroupId"
-                                        class="w-full h-8 text-xs flex items-center border-gray-200"
+                                        class="w-full h-8 text-xs flex items-center border-surface"
                                         :disabled="!authStore.can([Role.Admin, Role.Owner])"
                                         option-label="name"
                                         option-value="id"
@@ -120,7 +120,9 @@ const getGroupName = (id: number) => {
                                             >
                                                 <span class="truncate">{{ getGroupName(slotProps.value) }}</span>
                                             </div>
-                                            <span v-else class="text-xs text-gray-400">Assign...</span>
+                                            <span v-else class="text-xs text-surface-400 dark:text-surface-500"
+                                                >Assign...</span
+                                            >
                                         </template>
 
                                         <template #option="slotProps">

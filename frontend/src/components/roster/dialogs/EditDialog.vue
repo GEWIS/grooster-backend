@@ -51,7 +51,7 @@ const updateName = async () => {
         modal
         :pt="{
             root: 'border-none shadow-xl rounded-xl overflow-hidden',
-            header: 'bg-white border-b border-gray-100 p-5',
+            header: 'bg-surface-0 dark:bg-surface-900 border-b border-surface p-5',
             content: 'p-0', // We'll handle padding inside
         }"
         :style="{ width: '28rem' }"
@@ -59,27 +59,27 @@ const updateName = async () => {
         <template #header>
             <div class="flex items-center gap-3">
                 <div
-                    class="flex items-center justify-center w-11 h-11 rounded-full bg-amber-50 border border-amber-100"
+                    class="flex items-center justify-center w-11 h-11 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900"
                 >
                     <i class="pi pi-question-circle text-amber-600 text-xl"></i>
                 </div>
-                <span class="font-bold text-xl text-gray-800">Change Roster Name</span>
+                <span class="font-bold text-xl text-color">Change Roster Name</span>
             </div>
         </template>
 
         <div class="flex flex-col gap-2 pt-4">
-            <label class="text-sm font-semibold text-gray-700" for="rosterName">New Display Name</label>
+            <label class="text-sm font-semibold text-muted-color" for="rosterName">New Display Name</label>
             <div class="relative">
                 <InputText
                     id="rosterName"
                     v-model="newName"
                     autofocus
-                    class="w-full p-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    class="w-full p-3 border-surface rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g. Summer Shift 2024"
                     @keydown.enter="updateName"
                 />
             </div>
-            <small class="text-gray-500">Give your roster a descriptive name that others will recognize.</small>
+            <small class="text-muted-color">Give your roster a descriptive name that others will recognize.</small>
         </div>
 
         <template #footer>

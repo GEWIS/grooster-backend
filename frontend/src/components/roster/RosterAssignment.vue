@@ -134,10 +134,10 @@ const exportRoster = async () => {
 
 <template>
     <div v-if="savedRoster && savedRoster.length > 0" class="space-y-6 max-w-6xl mx-auto p-4">
-        <div class="flex flex-row justify-between items-center border-b border-slate-200 pb-4">
+        <div class="flex flex-row justify-between items-center border-b border-surface pb-4">
             <div>
-                <h2 class="text-xl font-bold text-slate-800">Shift Assignments</h2>
-                <p class="text-sm text-slate-500">Assign and manage team members for each active shift.</p>
+                <h2 class="text-xl font-bold text-color">Shift Assignments</h2>
+                <p class="text-sm text-muted-color">Assign and manage team members for each active shift.</p>
             </div>
 
             <div class="flex">
@@ -149,12 +149,12 @@ const exportRoster = async () => {
             <div
                 v-for="shift in savedRoster"
                 :key="shift.id"
-                class="bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-5"
+                class="bg-surface-0 dark:bg-surface-900 border border-surface rounded-xl shadow-sm hover:shadow-md transition-shadow p-5"
             >
                 <div class="flex flex-col md:flex-row md:items-center gap-6">
                     <div class="min-w-[160px]">
                         <span
-                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100"
+                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900"
                         >
                             {{ shift.rosterShift.name }}
                         </span>
@@ -164,12 +164,12 @@ const exportRoster = async () => {
                         <div
                             v-for="(user, index) in shiftAssignedUsers[shift.id]"
                             :key="user.id + '-' + shift.id"
-                            class="group flex items-center bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-1 py-1 transition-colors hover:bg-slate-100"
+                            class="group flex items-center bg-surface-50 dark:bg-surface-800 border border-surface rounded-lg pl-3 pr-1 py-1 transition-colors hover:bg-emphasis"
                         >
-                            <span class="text-sm font-medium text-slate-700">{{ user.name }}</span>
+                            <span class="text-sm font-medium text-muted-color">{{ user.name }}</span>
                             <Button
                                 v-if="authStore.can([Role.Admin, Role.Owner])"
-                                class="!p-0 !w-7 !h-7 !text-slate-400 group-hover:!text-red-500"
+                                class="!p-0 !w-7 !h-7 !text-surface-400 dark:!text-surface-500 group-hover:!text-red-500"
                                 icon="pi pi-times"
                                 rounded
                                 text
@@ -182,7 +182,7 @@ const exportRoster = async () => {
                                 v-if="authStore.can([Role.Admin, Role.Owner])"
                                 :key="'select-' + shift.id"
                                 v-model="selectedIds[shift.id]"
-                                class="!w-full !rounded-lg !border-dashed !border-slate-300 !bg-transparent hover:!border-indigo-400 transition-all !text-sm"
+                                class="!w-full !rounded-lg !border-dashed !border-surface !bg-transparent hover:!border-indigo-400 transition-all !text-sm"
                                 option-label="name"
                                 option-value="id"
                                 :options="availableUsersForShift(shift)"

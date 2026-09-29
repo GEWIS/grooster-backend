@@ -39,8 +39,8 @@ onMounted(async () => {
     <div class="p-4 max-w-7xl mx-auto">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Roster Management</h1>
-                <p class="text-gray-500">Manage and deploy your recurring shift schedules.</p>
+                <h1 class="text-2xl font-bold text-color">Roster Management</h1>
+                <p class="text-muted-color">Manage and deploy your recurring shift schedules.</p>
             </div>
             <div class="flex gap-2">
                 <Button
@@ -54,16 +54,16 @@ onMounted(async () => {
         </div>
 
         <section class="mb-12">
-            <h2 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <h2 class="text-lg font-semibold text-muted-color mb-4 flex items-center gap-2">
                 <i class="pi pi-copy text-primary"></i> Roster Templates
             </h2>
 
             <div
                 v-if="templates.length === 0"
-                class="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl"
+                class="text-center py-12 border-2 border-dashed border-surface rounded-xl"
             >
-                <i class="pi pi-calendar-plus text-5xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-lg">No templates found.</p>
+                <i class="pi pi-calendar-plus text-5xl text-surface-400 dark:text-surface-500 mb-4"></i>
+                <p class="text-muted-color text-lg">No templates found.</p>
             </div>
 
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -76,7 +76,7 @@ onMounted(async () => {
             </div>
         </section>
 
-        <hr class="border-gray-100 mb-12" />
+        <hr class="border-surface mb-12" />
 
         <ShiftGroupsSection @update:groups="(val: ShiftGroup[]) => (shiftGroups = val)" />
     </div>

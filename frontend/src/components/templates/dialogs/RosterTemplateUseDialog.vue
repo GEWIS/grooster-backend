@@ -88,7 +88,7 @@ const addRoster = async () => {
             <div v-if="props.shifts.length > 0" class="flex flex-col gap-2">
                 <div class="flex items-center justify-between">
                     <label class="text-sm font-semibold">Shifts</label>
-                    <span class="text-xs text-gray-400"
+                    <span class="text-xs text-surface-400 dark:text-surface-500"
                         >{{ selectedShifts.length }} / {{ props.shifts.length }} selected</span
                     >
                 </div>
@@ -99,8 +99,8 @@ const addRoster = async () => {
                         class="px-3 py-1 rounded-full text-sm font-medium border transition-all duration-150 cursor-pointer select-none"
                         :class="
                             selectedShifts.includes(shift)
-                                ? 'bg-[--p-primary-color] border-[--p-primary-color] text-[--p-primary-contrast-color]'
-                                : 'bg-transparent border-gray-300 text-gray-400 hover:border-[--p-primary-color] hover:text-[--p-primary-color]'
+                                ? 'bg-primary border-primary text-primary-contrast'
+                                : 'bg-transparent border-surface text-surface-400 dark:text-surface-500 hover:border-primary hover:text-primary'
                         "
                         type="button"
                         @click="toggleShift(shift)"

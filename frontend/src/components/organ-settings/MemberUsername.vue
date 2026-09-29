@@ -70,7 +70,10 @@ const resetName = () => {
 </script>
 
 <template>
-    <div v-if="memberSettings" class="bg-emerald-950/5 border border-emerald-100 rounded-xl overflow-hidden shadow-sm">
+    <div
+        v-if="memberSettings"
+        class="bg-emerald-950/5 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900 rounded-xl overflow-hidden shadow-sm"
+    >
         <div class="bg-emerald-950 p-6 flex items-center gap-4">
             <div
                 class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-900 shadow-sm"
@@ -84,7 +87,10 @@ const resetName = () => {
         </div>
         <div class="p-8 space-y-6">
             <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold uppercase tracking-wider text-emerald-900/60 ml-1" for="username">
+                <label
+                    class="text-xs font-bold uppercase tracking-wider text-emerald-900/60 dark:text-emerald-200/60 ml-1"
+                    for="username"
+                >
                     Display Name
                 </label>
 
@@ -93,7 +99,7 @@ const resetName = () => {
                         <input
                             id="username"
                             v-model="editName"
-                            class="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-emerald-950 font-medium"
+                            class="w-full px-4 py-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-emerald-950 dark:text-emerald-50 font-medium"
                             maxlength="25"
                             placeholder="Your name in this organ..."
                             type="text"
@@ -104,7 +110,7 @@ const resetName = () => {
                     <div class="flex gap-2">
                         <button
                             v-if="isChanged"
-                            class="px-4 py-2 text-emerald-700 hover:bg-emerald-100 rounded-lg transition-colors text-sm font-medium"
+                            class="px-4 py-2 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded-lg transition-colors text-sm font-medium"
                             @click="resetName"
                         >
                             Cancel
@@ -129,10 +135,10 @@ const resetName = () => {
     </div>
     <div
         v-else
-        class="animate-pulse bg-emerald-50/50 rounded-xl p-8 border border-emerald-100 h-64 flex flex-col justify-center items-center gap-4"
+        class="animate-pulse bg-emerald-50/50 dark:bg-emerald-950/40 rounded-xl p-8 border border-emerald-100 dark:border-emerald-900 h-64 flex flex-col justify-center items-center gap-4"
     >
-        <div class="h-12 w-12 bg-emerald-200 rounded-full"></div>
-        <div class="h-4 w-48 bg-emerald-200 rounded"></div>
+        <div class="h-12 w-12 bg-emerald-200 dark:bg-emerald-900 rounded-full"></div>
+        <div class="h-4 w-48 bg-emerald-200 dark:bg-emerald-900 rounded"></div>
     </div>
 </template>
 

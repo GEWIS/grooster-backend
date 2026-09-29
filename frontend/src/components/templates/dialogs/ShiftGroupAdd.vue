@@ -48,8 +48,8 @@ const createGroup = async () => {
     <Dialog v-model:visible="visible" modal :style="{ width: '28rem' }" @hide="emit('close')">
         <template #header>
             <div class="flex flex-col gap-1">
-                <h3 class="m-0 text-xl font-semibold text-surface-900">New Shift Group</h3>
-                <small class="text-surface-500">Specify the name of the shift group</small>
+                <h3 class="m-0 text-xl font-semibold text-color">New Shift Group</h3>
+                <small class="text-muted-color">Specify the name of the shift group</small>
             </div>
         </template>
         <div class="flex flex-col gap-2 justify-center">

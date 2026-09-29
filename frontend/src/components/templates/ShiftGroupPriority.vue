@@ -119,13 +119,17 @@ onMounted(fetchUserPriorities);
 
 <template>
     <div class="flex h-[400px]">
-        <div class="w-1/3 border-r border-emerald-50 overflow-y-auto bg-emerald-50/30">
+        <div
+            class="w-1/3 border-r border-emerald-50 dark:border-emerald-900 overflow-y-auto bg-emerald-50/30 dark:bg-emerald-950/30"
+        >
             <div
                 v-for="user in users"
                 :key="user.id"
                 :class="[
-                    'p-4 cursor-pointer transition-colors border-b border-emerald-50',
-                    selectedUser?.id === user.id ? 'bg-white font-bold text-emerald-700' : 'hover:bg-emerald-100/50',
+                    'p-4 cursor-pointer transition-colors border-b border-emerald-50 dark:border-emerald-900',
+                    selectedUser?.id === user.id
+                        ? 'bg-surface-0 dark:bg-surface-800 font-bold text-emerald-700 dark:text-emerald-300'
+                        : 'hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30',
                 ]"
                 @click="selectedUser = user"
             >
@@ -146,16 +150,18 @@ onMounted(fetchUserPriorities);
                     />
                 </div>
                 <div>
-                    <h3 class="font-bold text-gray-900">{{ selectedUser.name }}</h3>
-                    <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">
+                    <h3 class="font-bold text-color">{{ selectedUser.name }}</h3>
+                    <p class="text-xs text-muted-color uppercase tracking-widest mt-1">
                         Current Priority: {{ getUserPriority(selectedUser.id) }}
                     </p>
                 </div>
 
                 <div class="pt-4">
-                    <label class="block text-xs font-medium text-gray-400 mb-2 text-left">CHANGE ROLE</label>
+                    <label class="block text-xs font-medium text-surface-400 dark:text-surface-500 mb-2 text-left"
+                        >CHANGE ROLE</label
+                    >
                     <Select
-                        class="w-full border-emerald-200 text-sm focus:ring-emerald-500"
+                        class="w-full border-emerald-200 dark:border-emerald-800 text-sm focus:ring-emerald-500"
                         :model-value="currentPriority"
                         option-label="label"
                         option-value="value"
@@ -166,7 +172,9 @@ onMounted(fetchUserPriorities);
                 </div>
             </div>
 
-            <div v-else class="text-gray-400 italic text-sm">Select a member to manage their role</div>
+            <div v-else class="text-surface-400 dark:text-surface-500 italic text-sm">
+                Select a member to manage their role
+            </div>
         </div>
     </div>
 </template>

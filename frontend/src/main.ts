@@ -26,6 +26,7 @@ import ToastService from 'primevue/toastservice';
 import Toast from 'primevue/toast';
 import App from './App.vue';
 import router from '@/router/router';
+import { useThemeStore } from '@/stores/theme.store';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -36,7 +37,7 @@ app.use(PrimeVue, {
         preset: Aura,
         options: {
             prefix: 'p',
-            darkModeSelector: false,
+            darkModeSelector: '.app-dark',
             cssLayer: false,
         },
     },
@@ -60,5 +61,6 @@ app.component('Textarea', Textarea);
 app.component('Toast', Toast);
 
 app.use(pinia);
+useThemeStore().init();
 app.use(router);
 app.mount('#app');

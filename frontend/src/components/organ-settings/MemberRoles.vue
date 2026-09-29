@@ -115,7 +115,7 @@ onMounted(fetchUserOrganSettings);
 <template>
     <div
         v-if="users.length > 0"
-        class="bg-white border border-emerald-100 rounded-2xl overflow-hidden shadow-xl max-w-3xl mx-auto flex flex-col h-[550px]"
+        class="bg-surface-0 dark:bg-surface-900 border border-emerald-100 dark:border-emerald-900 rounded-2xl overflow-hidden shadow-xl max-w-3xl mx-auto flex flex-col h-[550px]"
     >
         <div class="bg-emerald-950 p-6 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-4">
@@ -133,15 +133,17 @@ onMounted(fetchUserOrganSettings);
         </div>
 
         <div class="flex flex-1 overflow-hidden">
-            <div class="w-1/3 border-r border-emerald-50 overflow-y-auto bg-emerald-50/20">
+            <div
+                class="w-1/3 border-r border-emerald-50 dark:border-emerald-900 overflow-y-auto bg-emerald-50/20 dark:bg-emerald-950/20"
+            >
                 <div
                     v-for="user in users"
                     :key="user.id"
                     :class="[
-                        'p-4 cursor-pointer transition-all border-b border-emerald-50/50 flex items-center gap-3',
+                        'p-4 cursor-pointer transition-all border-b border-emerald-50/50 dark:border-emerald-900/50 flex items-center gap-3',
                         selectedUser?.id === user.id
-                            ? 'bg-emerald-100/50 border-r-4 border-r-emerald-600'
-                            : 'hover:bg-emerald-50',
+                            ? 'bg-emerald-100/50 dark:bg-emerald-900/40 border-r-4 border-r-emerald-600'
+                            : 'hover:bg-emerald-50 dark:hover:bg-emerald-950/40',
                     ]"
                     @click="() => setUser(user)"
                 >
@@ -150,7 +152,7 @@ onMounted(fetchUserOrganSettings);
                         :class="
                             selectedUser?.id === user.id
                                 ? 'bg-emerald-600 text-white'
-                                : 'bg-emerald-200 text-emerald-800'
+                                : 'bg-emerald-200 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200'
                         "
                     >
                         {{ user.name.charAt(0) }}
@@ -158,7 +160,9 @@ onMounted(fetchUserOrganSettings);
                     <p
                         :class="[
                             'truncate text-sm',
-                            selectedUser?.id === user.id ? 'font-bold text-emerald-900' : 'text-gray-600',
+                            selectedUser?.id === user.id
+                                ? 'font-bold text-emerald-900 dark:text-emerald-100'
+                                : 'text-muted-color',
                         ]"
                     >
                         {{ user.name }}
@@ -166,18 +170,18 @@ onMounted(fetchUserOrganSettings);
                 </div>
             </div>
 
-            <div class="w-2/3 overflow-y-auto bg-white relative">
+            <div class="w-2/3 overflow-y-auto bg-surface-0 dark:bg-surface-900 relative">
                 <div v-if="selectedUser" class="p-8 h-full flex flex-col">
                     <div class="flex items-center gap-5 mb-8">
                         <div
-                            class="h-20 w-20 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-900 shadow-inner border border-emerald-200 shrink-0"
+                            class="h-20 w-20 bg-emerald-100 dark:bg-emerald-900/50 rounded-2xl flex items-center justify-center text-emerald-900 dark:text-emerald-100 shadow-inner border border-emerald-200 dark:border-emerald-800 shrink-0"
                         >
                             <span class="text-3xl font-black">{{ selectedUser.name.charAt(0) }}</span>
                         </div>
                         <div class="overflow-hidden">
-                            <h3 class="font-bold text-2xl text-gray-900 truncate">{{ selectedUser.name }}</h3>
+                            <h3 class="font-bold text-2xl text-color truncate">{{ selectedUser.name }}</h3>
                             <div
-                                class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mt-1"
+                                class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 text-xs font-bold uppercase tracking-wider mt-1"
                             >
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                 {{ getUserRole(selectedUser.id) }}
@@ -185,14 +189,16 @@ onMounted(fetchUserOrganSettings);
                         </div>
                     </div>
 
-                    <div class="space-y-6 bg-emerald-50/30 p-6 rounded-2xl border border-emerald-100">
+                    <div
+                        class="space-y-6 bg-emerald-50/30 dark:bg-emerald-950/30 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-900"
+                    >
                         <div>
                             <label
-                                class="block text-[10px] font-bold text-emerald-800 uppercase tracking-widest mb-2 px-1"
+                                class="block text-[10px] font-bold text-emerald-800 dark:text-emerald-200 uppercase tracking-widest mb-2 px-1"
                                 >Organization Role</label
                             >
                             <Select
-                                class="w-full border-emerald-200 text-sm focus:ring-emerald-500 shadow-sm"
+                                class="w-full border-emerald-200 dark:border-emerald-800 text-sm focus:ring-emerald-500 shadow-sm"
                                 :model-value="currentRole"
                                 option-label="label"
                                 option-value="value"
@@ -204,28 +210,32 @@ onMounted(fetchUserOrganSettings);
 
                         <div>
                             <label
-                                class="block text-[10px] font-bold text-emerald-800 uppercase tracking-widest mb-2 px-1"
+                                class="block text-[10px] font-bold text-emerald-800 dark:text-emerald-200 uppercase tracking-widest mb-2 px-1"
                                 >Display Name (Nickname)</label
                             >
                             <div class="relative">
                                 <input
                                     id="username"
                                     v-model="editName"
-                                    class="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-emerald-950 font-medium shadow-sm"
+                                    class="w-full px-4 py-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-emerald-950 dark:text-emerald-50 font-medium shadow-sm"
                                     maxlength="25"
                                     placeholder="Their name in this organ..."
                                     type="text"
                                     @keyup.enter="updateMemberSettings(selectedUser.id)"
                                 />
-                                <i class="pi pi-pencil absolute right-3 top-3 text-emerald-300 pointer-events-none" />
+                                <i
+                                    class="pi pi-pencil absolute right-3 top-3 text-emerald-300 dark:text-emerald-700 pointer-events-none"
+                                />
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-auto pt-6 flex items-center justify-end gap-3 border-t border-emerald-50">
+                    <div
+                        class="mt-auto pt-6 flex items-center justify-end gap-3 border-t border-emerald-50 dark:border-emerald-900"
+                    >
                         <button
                             v-if="isChanged"
-                            class="px-5 py-2.5 text-gray-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition-all text-sm font-semibold"
+                            class="px-5 py-2.5 text-muted-color hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-xl transition-all text-sm font-semibold"
                             @click="resetName"
                         >
                             Discard
@@ -244,12 +254,12 @@ onMounted(fetchUserOrganSettings);
 
                 <div v-else class="h-full flex flex-col items-center justify-center p-12 text-center">
                     <div
-                        class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-dashed border-gray-200"
+                        class="w-20 h-20 bg-surface-50 dark:bg-surface-800 rounded-full flex items-center justify-center mb-4 border border-dashed border-surface"
                     >
-                        <i class="pi pi-user-plus text-2xl text-gray-300" />
+                        <i class="pi pi-user-plus text-2xl text-surface-400 dark:text-surface-500" />
                     </div>
-                    <h3 class="text-gray-900 font-bold">No Member Selected</h3>
-                    <p class="text-gray-400 text-sm mt-1 max-w-[200px]">
+                    <h3 class="text-color font-bold">No Member Selected</h3>
+                    <p class="text-surface-400 dark:text-surface-500 text-sm mt-1 max-w-[200px]">
                         Select a member from the list to manage their profile settings.
                     </p>
                 </div>

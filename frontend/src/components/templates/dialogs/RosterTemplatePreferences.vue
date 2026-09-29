@@ -105,23 +105,25 @@ const onPreferenceChange = async (shiftId: number, templateShiftId: number, valu
     <Dialog v-model:visible="visible" modal :style="{ width: '28rem' }" @hide="emit('close')">
         <template #header>
             <div class="flex flex-col gap-1">
-                <h3 class="m-0 text-xl font-semibold text-surface-900">Roster Template Preferences</h3>
-                <small class="text-surface-500">Give your preferences for each shift in this template.</small>
+                <h3 class="m-0 text-xl font-semibold text-color">Roster Template Preferences</h3>
+                <small class="text-muted-color">Give your preferences for each shift in this template.</small>
             </div>
         </template>
-        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-                <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wider">Shift Preferences</h3>
+        <div
+            class="max-w-2xl mx-auto bg-surface-0 dark:bg-surface-900 rounded-xl shadow-sm border border-surface overflow-hidden"
+        >
+            <div class="px-6 py-4 border-b border-surface bg-surface-50/50 dark:bg-surface-800/50">
+                <h3 class="text-sm font-semibold text-muted-color uppercase tracking-wider">Shift Preferences</h3>
             </div>
 
-            <div class="divide-y divide-slate-100">
+            <div class="divide-y divide-surface-100 dark:divide-surface-700">
                 <div
                     v-for="item in displayShifts"
                     :key="item.rosterTemplateShiftID"
-                    class="grid grid-cols-2 items-center px-6 py-3 hover:bg-slate-50 transition-colors duration-200"
+                    class="grid grid-cols-2 items-center px-6 py-3 hover:bg-emphasis transition-colors duration-200"
                 >
                     <div class="flex items-center gap-3">
-                        <span class="text-sm font-medium text-slate-700">{{ item.displayName }}</span>
+                        <span class="text-sm font-medium text-muted-color">{{ item.displayName }}</span>
                     </div>
 
                     <div class="flex justify-end">

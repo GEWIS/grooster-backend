@@ -51,7 +51,7 @@ onMounted(async () => {
 
 <template>
     <section class="flex flex-col gap-2">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+        <h2 class="text-lg font-semibold text-muted-color mb-4 flex items-center gap-2">
             <i class="pi pi-users text-primary"></i> Shift Groups
             <Button
                 v-if="authStore.can([Role.Admin, Role.Owner])"
@@ -65,14 +65,14 @@ onMounted(async () => {
             <template v-for="group in shiftGroups" :key="group.id">
                 <div
                     :class="[
-                        'p-4 bg-white border rounded-lg shadow-sm transition-all cursor-pointer hover:border-primary',
-                        expandedGroupId === group.id ? 'border-primary ring-2 ring-primary' : 'border-gray-200',
+                        'p-4 bg-surface-0 dark:bg-surface-900 border rounded-lg shadow-sm transition-all cursor-pointer hover:border-primary',
+                        expandedGroupId === group.id ? 'border-primary ring-2 ring-primary' : 'border-surface',
                     ]"
                     @click="toggleGroup(group.id)"
                 >
                     <div class="flex items-center justify-between">
-                        <p class="font-bold text-gray-800">{{ group.name }}</p>
-                        <i class="pi pi-chevron-right text-gray-400 text-sm"></i>
+                        <p class="font-bold text-color">{{ group.name }}</p>
+                        <i class="pi pi-chevron-right text-surface-400 dark:text-surface-500 text-sm"></i>
                     </div>
                 </div>
             </template>
@@ -82,16 +82,16 @@ onMounted(async () => {
             <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]" @click="expandedGroupId = null"></div>
 
             <div
-                class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[70] bg-white border border-gray-200 rounded-2xl shadow-2xl p-8 w-[90vw] max-w-[800px] min-h-[500px] overflow-y-auto"
+                class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[70] bg-surface-0 dark:bg-surface-900 border border-surface rounded-2xl shadow-2xl p-8 w-[90vw] max-w-[800px] min-h-[500px] overflow-y-auto"
             >
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h3 class="text-2xl font-bold text-gray-800">
+                        <h3 class="text-2xl font-bold text-color">
                             Assigning priority for: {{ shiftGroups.find((g) => g.id === expandedGroupId)?.name }}
                         </h3>
                     </div>
                     <Button
-                        class="p-button-rounded p-button-text p-button-lg text-gray-400 hover:text-red-500"
+                        class="p-button-rounded p-button-text p-button-lg text-surface-400 dark:text-surface-500 hover:text-red-500"
                         icon="pi pi-times"
                         @click="expandedGroupId = null"
                     />

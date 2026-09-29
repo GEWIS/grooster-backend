@@ -3,8 +3,12 @@ import { useRoute } from 'vue-router';
 import { ref } from 'vue';
 import { useOrganStore } from '@/stores/organ.store.js';
 import { Role, useAuthStore } from '@/stores/auth.store';
+import { useThemeStore } from '@/stores/theme.store';
 
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
+
+const themeIcons = { system: 'pi-desktop', light: 'pi-sun', dark: 'pi-moon' };
 
 const route = useRoute();
 const organStore = useOrganStore();
@@ -87,6 +91,14 @@ const isActive = (path) => route.path === path;
                         </RouterLink>
                     </template>
                 </div>
+
+                <button
+                    class="flex items-center justify-center h-10 w-10 rounded-lg text-emerald-100 hover:bg-emerald-900"
+                    :title="`Theme: ${themeStore.mode}`"
+                    @click="themeStore.cycleMode()"
+                >
+                    <i :class="['pi', themeIcons[themeStore.mode]]"></i>
+                </button>
 
                 <button
                     class="md:hidden flex items-center justify-center h-10 w-10 rounded-lg text-emerald-100 hover:bg-emerald-900"

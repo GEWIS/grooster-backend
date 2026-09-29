@@ -1,8 +1,8 @@
 @import './base.css';
 @import 'tailwindcss';
 @import 'tailwindcss/utilities';
+@import 'tailwindcss-primeui';
 @import 'primeicons/primeicons.css';
 
-/*.full-width {*/
-/*  width: 100%;*/
-/*}*/
+/* Match PrimeVue's darkModeSelector so Tailwind's dark: variant uses the same trigger */
+@custom-variant dark (&:where(.app-dark, .app-dark *));
