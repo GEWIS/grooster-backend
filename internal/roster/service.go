@@ -349,36 +349,45 @@ func (s *service) getSavedShiftOrdering(savedShifts []*models.SavedShift, organI
 		shiftGroupID := savedShift.RosterShift.ShiftGroupID
 		shiftName := savedShift.RosterShift.Name
 
-		// Get the latest shift from users to check when they were last assigned
+		// Per user, the date of the latest roster they were assigned to this shift.
 		// It first checks by groups and if no group is assigned it checks on name.
-		// Manual "push to bottom" overrides (grouped shifts only) are folded into
-		// last_date, so a pushed user sorts as if they'd just been assigned now.
+		lastAssigned := s.db.Table("user_shift_saved AS uss").
+			Select("uss.user_id, MAX(r.date) AS last_assigned").
+			Joins("JOIN saved_shifts as ss ON ss.id = uss.saved_shift_id").
+			Joins("JOIN roster_shifts as rs ON rs.id = ss.roster_shift_id").
+			Joins("JOIN rosters as r on r.id = ss.roster_id").
+			Where("(? IS NOT NULL AND rs.shift_group_id = ?) OR (? IS NULL AND rs.name = ?)",
+				shiftGroupID, shiftGroupID, shiftGroupID, shiftName).
+			Group("uss.user_id")
+
+		// Per user, the latest manual "push to bottom" override for this shift group.
+		// Only grouped shifts can have overrides, so this is empty when shiftGroupID is nil.
+		lastOverride := s.db.Table("shift_ordering_overrides").
+			Select("user_id, MAX(set_at) AS last_override").
+			Where("shift_group_id = ?", shiftGroupID).
+			Group("user_id")
+
+		// Order the organ's users by group priority, then by whoever was assigned
+		// longest ago. last_date is the later of the last assignment and the last
+		// override, so a pushed user sorts as if they'd just been assigned now.
+		// The subqueries are already aggregated per user, so these joins can't fan
+		// out and leak other users' assignment dates.
 		err := s.db.Table("users AS u").
 			Select(`
 				u.*,
 				CASE
-					WHEN COALESCE(MAX(r.date), '1970-01-01') > COALESCE(MAX(soo.set_at), '1970-01-01')
-					THEN COALESCE(MAX(r.date), '1970-01-01')
-					ELSE COALESCE(MAX(soo.set_at), '1970-01-01')
+					WHEN COALESCE(la.last_assigned, '1970-01-01') > COALESCE(lo.last_override, '1970-01-01')
+					THEN COALESCE(la.last_assigned, '1970-01-01')
+					ELSE COALESCE(lo.last_override, '1970-01-01')
 				END AS last_date,
-				COALESCE(MAX(sgp.priority), 1) AS group_priority
-    		`).
+				COALESCE(sgp.priority, 1) AS group_priority
+			`).
 			Joins("JOIN user_organs AS uo ON u.id = uo.user_id").
-			Joins(`LEFT JOIN shift_group_priorities AS sgp ON
-				sgp.user_id = u.id AND
-				sgp.shift_group_id = ?`, shiftGroupID).
-			Joins(`LEFT JOIN roster_shifts AS rs ON (
-				(? IS NOT NULL AND rs.shift_group_id = ?) OR
-				(? IS NULL AND rs.name = ?)
-			)`, shiftGroupID, shiftGroupID, shiftGroupID, shiftName).
-			Joins("LEFT JOIN saved_shifts AS ss ON ss.roster_shift_id = rs.id").
-			Joins("LEFT JOIN user_shift_saved AS uss ON uss.saved_shift_id = ss.id AND uss.user_id = u.id").
-			Joins("LEFT JOIN rosters AS r ON r.id = ss.roster_id").
-			Joins(`LEFT JOIN shift_ordering_overrides AS soo ON
-				soo.user_id = u.id AND soo.shift_group_id = ?`, shiftGroupID).
+			Joins("LEFT JOIN shift_group_priorities AS sgp ON sgp.user_id = u.id AND sgp.shift_group_id = ?", shiftGroupID).
+			Joins("LEFT JOIN (?) AS la ON la.user_id = u.id", lastAssigned).
+			Joins("LEFT JOIN (?) AS lo ON lo.user_id = u.id", lastOverride).
 			Where("uo.organ_id = ?", organID).
-			Group("u.id").
-			Order("group_priority DESC, last_date ASC").
+			Order("group_priority DESC, last_date ASC, u.id ASC"). // u.id = deterministic tie-break
 			Scan(&users).Error
 
 		if err != nil {
