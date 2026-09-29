@@ -881,6 +881,137 @@ func (suite *TestRosterSuite) TestRosterResponsibleDelete_Invalid() {
 	assert.ErrorIs(suite.T(), err, gorm.ErrRecordNotFound)
 }
 
+// shift ordering test cases
+
+// newOrderingOrgan creates a fresh organ with the given members, so ordering
+// tests are not influenced by seeded users.
+func (suite *TestRosterSuite) newOrderingOrgan(names ...string) (models.Organ, []models.User) {
+	organ := models.Organ{Name: "Ordering " + suite.T().Name()}
+	suite.Require().NoError(suite.db.Create(&organ).Error)
+
+	users := make([]models.User, len(names))
+	for i, name := range names {
+		users[i] = models.User{Name: name, GEWISID: uint(900000 + i)}
+		suite.Require().NoError(suite.db.Create(&users[i]).Error)
+		suite.Require().NoError(suite.db.Create(&models.UserOrgan{UserID: users[i].ID, OrganID: organ.ID}).Error)
+	}
+
+	return organ, users
+}
+
+// addAssignedShift creates a roster on the given date with a single saved shift
+// assigned to the given users.
+func (suite *TestRosterSuite) addAssignedShift(organID uint, date time.Time, shiftName string, groupID *uint, users ...models.User) *models.SavedShift {
+	roster := models.Roster{Name: "Ordering Roster", OrganID: organID, Date: date}
+	suite.Require().NoError(suite.db.Create(&roster).Error)
+
+	shift := models.RosterShift{RosterID: roster.ID, Name: shiftName, ShiftGroupID: groupID}
+	suite.Require().NoError(suite.db.Create(&shift).Error)
+
+	assigned := make([]*models.User, len(users))
+	for i := range users {
+		assigned[i] = &users[i]
+	}
+
+	savedShift := models.SavedShift{RosterID: roster.ID, RosterShift: &shift, Users: assigned}
+	suite.Require().NoError(suite.db.Create(&savedShift).Error)
+
+	return &savedShift
+}
+
+func (suite *TestRosterSuite) orderingIDs(savedShift *models.SavedShift, organID uint) []uint {
+	orderings, err := suite.service.getSavedShiftOrdering([]*models.SavedShift{savedShift}, organID)
+	suite.Require().NoError(err)
+	suite.Require().Len(orderings, 1)
+
+	var ids []uint
+	for _, u := range orderings[0].Users {
+		ids = append(ids, u.ID)
+	}
+	return ids
+}
+
+func (suite *TestRosterSuite) newOrderingGroup(organID uint) models.ShiftGroup {
+	group := models.ShiftGroup{OrganID: organID, Name: "Ordering Group"}
+	suite.Require().NoError(suite.db.Create(&group).Error)
+	return group
+}
+
+func daysAgo(days int) time.Time {
+	return time.Now().AddDate(0, 0, -days)
+}
+
+func (suite *TestRosterSuite) TestShiftOrdering_RotatesByLastAssignment() {
+	organ, u := suite.newOrderingOrgan("A", "B", "C")
+	group := suite.newOrderingGroup(organ.ID)
+
+	suite.addAssignedShift(organ.ID, daysAgo(14), "Ordering Tap", &group.ID, u[0])
+	current := suite.addAssignedShift(organ.ID, daysAgo(7), "Ordering Tap", &group.ID, u[1])
+
+	assert.Equal(suite.T(), []uint{u[2].ID, u[0].ID, u[1].ID}, suite.orderingIDs(current, organ.ID))
+}
+
+func (suite *TestRosterSuite) TestShiftOrdering_PushToBottom() {
+	organ, u := suite.newOrderingOrgan("A", "B", "C")
+	group := suite.newOrderingGroup(organ.ID)
+
+	suite.addAssignedShift(organ.ID, daysAgo(14), "Ordering Tap", &group.ID, u[0])
+	current := suite.addAssignedShift(organ.ID, daysAgo(7), "Ordering Tap", &group.ID, u[1])
+
+	suite.Require().NoError(suite.service.PushUserToBottom(group.ID, u[2].ID))
+
+	assert.Equal(suite.T(), []uint{u[0].ID, u[1].ID, u[2].ID}, suite.orderingIDs(current, organ.ID))
+}
+
+func (suite *TestRosterSuite) TestShiftOrdering_NewerAssignmentBeatsOlderOverride() {
+	organ, u := suite.newOrderingOrgan("A", "B")
+	group := suite.newOrderingGroup(organ.ID)
+
+	override := models.ShiftOrderingOverride{UserID: u[0].ID, ShiftGroupID: group.ID, SetAt: daysAgo(20)}
+	suite.Require().NoError(suite.db.Create(&override).Error)
+
+	suite.addAssignedShift(organ.ID, daysAgo(14), "Ordering Tap", &group.ID, u[1])
+	current := suite.addAssignedShift(organ.ID, daysAgo(7), "Ordering Tap", &group.ID, u[0])
+
+	assert.Equal(suite.T(), []uint{u[1].ID, u[0].ID}, suite.orderingIDs(current, organ.ID))
+}
+
+func (suite *TestRosterSuite) TestShiftOrdering_UngroupedMatchesByName() {
+	organ, u := suite.newOrderingOrgan("A", "B", "C")
+
+	current := suite.addAssignedShift(organ.ID, daysAgo(7), "Ordering Bar", nil, u[0])
+	suite.addAssignedShift(organ.ID, daysAgo(14), "Ordering Bar", nil, u[1])
+	suite.addAssignedShift(organ.ID, daysAgo(1), "Ordering Kitchen", nil, u[2])
+
+	assert.Equal(suite.T(), []uint{u[2].ID, u[1].ID, u[0].ID}, suite.orderingIDs(current, organ.ID))
+}
+
+func (suite *TestRosterSuite) TestShiftOrdering_PriorityBeforeDate() {
+	organ, u := suite.newOrderingOrgan("A", "B")
+	group := suite.newOrderingGroup(organ.ID)
+
+	current := suite.addAssignedShift(organ.ID, daysAgo(7), "Ordering Tap", &group.ID, u[0])
+
+	priority := models.ShiftGroupPriority{ShiftGroupID: group.ID, UserID: u[0].ID, Priority: models.High}
+	suite.Require().NoError(suite.db.Create(&priority).Error)
+
+	assert.Equal(suite.T(), []uint{u[0].ID, u[1].ID}, suite.orderingIDs(current, organ.ID))
+}
+
+func (suite *TestRosterSuite) TestShiftOrdering_OnlyOrganMembers() {
+	organ, u := suite.newOrderingOrgan("A")
+	group := suite.newOrderingGroup(organ.ID)
+
+	outsider := models.User{Name: "Outsider", GEWISID: 999999}
+	suite.Require().NoError(suite.db.Create(&outsider).Error)
+
+	current := suite.addAssignedShift(organ.ID, daysAgo(7), "Ordering Tap", &group.ID, u[0], outsider)
+
+	ids := suite.orderingIDs(current, organ.ID)
+	assert.Equal(suite.T(), []uint{u[0].ID}, ids)
+	assert.NotContains(suite.T(), ids, outsider.ID)
+}
+
 func TestRosterService(t *testing.T) {
 	suite.Run(t, new(TestRosterSuite))
 }
