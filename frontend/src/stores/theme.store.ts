@@ -4,9 +4,14 @@ export type ThemeMode = 'system' | 'light' | 'dark';
 
 const systemQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
+interface ThemeState {
+    mode: ThemeMode;
+    systemDark: boolean;
+}
+
 export const useThemeStore = defineStore('theme', {
-    state: () => ({
-        mode: 'system' as ThemeMode,
+    state: (): ThemeState => ({
+        mode: 'system',
         systemDark: systemQuery.matches,
     }),
     persist: { pick: ['mode'] },

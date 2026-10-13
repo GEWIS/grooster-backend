@@ -2,9 +2,13 @@ import { defineStore } from 'pinia';
 import { RosterTemplate, TemplateCreateRequest } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 
+interface TemplateState {
+    templates: Record<number, RosterTemplate>;
+}
+
 export const useTemplateStore = defineStore('rosterTemplate', {
-    state: () => ({
-        templates: {} as Record<number, RosterTemplate>,
+    state: (): TemplateState => ({
+        templates: {},
     }),
     getters: {
         getTemplate: (state) => {

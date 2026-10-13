@@ -1,9 +1,14 @@
 import { defineStore } from 'pinia';
 
+interface OrganState {
+    organ: number | undefined;
+    organName: string | undefined;
+}
+
 export const useOrganStore = defineStore('organ', {
-    state: () => ({
-        organ: undefined as number | undefined,
-        organName: undefined as string | undefined,
+    state: (): OrganState => ({
+        organ: undefined,
+        organName: undefined,
     }),
     getters: {
         getOrgan: (state) => state.organ,

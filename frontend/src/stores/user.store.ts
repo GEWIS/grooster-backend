@@ -2,9 +2,13 @@ import { defineStore } from 'pinia';
 import { User } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 
+interface UserState {
+    user: User | undefined;
+}
+
 export const useUserStore = defineStore('user', {
-    state: () => ({
-        user: undefined as User | undefined,
+    state: (): UserState => ({
+        user: undefined,
     }),
     getters: {
         getUser: (state) => state.user,

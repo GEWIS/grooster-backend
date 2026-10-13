@@ -12,8 +12,12 @@ interface CustomJwtPayload extends JwtPayload {
     organs: Record<string, string>;
 }
 
+interface AuthState {
+    token: string | null;
+}
+
 export const useAuthStore = defineStore('auth', {
-    state: () => ({
+    state: (): AuthState => ({
         token: localStorage.getItem('access_token') || null,
     }),
     getters: {

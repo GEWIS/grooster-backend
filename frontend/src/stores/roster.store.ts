@@ -15,13 +15,21 @@ import type {
 } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
 
+interface RosterState {
+    rosters: Record<number, Roster>;
+    savedRoster: Record<number, SavedShiftResponse>;
+    comments: Record<number, RosterComment[]>;
+    responsibles: Record<number, RosterResponsible[]>;
+    selectedRosterId: number | null;
+}
+
 export const useRosterStore = defineStore('roster', {
-    state: () => ({
-        rosters: {} as Record<number, Roster>,
-        savedRoster: {} as Record<number, SavedShiftResponse>,
-        comments: {} as Record<number, RosterComment[]>,
-        responsibles: {} as Record<number, RosterResponsible[]>,
-        selectedRosterId: null as number | null,
+    state: (): RosterState => ({
+        rosters: {},
+        savedRoster: {},
+        comments: {},
+        responsibles: {},
+        selectedRosterId: null,
     }),
     persist: true,
     getters: {
