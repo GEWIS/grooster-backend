@@ -28,6 +28,6 @@ jobs:
       node-version: "^22.0.0"
       build: true
       test: false
-      working-directory: './client'
+      working-directory: './packages/grooster-client'
       prepare-command: "docker build . -t test-image && docker compose -f docker-compose.test.yaml up -d"
       cleanup-command: 'docker compose -f docker-compose.test.yaml down'

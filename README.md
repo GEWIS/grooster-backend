@@ -53,7 +53,7 @@ swag init -g cmd/server/main.go -d ./ -o docs --parseInternal --pd
 To generate the client (which can be uploaded to npm) from the root directory, run:
 
 ```
-openapi-generator-cli generate -i docs/swagger.yaml -g typescript-axios -o client/src
+openapi-generator-cli generate -i docs/swagger.yaml -g typescript-axios -o packages/grooster-client/src
 ```
 
 ## Running Locally

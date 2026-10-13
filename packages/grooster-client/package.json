@@ -9,7 +9,7 @@
   "repository": {
     "url": "git+https://github.com/GEWIS/grooster-backend.git",
     "type": "git",
-    "directory": "client"
+    "directory": "packages/grooster-client"
   },
   "scripts": {
     "lint": "eslint .",

@@ -28,6 +28,6 @@ jobs:
     with:
       node-version: '22.x'
       version: ${{ needs.versioning.outputs.next-version }}
-      working-directory: './client'
+      working-directory: './packages/grooster-client'
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
