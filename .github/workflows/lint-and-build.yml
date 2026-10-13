@@ -21,6 +21,7 @@ jobs:
       format: true
       build: true
       test: true
+      working-directory: "./backend"
 
   build-and-lint-client:
     uses: GEWIS/actions/.github/workflows/lint-and-build-npm.yml@v1
@@ -29,5 +30,5 @@ jobs:
       build: true
       test: false
       working-directory: './packages/grooster-client'
-      prepare-command: "docker build . -t test-image && docker compose -f docker-compose.test.yaml up -d"
-      cleanup-command: 'docker compose -f docker-compose.test.yaml down'
+      prepare-command: "docker build backend -t test-image && docker compose -f backend/docker-compose.test.yaml up -d"
+      cleanup-command: 'docker compose -f backend/docker-compose.test.yaml down'

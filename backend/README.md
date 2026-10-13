@@ -1,0 +1,73 @@
+# grooster-backend
+
+The Go backend of the GEWIS rooster (roster/schedule) maker. All commands below are run from this `backend/` directory.
+
+## Setup
+
+Make sure you can run Go and have this repository open in your favourite IDE.
+
+Install the required packages:
+
+```
+go mod tidy
+```
+
+## Configuration
+
+Copy the example environment file:
+
+```
+cp .env-example .env
+```
+
+Ensure `DEV_TYPE` is set to "local" in your `.env` file if you want to run the project without Keycloak authentication.
+
+Make sure to set the `JWT_SECRET`
+
+Set `ALLOWED_ORIGINS` to your locally run frontend
+
+## Seeding the Database
+
+If you want to seed the database with initial data (users, organs, rosters), run:
+
+```
+go run ./cmd/seeder/main.go
+```
+
+## Running the Application
+
+To start the application, run:
+
+```
+go run ./cmd/src/main.go
+```
+
+## Generating Docs and Client
+
+To generate the documentation (Swagger/OpenAPI), run:
+
+```
+swag init -g cmd/server/main.go -d ./ -o docs --parseInternal --pd
+```
+
+To generate the client (which can be uploaded to npm) into `packages/grooster-client`, run:
+
+```
+openapi-generator-cli generate -i docs/swagger.yaml -g typescript-axios -o ../packages/grooster-client/src
+```
+
+## Running Locally
+
+1. Ensure your `.env` is configured (see Configuration section above).
+2. Seed the database if necessary.
+3. Start the server
+
+```
+go run ./cmd/src/main.go
+```
+
+## Creating migrations
+First make sure you have installed golang-migrate on your pc
+```
+migrate create -ext sql -dir internal/platform/database/migrations -seq file_name
+```

@@ -1,73 +1,14 @@
-# grooster-backend
+# grooster
 
-A GEWIS rooster (roster/schedule) maker. This is the backend repository.
+A GEWIS rooster (roster/schedule) maker.
 
-## Setup
+## Repository layout
 
-Make sure you can run Go and have this repository open in your favourite IDE.
+| Path                        | Contents                                                        |
+|-----------------------------|-----------------------------------------------------------------|
+| `backend/`                  | Go backend, see [backend/README.md](backend/README.md)          |
+| `frontend/`                 | Vue frontend, see [frontend/README.md](frontend/README.md)      |
+| `packages/grooster-client/` | Generated TypeScript API client (`@gewis/grooster-backend-ts`)  |
 
-Install the required packages:
-
-```
-go mod tidy
-```
-
-## Configuration
-
-Copy the example environment file:
-
-```
-cp .env-example .env
-```
-
-Ensure `DEV_TYPE` is set to "local" in your `.env` file if you want to run the project without Keycloak authentication.
-
-Make sure to set the `JWT_SECRET`
-
-Set `ALLOWED_ORIGINS` to your locally run frontend
-
-## Seeding the Database
-
-If you want to seed the database with initial data (users, organs, rosters), run:
-
-```
-go run ./cmd/seeder/main.go
-```
-
-## Running the Application
-
-To start the application, run:
-
-```
-go run ./cmd/src/main.go
-```
-
-## Generating Docs and Client
-
-To generate the documentation (Swagger/OpenAPI) from the root directory, run:
-
-```
-swag init -g cmd/server/main.go -d ./ -o docs --parseInternal --pd
-```
-
-To generate the client (which can be uploaded to npm) from the root directory, run:
-
-```
-openapi-generator-cli generate -i docs/swagger.yaml -g typescript-axios -o packages/grooster-client/src
-```
-
-## Running Locally
-
-1. Ensure your `.env` is configured (see Configuration section above).
-2. Seed the database if necessary.
-3. Start the server
-
-```
-go run ./cmd/src/main.go
-```
-
-## Creating migrations
-First make sure you have installed golang-migrate on your pc
-```
-migrate create -ext sql -dir internal/platform/database/migrations -seq file_name
-```
+The API client is generated from the backend's OpenAPI spec (see
+[backend/README.md](backend/README.md#generating-docs-and-client)) and published to npm.
