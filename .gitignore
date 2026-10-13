@@ -1,0 +1,3 @@
+# Project-specific ignores live in backend/, frontend/ and packages/grooster-client/
+.DS_Store
+.idea
