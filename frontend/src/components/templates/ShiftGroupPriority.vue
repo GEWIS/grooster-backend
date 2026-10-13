@@ -7,7 +7,7 @@ import {
     User,
 } from '@gewis/grooster-backend-ts';
 import { computed, onMounted, ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from 'openvue/usetoast';
 import { useOrganStore } from '@/stores/organ.store';
 import ApiService from '@/services/ApiService';
 

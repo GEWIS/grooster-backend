@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { AnswerCreateRequest, AnswerUpdateRequest, Roster, RosterAnswer, User } from '@gewis/grooster-backend-ts';
 import { useRoute } from 'vue-router';
-import { useToast } from 'primevue/usetoast';
+import { useToast } from 'openvue/usetoast';
 import { useRosterStore } from '@/stores/roster.store';
 import { getGEWISId } from '@/helpers/TokenHelper';
 import ApiService from '@/services/ApiService';

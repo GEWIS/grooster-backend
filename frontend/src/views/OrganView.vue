@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { Select } from 'primevue';
+import { Select } from 'openvue';
 import type { Organ } from '@gewis/grooster-backend-ts';
 import { useRouter } from 'vue-router';
 import { getGEWISId } from '@/helpers/TokenHelper';
