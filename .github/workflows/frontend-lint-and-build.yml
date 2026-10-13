@@ -1,11 +1,17 @@
-name: Lint and Build
+name: Frontend - Lint and Build
 on:
     push:
         branches:
             - develop
+        paths:
+            - 'frontend/**'
+            - '.github/workflows/frontend-lint-and-build.yml'
     pull_request:
         branches:
             - develop
+        paths:
+            - 'frontend/**'
+            - '.github/workflows/frontend-lint-and-build.yml'
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,3 +23,4 @@ jobs:
         with:
             node-version: '22.x'
             format: true
+            working-directory: './frontend'
