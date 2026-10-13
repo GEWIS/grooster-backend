@@ -1,0 +1,14 @@
+@layer base {
+    body {
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        color: var(--p-surface-900);
+        background: var(--p-surface-50);
+        text-rendering: optimizeLegibility;
+    }
+
+    .app-dark body {
+        color: var(--p-surface-50);
+        background: var(--p-surface-950);
+    }
+}
