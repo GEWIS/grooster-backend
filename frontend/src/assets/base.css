@@ -1,39 +1,14 @@
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    font-weight: normal;
-}
+@layer base {
+    body {
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        color: var(--p-surface-900);
+        background: var(--p-surface-50);
+        text-rendering: optimizeLegibility;
+    }
 
-body {
-    min-height: 100vh;
-    color: var(--p-text-color);
-    background: var(--p-surface-0);
-    transition:
-        color 0.5s,
-        background-color 0.5s;
-    line-height: 1.6;
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        'Segoe UI',
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        'Fira Sans',
-        'Droid Sans',
-        'Helvetica Neue',
-        sans-serif;
-    font-size: 15px;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-/* Slightly darker than cards (surface-900) so they stand out in dark mode */
-.app-dark body {
-    background: var(--p-surface-950);
+    .app-dark body {
+        color: var(--p-surface-50);
+        background: var(--p-surface-950);
+    }
 }

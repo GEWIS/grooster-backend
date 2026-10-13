@@ -1,63 +1,58 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { ShiftGroupCreateRequest } from '@gewis/grooster-backend-ts';
+import { ref, watch } from 'vue';
+import { useToast } from 'openvue/usetoast';
 import ApiService from '@/services/ApiService';
-import { useOrganStore } from '@/stores/organ.store';
+import { dialogPt, readableDisabled } from '@/theme/pt';
 
-const organStore = useOrganStore();
+const props = defineProps<{ organId: number }>();
+const visible = defineModel<boolean>('visible', { required: true });
+const emit = defineEmits<{ created: [] }>();
 
-const props = withDefaults(
-    defineProps<{
-        open: boolean;
-    }>(),
-    {
-        open: false,
-    },
-);
+const toast = useToast();
+const name = ref('');
+const saving = ref(false);
+watch(visible, (open) => open && (name.value = ''));
 
-const emit = defineEmits(['close']);
-
-const visible = computed({
-    get: () => props.open,
-    set: () => {
-        emit('close');
-    },
-});
-
-const groupName = ref('');
-
-const createGroup = async () => {
+async function create() {
+    if (!name.value.trim()) return;
+    saving.value = true;
     try {
-        const params: ShiftGroupCreateRequest = {
-            organId: Number(organStore.organ),
-            name: groupName.value,
-        };
-
-        await ApiService.shiftGroupApi.createShiftGroup(params);
-
-        groupName.value = '';
-
-        emit('close');
+        await ApiService.shiftGroupApi.createShiftGroup({ organId: props.organId, name: name.value.trim() });
+        emit('created');
+        visible.value = false;
     } catch (error) {
         console.error(error);
+        toast.add({ severity: 'error', summary: 'Could not create the group', life: 5000 });
+    } finally {
+        saving.value = false;
     }
-};
+}
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :style="{ width: '28rem' }" @hide="emit('close')">
-        <template #header>
-            <div class="flex flex-col gap-1">
-                <h3 class="m-0 text-xl font-semibold text-color">New Shift Group</h3>
-                <small class="text-muted-color">Specify the name of the shift group</small>
-            </div>
+    <Dialog v-model:visible="visible" header="New shift group" modal :pt="dialogPt">
+        <form id="shift-group-form" class="flex flex-col gap-1.5" @submit.prevent="create">
+            <label class="text-[13px] font-semibold text-surface-700 dark:text-surface-100" for="shift-group-name">
+                Group name
+            </label>
+            <InputText
+                id="shift-group-name"
+                v-model="name"
+                autocomplete="off"
+                autofocus
+                class="h-[42px] w-full text-base md:text-sm"
+            />
+        </form>
+        <template #footer>
+            <Button class="h-10 text-sm" label="Cancel" outlined severity="secondary" @click="visible = false" />
+            <Button
+                :class="['h-10 text-sm', readableDisabled]"
+                :disabled="!name.trim()"
+                form="shift-group-form"
+                label="Create group"
+                :loading="saving"
+                type="submit"
+            />
         </template>
-        <div class="flex flex-col gap-2 justify-center">
-            <InputText v-model="groupName" class="w-full" name="groupName" type="text" />
-
-            <Button icon="pi pi-plus" label="Add" severity="primary" @click="createGroup" />
-        </div>
     </Dialog>
 </template>
-
-<style scoped></style>

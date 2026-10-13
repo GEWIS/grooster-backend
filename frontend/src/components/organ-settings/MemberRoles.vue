@@ -1,278 +1,286 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { GEWISRoosterInternalModelsOrganRole, User, UserOrgan } from '@gewis/grooster-backend-ts';
-import { UpdateMemberSettingsParams } from '@gewis/grooster-backend-ts/dist/api';
+import { useConfirm } from 'openvue/useconfirm';
+import { useToast } from 'openvue/usetoast';
+import IconField from 'openvue/iconfield';
+import InputIcon from 'openvue/inputicon';
+import { OiChevronLeft, OiSearch } from '@openvue/openicons-vue';
+import { GEWISRoosterInternalModelsOrganRole, type User, type UserOrgan } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
-import { useOrganStore } from '@/stores/organ.store';
-import RoleChangeConfirmation from '@/components/organ-settings/dialogs/RoleChangeConfirmation.vue';
+import { fieldSelectPt, readableDisabled } from '@/theme/pt';
 
 export type UserRole = (typeof GEWISRoosterInternalModelsOrganRole)[keyof typeof GEWISRoosterInternalModelsOrganRole];
 
 const roleOptions = Object.entries(GEWISRoosterInternalModelsOrganRole).map(([key, value]) => ({
     label: key.replace('Role', ''),
-    value: value,
+    value,
 }));
+const roleHelp: Record<UserRole, string> = {
+    owner: 'Owners and admins manage rosters, templates and members.',
+    admin: 'Owners and admins manage rosters, templates and members.',
+    member: 'Members fill in their own answers.',
+};
 
-const organStore = useOrganStore();
+const props = defineProps<{ organId: number }>();
+
+const confirm = useConfirm();
+const toast = useToast();
 
 const users = ref<User[]>([]);
-const userOrganSettings = ref<UserOrgan[]>([]);
-const selectedUser = ref<User | null>(null);
+const settings = ref<UserOrgan[]>([]);
+const selectedId = ref<number | null>(null);
+const search = ref('');
 
-const currentRole = computed(() => (selectedUser.value ? getUserRole(selectedUser.value.id) : null));
-const pendingRole = ref<UserRole | null>(null);
+const settingFor = (userId: number) => settings.value.find((s) => s.userId === userId);
+const roleOf = (userId: number) => settingFor(userId)?.role;
+const roleLabel = (role: UserRole | undefined) => roleOptions.find((o) => o.value === role)?.label ?? '';
 
-type Dialog = 'Confirm' | 'None';
-const currentDialog = ref<Dialog>('None');
-
-const editName = ref('');
-const isSaving = ref(false);
-
-const isChanged = computed(() => {
-    if (!selectedUser.value) return false;
-    const original = userOrganSettings.value.find((uo) => uo.userId === selectedUser.value.id);
-    return original ? editName.value !== original.username : false;
+const filteredUsers = computed(() => {
+    const query = search.value.trim().toLowerCase();
+    if (!query) return users.value;
+    return users.value.filter(
+        (user) =>
+            user.name.toLowerCase().includes(query) ||
+            (settingFor(user.id)?.username ?? '').toLowerCase().includes(query),
+    );
 });
+const selected = computed(() => users.value.find((user) => user.id === selectedId.value) ?? null);
 
-const fetchUsers = async () => {
+// Form state for the selected member; saved together with "Save changes"
+const draftRole = ref<UserRole | null>(null);
+const draftName = ref('');
+const saving = ref(false);
+
+function select(user: User) {
+    selectedId.value = user.id;
+    resetDraft();
+}
+function resetDraft() {
+    if (!selected.value) return;
+    draftRole.value = roleOf(selected.value.id) ?? null;
+    draftName.value = settingFor(selected.value.id)?.username ?? '';
+}
+
+const roleChanged = computed(() => !!selected.value && draftRole.value !== roleOf(selected.value.id));
+const nameChanged = computed(
+    () => !!selected.value && draftName.value !== (settingFor(selected.value.id)?.username ?? ''),
+);
+const dirty = computed(() => roleChanged.value || nameChanged.value);
+
+async function persist() {
+    const user = selected.value;
+    if (!user) return;
+    saving.value = true;
     try {
-        const response = await ApiService.user.userGet(organStore.organ);
-        users.value = response.data;
-    } catch (e) {
-        console.error(e);
-        users.value = [];
-    }
-};
-
-const fetchUserOrganSettings = async () => {
-    try {
-        const response = await ApiService.organ.getMembersSettings(organStore.organ);
-        userOrganSettings.value = response.data;
-    } catch (e) {
-        console.error(e);
-    }
-};
-
-const getUserRole = (userId: number) => {
-    return userOrganSettings.value.find((organ: UserOrgan) => organ.userId == userId)?.role;
-};
-
-const handleRoleUpdate = (role: UserRole) => {
-    pendingRole.value = role;
-    currentDialog.value = 'Confirm';
-};
-
-const confirmRoleChange = async (userId: number, role: UserRole) => {
-    try {
-        const { data } = await ApiService.organ.organIdMemberUserIdRolePatch(organStore.organ, userId, { role });
-        userOrganSettings.value = userOrganSettings.value.map((userOrgan) => {
-            if (userOrgan.userId === data.userId) {
-                return data;
-            } else {
-                return userOrgan;
-            }
-        });
-    } catch (e) {
-        console.error(e);
+        if (roleChanged.value && draftRole.value) {
+            const { data } = await ApiService.organ.organIdMemberUserIdRolePatch(props.organId, user.id, {
+                role: draftRole.value,
+            });
+            settings.value = settings.value.map((s) => (s.userId === data.userId ? data : s));
+        }
+        if (nameChanged.value) {
+            await ApiService.organ.organIdMemberUserIdPatch(props.organId, user.id, { username: draftName.value });
+            await fetchSettings();
+        }
+        toast.add({ severity: 'success', summary: 'Changes saved', life: 3000 });
+    } catch (error) {
+        console.error('Failed to update member:', error);
+        toast.add({ severity: 'error', summary: 'Could not save the changes', life: 5000 });
     } finally {
-        pendingRole.value = null;
-        currentDialog.value = 'None';
+        saving.value = false;
+        resetDraft();
     }
-};
+}
 
-const setUser = (user: User) => {
-    selectedUser.value = user;
-    const settings = userOrganSettings.value.find((uo) => uo.userId === user.id);
-    editName.value = settings ? settings.username : '';
-};
+function save() {
+    if (!roleChanged.value) return void persist();
+    confirm.require({
+        header: 'Change role?',
+        message: `${selected.value?.name} becomes ${roleLabel(draftRole.value ?? undefined)} in this organization.`,
+        acceptProps: { label: 'Change role' },
+        rejectProps: { label: 'Cancel', severity: 'secondary', outlined: true },
+        accept: () => void persist(),
+    });
+}
 
-const resetName = () => {
-    if (selectedUser.value) {
-        const settings = userOrganSettings.value.find((uo) => uo.userId === selectedUser.value.id);
-        editName.value = settings ? settings.username : '';
-    }
-};
-
-const updateMemberSettings = async (userId: number) => {
-    const params: UpdateMemberSettingsParams = {
-        username: editName.value,
-    };
-
-    isSaving.value = true;
+async function fetchUsers() {
     try {
-        await ApiService.organ.organIdMemberUserIdPatch(organStore.organ, userId, params);
-        await fetchUserOrganSettings();
-    } catch (e) {
-        console.error('Failed to update settings:', e);
-    } finally {
-        isSaving.value = false;
+        users.value = (await ApiService.user.userGet(props.organId)).data;
+    } catch (error) {
+        console.error(error);
     }
-};
+}
+async function fetchSettings() {
+    try {
+        settings.value = (await ApiService.organ.getMembersSettings(props.organId)).data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+onMounted(() => Promise.all([fetchUsers(), fetchSettings()]));
 
-onMounted(fetchUsers);
-onMounted(fetchUserOrganSettings);
+defineExpose({ count: computed(() => users.value.length) });
+
+const roleTagClass = (role: UserRole | undefined) =>
+    role === 'owner'
+        ? 'bg-surface-900 text-white dark:bg-surface-0 dark:text-surface-900'
+        : 'bg-surface-100 text-surface-700 dark:bg-surface-800 dark:text-surface-100';
+const labelClass = 'text-[13px] font-semibold text-surface-700 dark:text-surface-100';
 </script>
+
 <template>
-    <div
-        v-if="users.length > 0"
-        class="bg-surface-0 dark:bg-surface-900 border border-emerald-100 dark:border-emerald-900 rounded-2xl overflow-hidden shadow-xl max-w-3xl mx-auto flex flex-col h-[550px]"
-    >
-        <div class="bg-emerald-950 p-6 flex items-center justify-between shrink-0">
-            <div class="flex items-center gap-4">
-                <div
-                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                >
-                    <i class="pi pi-users text-xl" />
-                </div>
-                <div>
-                    <h2 class="text-white font-bold text-lg leading-tight">Organization Members</h2>
-                    <p class="text-emerald-400/60 text-xs">Manage roles and local nicknames</p>
-                </div>
+    <div class="flex overflow-hidden rounded-card border border-surface bg-surface-0 md:h-[660px] dark:bg-surface-900">
+        <!-- List -->
+        <div
+            :class="[
+                'w-full shrink-0 flex-col border-surface md:flex md:w-[400px] md:border-r',
+                selected ? 'hidden' : 'flex',
+            ]"
+        >
+            <div class="border-b border-surface px-4 py-3.5">
+                <IconField>
+                    <InputIcon><OiSearch aria-hidden="true" :size="16" /></InputIcon>
+                    <InputText
+                        v-model="search"
+                        aria-label="Search members"
+                        class="h-10 w-full text-base md:text-sm"
+                        placeholder="Search by name"
+                    />
+                </IconField>
             </div>
-            <div class="text-emerald-500/50 text-sm font-mono">{{ users.length }} Members</div>
+            <ul aria-label="Members" class="grow overflow-y-auto">
+                <li v-for="user in filteredUsers" :key="user.id">
+                    <button
+                        :aria-current="selectedId === user.id ? 'true' : undefined"
+                        :class="[
+                            'flex h-[60px] w-full items-center gap-3 border-l-[3px] px-4 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+                            selectedId === user.id
+                                ? 'border-l-primary bg-highlight'
+                                : 'border-l-transparent hover:bg-surface-50 dark:hover:bg-surface-800',
+                        ]"
+                        type="button"
+                        @click="select(user)"
+                    >
+                        <span class="flex min-w-0 grow flex-col">
+                            <span class="truncate text-sm font-semibold">{{ user.name }}</span>
+                            <span
+                                v-if="settingFor(user.id)?.username"
+                                class="truncate text-xs text-surface-600 dark:text-surface-200"
+                            >
+                                Shown as {{ settingFor(user.id)?.username }}
+                            </span>
+                        </span>
+                        <span
+                            :class="['rounded-full px-2 py-0.5 text-xs font-semibold', roleTagClass(roleOf(user.id))]"
+                        >
+                            {{ roleLabel(roleOf(user.id)) }}
+                        </span>
+                    </button>
+                </li>
+                <li v-if="!filteredUsers.length" class="px-4 py-6 text-sm text-surface-600 dark:text-surface-200">
+                    No members match "{{ search }}".
+                </li>
+            </ul>
         </div>
 
-        <div class="flex flex-1 overflow-hidden">
-            <div
-                class="w-1/3 border-r border-emerald-50 dark:border-emerald-900 overflow-y-auto bg-emerald-50/20 dark:bg-emerald-950/20"
-            >
-                <div
-                    v-for="user in users"
-                    :key="user.id"
-                    :class="[
-                        'p-4 cursor-pointer transition-all border-b border-emerald-50/50 dark:border-emerald-900/50 flex items-center gap-3',
-                        selectedUser?.id === user.id
-                            ? 'bg-emerald-100/50 dark:bg-emerald-900/40 border-r-4 border-r-emerald-600'
-                            : 'hover:bg-emerald-50 dark:hover:bg-emerald-950/40',
-                    ]"
-                    @click="() => setUser(user)"
+        <!-- Detail -->
+        <div :class="['min-w-0 grow flex-col md:flex', selected ? 'flex' : 'hidden']">
+            <template v-if="selected">
+                <button
+                    class="flex h-11 items-center gap-1 px-3 text-sm font-semibold text-primary md:hidden"
+                    type="button"
+                    @click="selectedId = null"
                 >
-                    <div
-                        class="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                        :class="
-                            selectedUser?.id === user.id
-                                ? 'bg-emerald-600 text-white'
-                                : 'bg-emerald-200 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200'
-                        "
-                    >
-                        {{ user.name.charAt(0) }}
-                    </div>
-                    <p
-                        :class="[
-                            'truncate text-sm',
-                            selectedUser?.id === user.id
-                                ? 'font-bold text-emerald-900 dark:text-emerald-100'
-                                : 'text-muted-color',
-                        ]"
-                    >
-                        {{ user.name }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="w-2/3 overflow-y-auto bg-surface-0 dark:bg-surface-900 relative">
-                <div v-if="selectedUser" class="p-8 h-full flex flex-col">
-                    <div class="flex items-center gap-5 mb-8">
-                        <div
-                            class="h-20 w-20 bg-emerald-100 dark:bg-emerald-900/50 rounded-2xl flex items-center justify-center text-emerald-900 dark:text-emerald-100 shadow-inner border border-emerald-200 dark:border-emerald-800 shrink-0"
+                    <OiChevronLeft aria-hidden="true" :size="18" /> All members
+                </button>
+                <div class="flex flex-col gap-1.5 border-b border-surface px-5 pb-6 pt-2 md:px-8 md:py-7">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <h2 class="font-display text-[26px] font-semibold">{{ selected.name }}</h2>
+                        <span
+                            :class="[
+                                'rounded-full px-2 py-0.5 text-xs font-semibold',
+                                roleTagClass(roleOf(selected.id)),
+                            ]"
                         >
-                            <span class="text-3xl font-black">{{ selectedUser.name.charAt(0) }}</span>
-                        </div>
-                        <div class="overflow-hidden">
-                            <h3 class="font-bold text-2xl text-color truncate">{{ selectedUser.name }}</h3>
-                            <div
-                                class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 text-xs font-bold uppercase tracking-wider mt-1"
-                            >
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                {{ getUserRole(selectedUser.id) }}
-                            </div>
-                        </div>
+                            {{ roleLabel(roleOf(selected.id)) }}
+                        </span>
                     </div>
-
-                    <div
-                        class="space-y-6 bg-emerald-50/30 dark:bg-emerald-950/30 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-900"
-                    >
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold text-emerald-800 dark:text-emerald-200 uppercase tracking-widest mb-2 px-1"
-                                >Organization Role</label
-                            >
-                            <Select
-                                class="w-full border-emerald-200 dark:border-emerald-800 text-sm focus:ring-emerald-500 shadow-sm"
-                                :model-value="currentRole"
-                                option-label="label"
-                                option-value="value"
-                                :options="roleOptions"
-                                placeholder="Select a Role"
-                                @update:model-value="(value) => handleRoleUpdate(value)"
-                            />
-                        </div>
-
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold text-emerald-800 dark:text-emerald-200 uppercase tracking-widest mb-2 px-1"
-                                >Display Name (Nickname)</label
-                            >
-                            <div class="relative">
-                                <input
-                                    id="username"
-                                    v-model="editName"
-                                    class="w-full px-4 py-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-emerald-950 dark:text-emerald-50 font-medium shadow-sm"
-                                    maxlength="25"
-                                    placeholder="Their name in this organ..."
-                                    type="text"
-                                    @keyup.enter="updateMemberSettings(selectedUser.id)"
-                                />
-                                <i
-                                    class="pi pi-pencil absolute right-3 top-3 text-emerald-300 dark:text-emerald-700 pointer-events-none"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="mt-auto pt-6 flex items-center justify-end gap-3 border-t border-emerald-50 dark:border-emerald-900"
-                    >
-                        <button
-                            v-if="isChanged"
-                            class="px-5 py-2.5 text-muted-color hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-xl transition-all text-sm font-semibold"
-                            @click="resetName"
-                        >
-                            Discard
-                        </button>
-
-                        <button
-                            class="flex items-center gap-2 px-8 py-2.5 bg-emerald-700 text-white rounded-xl font-bold hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed transition-all shadow-md shadow-emerald-900/10"
-                            :disabled="!isChanged || isSaving"
-                            @click="updateMemberSettings(selectedUser.id)"
-                        >
-                            <i v-if="isSaving" class="pi pi-spin pi-spinner text-xs" />
-                            <span>{{ isSaving ? 'Saving...' : 'Update Settings' }}</span>
-                        </button>
-                    </div>
+                    <span class="text-sm text-surface-600 dark:text-surface-200">
+                        {{
+                            settingFor(selected.id)?.username
+                                ? `Shown as ${settingFor(selected.id)?.username} on rosters`
+                                : 'No display name set; rosters show the full name'
+                        }}
+                    </span>
                 </div>
-
-                <div v-else class="h-full flex flex-col items-center justify-center p-12 text-center">
-                    <div
-                        class="w-20 h-20 bg-surface-50 dark:bg-surface-800 rounded-full flex items-center justify-center mb-4 border border-dashed border-surface"
-                    >
-                        <i class="pi pi-user-plus text-2xl text-surface-400 dark:text-surface-500" />
+                <form
+                    id="member-form"
+                    class="grid max-w-[720px] grid-cols-1 gap-5 px-5 py-6 md:grid-cols-2 md:px-8 md:py-7"
+                    @submit.prevent="save"
+                >
+                    <div class="flex flex-col gap-1.5">
+                        <label :class="labelClass" for="member-role">Organization role</label>
+                        <Select
+                            v-model="draftRole"
+                            aria-describedby="member-role-help"
+                            class="h-[42px] w-full items-center"
+                            input-id="member-role"
+                            option-label="label"
+                            option-value="value"
+                            :options="roleOptions"
+                            :pt="fieldSelectPt"
+                        />
+                        <span id="member-role-help" class="text-xs text-surface-600 dark:text-surface-200">
+                            {{ draftRole ? roleHelp[draftRole] : '' }}
+                        </span>
                     </div>
-                    <h3 class="text-color font-bold">No Member Selected</h3>
-                    <p class="text-surface-400 dark:text-surface-500 text-sm mt-1 max-w-[200px]">
-                        Select a member from the list to manage their profile settings.
-                    </p>
+                    <div class="flex flex-col gap-1.5">
+                        <label :class="labelClass" for="member-name">Display name</label>
+                        <InputText
+                            id="member-name"
+                            v-model="draftName"
+                            aria-describedby="member-name-help"
+                            class="h-[42px] w-full text-base md:text-sm"
+                            maxlength="25"
+                            :placeholder="selected.name"
+                        />
+                        <span id="member-name-help" class="text-xs text-surface-600 dark:text-surface-200">
+                            Shown on rosters and exports in this organization.
+                        </span>
+                    </div>
+                </form>
+                <span class="grow" />
+                <div
+                    class="flex flex-wrap items-center justify-end gap-2.5 border-t border-surface bg-surface-50 px-5 py-4 md:px-8 dark:bg-surface-800"
+                >
+                    <span
+                        v-if="dirty"
+                        aria-live="polite"
+                        class="mr-auto text-[13px] text-surface-600 dark:text-surface-200"
+                    >
+                        Unsaved changes
+                    </span>
+                    <Button
+                        class="h-10 bg-surface-0 text-sm dark:bg-surface-900"
+                        :disabled="!dirty"
+                        label="Discard"
+                        outlined
+                        severity="secondary"
+                        @click="resetDraft"
+                    />
+                    <Button
+                        :class="['h-10 text-sm', readableDisabled]"
+                        :disabled="!dirty"
+                        form="member-form"
+                        label="Save changes"
+                        :loading="saving"
+                        type="submit"
+                    />
                 </div>
-            </div>
+            </template>
+            <p v-else class="m-auto px-6 text-center text-sm text-surface-600 dark:text-surface-200">
+                Pick a member to change their role or display name.
+            </p>
         </div>
     </div>
-
-    <RoleChangeConfirmation
-        v-if="pendingRole && selectedUser"
-        :open="currentDialog === 'Confirm'"
-        :role="pendingRole"
-        :user-id="selectedUser.id"
-        @close="currentDialog = 'None'"
-        @confirm="({ userId, role }) => confirmRoleChange(userId, role)"
-    />
 </template>

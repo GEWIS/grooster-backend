@@ -1,12 +1,15 @@
 /* eslint vue/multi-word-component-names: 0 */
 /* eslint vue/no-reserved-component-names: 0 */
 
+import '@fontsource/fira-mono/400.css';
+import '@fontsource/fira-mono/500.css';
+import '@fontsource/fira-mono/700.css';
+import '@fontsource-variable/bricolage-grotesque/opsz.css';
 import './assets/main.css';
 
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import PrimeVue from 'openvue/config';
-import Aura from '@openvue/themes/aura';
+import OpenVue from 'openvue/config';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 import Button from 'openvue/button';
@@ -23,8 +26,10 @@ import { Divider } from 'openvue';
 import Popover from 'openvue/popover';
 import Textarea from 'openvue/textarea';
 import ToastService from 'openvue/toastservice';
+import ConfirmationService from 'openvue/confirmationservice';
 import Toast from 'openvue/toast';
 import App from './App.vue';
+import RosterPreset from '@/theme/openvue-preset';
 import router from '@/router/router';
 import { useThemeStore } from '@/stores/theme.store';
 
@@ -32,17 +37,18 @@ const app = createApp(App);
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
-app.use(PrimeVue, {
+app.use(OpenVue, {
     theme: {
-        preset: Aura,
+        preset: RosterPreset,
         options: {
             prefix: 'p',
             darkModeSelector: '.app-dark',
-            cssLayer: false,
+            cssLayer: { name: 'primevue', order: 'theme, base, primevue' },
         },
     },
 });
 app.use(ToastService);
+app.use(ConfirmationService);
 
 // Components
 app.component('Button', Button);

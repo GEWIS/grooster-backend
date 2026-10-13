@@ -1,183 +1,125 @@
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref } from 'vue';
-import { TemplateCreateRequest } from '@gewis/grooster-backend-ts';
-import { useRoute } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { OiPlus, OiTimes } from '@openvue/openicons-vue';
 import { useTemplateStore } from '@/stores/template.store';
+import { dialogPt, readableDisabled } from '@/theme/pt';
 
-const route = useRoute();
+const props = defineProps<{ organId: number }>();
+const visible = defineModel<boolean>('visible', { required: true });
+
 const templateStore = useTemplateStore();
-
-const props = withDefaults(
-    defineProps<{
-        open: boolean;
-    }>(),
-    {
-        open: false,
-    },
-);
-
-const emit = defineEmits(['close']);
-
-const visible = computed({
-    get: () => props.open,
-    set: () => {
-        emit('close');
-    },
-});
-
-const initialValues = reactive({
-    shiftName: '',
-});
+const name = ref('');
+const shiftName = ref('');
 const shifts = ref<string[]>([]);
-const templateName = ref<string>('');
-const shiftNameInput = ref<HTMLInputElement | null>(null);
+const saving = ref(false);
 
-const resolver = ({ values }) => {
-    const errors = { shiftName: [] };
-
-    if (!values.shiftName) {
-        errors.shiftName.push({ message: 'A shift name is required.' });
-    }
-
-    return {
-        values,
-        errors,
-    };
-};
-
-const onFormSubmit = async (e) => {
-    if (e.valid) {
-        shifts.value.push(e.values.shiftName);
-        e.reset();
-
-        await nextTick();
-        shiftNameInput.value?.focus();
-    }
-};
-
-const removeShift = (index: number) => {
-    shifts.value.splice(index, 1);
-};
-
-const saveTemplate = async () => {
-    const params: TemplateCreateRequest = {
-        name: templateName.value,
-        organId: parseInt(route.params.id as string),
-        shifts: shifts.value,
-    };
-    await templateStore.createTemplate(params);
-
+watch(visible, (open) => {
+    if (!open) return;
+    name.value = '';
+    shiftName.value = '';
     shifts.value = [];
-    emit('close');
-};
+});
+
+function addShift() {
+    const trimmed = shiftName.value.trim();
+    if (!trimmed) return;
+    shifts.value.push(trimmed);
+    shiftName.value = '';
+}
+
+const canSave = computed(() => !!name.value.trim() && shifts.value.length > 0 && !saving.value);
+
+async function save() {
+    if (!canSave.value) return;
+    saving.value = true;
+    try {
+        await templateStore.createTemplate({ name: name.value.trim(), organId: props.organId, shifts: shifts.value });
+        visible.value = false;
+    } finally {
+        saving.value = false;
+    }
+}
+
+const labelClass = 'text-[13px] font-semibold text-surface-700 dark:text-surface-100';
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :style="{ width: '28rem' }" @hide="emit('close')">
+    <Dialog v-model:visible="visible" modal :pt="dialogPt">
         <template #header>
             <div class="flex flex-col gap-1">
-                <h3 class="m-0 text-xl font-semibold text-color">New Roster Template</h3>
-                <small class="text-muted-color">Define the sequence of shifts for this rotation.</small>
+                <h2 class="font-display text-[22px] font-semibold tracking-[-0.01em]">New template</h2>
+                <p class="text-sm text-surface-600 dark:text-surface-200">Define the sequence of shifts.</p>
             </div>
         </template>
 
-        <div class="flex flex-col gap-6 pt-2">
-            <div class="flex flex-col gap-2">
-                <label class="font-bold text-sm text-muted-color" for="templateName">Template Name</label>
-                <InputText
-                    id="templateName"
-                    v-model="templateName"
-                    class="w-full"
-                    placeholder="e.g. Weekly Operations"
-                />
-            </div>
-
-            <Divider class="m-0" />
-
-            <div class="flex flex-col gap-2">
-                <label class="font-bold text-sm text-muted-color">Add Shift to Sequence</label>
-                <Form v-slot="$form" class="flex gap-2" :initial-values :resolver @submit="onFormSubmit">
-                    <div class="flex-1">
-                        <InputText
-                            ref="shiftNameInput"
-                            class="w-full"
-                            name="shiftName"
-                            placeholder="e.g. Morning Shift"
-                            type="text"
-                        />
-                        <Message
-                            v-if="$form.shiftName?.invalid"
-                            class="mt-1"
-                            severity="error"
-                            size="small"
-                            variant="simple"
-                        >
-                            {{ $form.shiftName.error?.message }}
-                        </Message>
-                    </div>
-                    <Button icon="pi pi-plus" label="Add" severity="primary" type="submit" />
-                </Form>
-            </div>
-
-            <div class="flex flex-col gap-1">
-                <label class="font-bold text-sm text-muted-color">Shift Sequence</label>
-                <div
-                    v-if="shifts.length > 0"
-                    class="grid grid-cols-2 gap-3 bg-surface-50 dark:bg-surface-800 p-3 border-round border-1 border-surface overflow-y-auto"
-                    style="max-height: 320px"
-                >
-                    <div
-                        v-for="(shift, index) in shifts"
-                        :key="index"
-                        class="flex flex-col bg-surface-0 dark:bg-surface-900 border-round shadow-sm border-top-3 border-primary p-3 relative"
-                    >
-                        <div class="flex justify-between items-center mb-2">
-                            <span
-                                class="flex align-items-center justify-content-center bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 font-bold border-circle text-xs"
-                                style="min-width: 22px; height: 22px"
-                            >
-                                {{ index + 1 }}
-                            </span>
-                            <Button
-                                class="w-2rem h-2rem"
-                                icon="pi pi-trash"
-                                rounded
-                                severity="danger"
-                                size="small"
-                                text
-                                @click="removeShift(index)"
-                            />
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            <span class="font-medium text-sm truncate" :title="shift">{{ shift }}</span>
-                        </div>
-                    </div>
-
-                    <div class="col-span-2 text-center mt-2">
-                        <small class="text-surface-400 dark:text-surface-500"
-                            >Shifts follow the numbered sequence</small
-                        >
-                    </div>
-                </div>
-
-                <div v-else class="text-center p-6 border-dashed border-2 border-surface border-round">
-                    <i class="pi pi-list text-3xl text-surface-400 dark:text-surface-500 mb-2"></i>
-                    <p class="m-0 text-surface-400 dark:text-surface-500">
-                        Add your first shift to begin the sequence.
-                    </p>
-                </div>
-            </div>
-
-            <Button
-                class="w-full py-3 mt-2"
-                icon="pi pi-save"
-                label="Save Roster Template"
-                severity="success"
-                @click="saveTemplate"
+        <div class="flex flex-col gap-1.5">
+            <label :class="labelClass" for="template-name">Template name</label>
+            <InputText
+                id="template-name"
+                v-model="name"
+                autocomplete="off"
+                autofocus
+                class="h-[42px] w-full text-base md:text-sm"
             />
         </div>
+
+        <form class="flex flex-col gap-1.5" @submit.prevent="addShift">
+            <label :class="labelClass" for="template-shift">Add a shift</label>
+            <div class="flex gap-2">
+                <InputText
+                    id="template-shift"
+                    v-model="shiftName"
+                    autocomplete="off"
+                    class="h-[42px] grow text-base md:text-sm"
+                    placeholder="E.g. Bar"
+                />
+                <Button
+                    class="h-[42px] bg-surface-0 text-sm dark:bg-surface-900"
+                    :disabled="!shiftName.trim()"
+                    label="Add"
+                    outlined
+                    severity="secondary"
+                    type="submit"
+                >
+                    <template #icon><OiPlus aria-hidden="true" :size="16" /></template>
+                </Button>
+            </div>
+        </form>
+
+        <div class="flex flex-col gap-1.5">
+            <span :class="labelClass">Shift sequence</span>
+            <ol v-if="shifts.length" class="flex flex-wrap gap-1.5">
+                <li
+                    v-for="(shift, index) in shifts"
+                    :key="`${index}-${shift}`"
+                    class="inline-flex h-8 items-center gap-1.5 rounded-md bg-surface-100 pl-2.5 pr-1 text-[13px] font-semibold text-surface-700 dark:bg-surface-800 dark:text-surface-100"
+                >
+                    <b class="font-bold text-primary">{{ index + 1 }}</b
+                    >{{ shift }}
+                    <button
+                        :aria-label="`Remove ${shift}`"
+                        class="flex size-6 items-center justify-center rounded hover:bg-surface-200 focus-visible:outline-2 focus-visible:outline-primary dark:hover:bg-surface-700"
+                        type="button"
+                        @click="shifts.splice(index, 1)"
+                    >
+                        <OiTimes aria-hidden="true" :size="16" />
+                    </button>
+                </li>
+            </ol>
+            <p v-else class="text-sm text-surface-600 dark:text-surface-200">
+                Add your first shift to start the sequence.
+            </p>
+        </div>
+
+        <template #footer>
+            <Button class="h-10 text-sm" label="Cancel" outlined severity="secondary" @click="visible = false" />
+            <Button
+                :class="['h-10 text-sm', readableDisabled]"
+                :disabled="!canSave"
+                label="Create template"
+                :loading="saving"
+                @click="save"
+            />
+        </template>
     </Dialog>
 </template>
-
-<style scoped></style>

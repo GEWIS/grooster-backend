@@ -1,7 +1,10 @@
-@import './base.css';
+/* OpenVue styles live in the `primevue` layer (see main.ts) so Tailwind utilities can override them */
+@layer theme, base, primevue, components, utilities;
+
 @import 'tailwindcss';
-@import 'tailwindcss/utilities';
 @import 'tailwindcss-primeui';
+@import './roster-tokens.css';
+@import './base.css';
 @import 'primeicons/primeicons.css';
 
 /* Match PrimeVue's darkModeSelector so Tailwind's dark: variant uses the same trigger */

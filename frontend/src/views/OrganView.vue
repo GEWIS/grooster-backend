@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { Select } from 'openvue';
+import { OiChevronRight } from '@openvue/openicons-vue';
 import type { Organ } from '@gewis/grooster-backend-ts';
 import { useRouter } from 'vue-router';
 import { getGEWISId } from '@/helpers/TokenHelper';
 import ApiService from '@/services/ApiService';
+import PageHeader from '@/components/common/PageHeader.vue';
 
 const router = useRouter();
 
 const user = ref();
 const organs = ref<Organ[]>();
-const selectedOrgan = ref<number>();
 
 onMounted(async () => {
     await loadUser();
@@ -34,19 +34,25 @@ const onSelect = async (organId: number) => {
 </script>
 
 <template>
-    <div v-if="organs && user">
-        <Select
-            v-model="selectedOrgan"
-            option-label="name"
-            option-value="id"
-            :options="organs"
-            placeholder="Select an organ"
-            @change="onSelect(selectedOrgan)"
-        />
-    </div>
-    <div v-else>
-        <p>You should not see this!</p>
+    <div class="mx-auto flex w-full max-w-[560px] flex-col gap-6 px-4 py-6 md:py-10">
+        <PageHeader description="Pick the organization you want to plan for." title="Organizations" />
+        <ul
+            v-if="organs?.length"
+            class="overflow-hidden rounded-card border border-surface bg-surface-0 dark:bg-surface-900"
+        >
+            <li v-for="organ in organs" :key="organ.id" class="border-t border-surface first:border-t-0">
+                <button
+                    class="flex h-14 w-full items-center gap-3 px-5 text-left text-[15px] font-semibold hover:bg-surface-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary dark:hover:bg-surface-800"
+                    type="button"
+                    @click="onSelect(organ.id)"
+                >
+                    <span class="grow">{{ organ.name }}</span>
+                    <OiChevronRight aria-hidden="true" class="text-surface-600 dark:text-surface-200" :size="18" />
+                </button>
+            </li>
+        </ul>
+        <p v-else-if="user" class="text-sm text-surface-600 dark:text-surface-200">
+            You are not a member of any organization yet.
+        </p>
     </div>
 </template>
-
-<style scoped></style>

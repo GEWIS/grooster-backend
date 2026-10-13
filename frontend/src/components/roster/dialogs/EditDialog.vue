@@ -1,97 +1,74 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { RosterUpdateRequest } from '@gewis/grooster-backend-ts';
+import type { Roster } from '@gewis/grooster-backend-ts';
 import { useRosterStore } from '@/stores/roster.store';
+import { parseRosterDate, toRosterDate } from '@/helpers/date';
+import { dialogPt, readableDisabled } from '@/theme/pt';
 
-const props = withDefaults(defineProps<{ open: boolean }>(), { open: false });
+// "Edit details" from the roster's overflow menu: name and date.
+const props = defineProps<{ roster: Roster }>();
+const visible = defineModel<boolean>('visible', { required: true });
 
-const emit = defineEmits(['close']);
 const rosterStore = useRosterStore();
+const name = ref('');
+const date = ref<Date | null>(null);
+const saving = ref(false);
 
-const newName = ref('');
-const isSubmitting = ref(false);
-
-watch(
-    () => props.open,
-    (isOpen) => {
-        if (isOpen) {
-            const currentRoster = rosterStore.rosters[rosterStore.selectedRosterId];
-            newName.value = currentRoster?.name || '';
-        }
-    },
-);
-
-const visible = computed({
-    get: () => props.open,
-    set: () => {
-        emit('close');
-    },
+watch(visible, (open) => {
+    if (!open) return;
+    name.value = props.roster.name ?? '';
+    date.value = parseRosterDate(props.roster.date);
 });
 
-const updateName = async () => {
-    if (!newName.value.trim()) return;
+const canSave = computed(() => !!name.value.trim() && !!date.value && !saving.value);
 
-    isSubmitting.value = true;
+async function save() {
+    if (!canSave.value || !date.value) return;
+    saving.value = true;
     try {
-        const params: RosterUpdateRequest = { name: newName.value };
-        await rosterStore.updateRoster(rosterStore.selectedRosterId, params);
-        emit('close');
+        await rosterStore.updateRoster(props.roster.id, { name: name.value.trim(), date: toRosterDate(date.value) });
+        visible.value = false;
     } finally {
-        isSubmitting.value = false;
+        saving.value = false;
     }
-};
+}
+
+const labelClass = 'text-[13px] font-semibold text-surface-700 dark:text-surface-100';
 </script>
 
 <template>
-    <Dialog
-        v-model:visible="visible"
-        class="mx-4"
-        :dismissable-mask="true"
-        :draggable="false"
-        modal
-        :pt="{
-            root: 'border-none shadow-xl rounded-xl overflow-hidden',
-            header: 'bg-surface-0 dark:bg-surface-900 border-b border-surface p-5',
-            content: 'p-0', // We'll handle padding inside
-        }"
-        :style="{ width: '28rem' }"
-    >
-        <template #header>
-            <div class="flex items-center gap-3">
-                <div
-                    class="flex items-center justify-center w-11 h-11 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900"
-                >
-                    <i class="pi pi-question-circle text-amber-600 text-xl"></i>
-                </div>
-                <span class="font-bold text-xl text-color">Change Roster Name</span>
-            </div>
-        </template>
-
-        <div class="flex flex-col gap-2 pt-4">
-            <label class="text-sm font-semibold text-muted-color" for="rosterName">New Display Name</label>
-            <div class="relative">
+    <Dialog v-model:visible="visible" header="Edit details" modal :pt="dialogPt">
+        <form id="edit-roster-form" class="flex flex-col gap-[18px]" @submit.prevent="save">
+            <div class="flex flex-col gap-1.5">
+                <label :class="labelClass" for="edit-roster-name">Roster name</label>
                 <InputText
-                    id="rosterName"
-                    v-model="newName"
+                    id="edit-roster-name"
+                    v-model="name"
+                    autocomplete="off"
                     autofocus
-                    class="w-full p-3 border-surface rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g. Summer Shift 2024"
-                    @keydown.enter="updateName"
+                    class="h-[42px] w-full text-base md:text-sm"
                 />
             </div>
-            <small class="text-muted-color">Give your roster a descriptive name that others will recognize.</small>
-        </div>
-
+            <div class="flex flex-col gap-1.5">
+                <label :class="labelClass" for="edit-roster-date">Date</label>
+                <DatePicker
+                    v-model="date"
+                    date-format="D d M yy"
+                    input-id="edit-roster-date"
+                    :pt="{ pcInputText: { root: { class: 'h-[42px] w-full text-base md:text-sm' } } }"
+                />
+            </div>
+        </form>
         <template #footer>
-            <Button label="Cancel" severity="secondary" text @click="emit('close')" />
+            <Button class="h-10 text-sm" label="Cancel" outlined severity="secondary" @click="visible = false" />
             <Button
-                class="px-5 bg-blue-600 border-none hover:bg-blue-700"
-                icon="pi pi-check"
-                label="Save Changes"
-                @click="updateName"
+                :class="['h-10 text-sm', readableDisabled]"
+                :disabled="!canSave"
+                form="edit-roster-form"
+                label="Save changes"
+                :loading="saving"
+                type="submit"
             />
         </template>
     </Dialog>
 </template>
-
-<style scoped></style>

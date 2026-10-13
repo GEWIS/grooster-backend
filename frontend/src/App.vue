@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import TopNavbar from '@/components/TopNavbar.vue';
+import ConfirmDialog from 'openvue/confirmdialog';
+import AppTopBar from '@/components/AppTopBar.vue';
+import { confirmDialogPt } from '@/theme/pt';
 </script>
 
 <template>
-    <div class="flex flex-col min-h-screen">
+    <div class="flex min-h-screen flex-col">
         <Toast />
-        <TopNavbar />
-        <div class="flex-1 p-4">
+        <ConfirmDialog :pt="confirmDialogPt" />
+        <AppTopBar />
+        <main class="flex flex-1 flex-col">
             <RouterView />
-        </div>
+        </main>
     </div>
 </template>
-
-<style scoped></style>

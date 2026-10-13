@@ -1,113 +1,108 @@
 <script setup lang="ts">
-import { User } from '@gewis/grooster-backend-ts';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useToast } from 'openvue/usetoast';
+import { OiTimes } from '@openvue/openicons-vue';
 import { useRosterStore } from '@/stores/roster.store';
-import { useOrganStore } from '@/stores/organ.store';
-import { Role, useAuthStore } from '@/stores/auth.store';
-import ApiService from '@/services/ApiService';
+import type { RosterMember } from '@/composables/useRosterGrid';
 
 const props = defineProps<{
-    id: number;
+    rosterId: number;
+    members: RosterMember[];
+    isAdmin: boolean;
 }>();
 
 const rosterStore = useRosterStore();
-const organStore = useOrganStore();
-const authStore = useAuthStore();
-
-const organUsers = ref<User[]>([]);
+const toast = useToast();
 const selectedUserId = ref<number | null>(null);
 
-const responsibles = computed(() => rosterStore.getResponsibles(props.id));
-
-const responsibleUsers = computed(() =>
+const responsibles = computed(() => rosterStore.getResponsibles(props.rosterId));
+const responsibleMembers = computed(() =>
     responsibles.value
-        .map((responsible) => organUsers.value.find((user) => user.id === responsible.userId))
-        .filter((user): user is User => !!user),
+        .map((responsible) => props.members.find((member) => member.id === responsible.userId))
+        .filter((member): member is RosterMember => !!member),
 );
-
-const availableUsers = computed(() =>
-    organUsers.value.filter((user) => !responsibles.value.some((responsible) => responsible.userId === user.id)),
+const availableMembers = computed(() =>
+    props.members.filter((member) => !responsibles.value.some((responsible) => responsible.userId === member.id)),
 );
-
-onMounted(async () => {
-    try {
-        const response = await ApiService.user.userGet(organStore.organ);
-        organUsers.value = response.data;
-    } catch (error) {
-        console.error('Failed to fetch organ users:', error);
-    }
-});
 
 watch(
-    () => props.id,
-    (rosterId) => {
-        void rosterStore.fetchResponsibles(rosterId);
-    },
+    () => props.rosterId,
+    (rosterId) => void rosterStore.fetchResponsibles(rosterId),
     { immediate: true },
 );
 
-const addResponsible = async (userId: number) => {
+async function addResponsible(userId: number | null) {
     if (!userId) return;
-
     try {
-        await rosterStore.addResponsible(props.id, userId);
+        await rosterStore.addResponsible(props.rosterId, userId);
     } catch (error) {
         console.error('Failed to add roster responsible:', error);
+        toast.add({ severity: 'error', summary: 'Could not add the responsible', life: 5000 });
     }
-
     selectedUserId.value = null;
-};
+}
 
-const removeResponsible = async (userId: number) => {
+async function removeResponsible(userId: number) {
     try {
-        await rosterStore.removeResponsible(props.id, userId);
+        await rosterStore.removeResponsible(props.rosterId, userId);
     } catch (error) {
         console.error('Failed to remove roster responsible:', error);
+        toast.add({ severity: 'error', summary: 'Could not remove the responsible', life: 5000 });
     }
-};
+}
 </script>
 
 <template>
-    <div class="space-y-3 border-b border-surface pb-4">
-        <div>
-            <h2 class="text-xl font-bold text-color">Responsibles</h2>
-            <p class="text-sm text-muted-color">Users responsible for organising this activity.</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-            <div
-                v-for="user in responsibleUsers"
-                :key="user.id"
-                class="group flex items-center bg-surface-50 dark:bg-surface-800 border border-surface rounded-lg pl-3 pr-1 py-1 transition-colors hover:bg-emphasis"
-            >
-                <span class="text-sm font-medium text-muted-color">{{ user.name }}</span>
-                <Button
-                    v-if="authStore.can([Role.Admin, Role.Owner])"
-                    class="!p-0 !w-7 !h-7 !text-surface-400 dark:!text-surface-500 group-hover:!text-red-500"
-                    icon="pi pi-times"
-                    rounded
-                    text
-                    @click="removeResponsible(user.id)"
-                />
-            </div>
-
-            <p v-if="responsibleUsers.length === 0" class="text-sm text-surface-400 dark:text-surface-500">
-                No responsibles assigned yet.
+    <section
+        aria-labelledby="responsibles-title"
+        class="flex flex-col gap-3 rounded-card border border-surface bg-surface-0 px-5 py-[18px] md:flex-row md:items-center md:gap-5 dark:bg-surface-900"
+    >
+        <div class="flex flex-col gap-0.5 md:w-[300px] md:shrink-0">
+            <h2 id="responsibles-title" class="text-base font-semibold">Responsibles</h2>
+            <p class="text-[13px] text-surface-600 dark:text-surface-200">
+                Members responsible for organising this activity.
             </p>
-
-            <div v-if="authStore.can([Role.Admin, Role.Owner])" class="relative min-w-[180px]">
+        </div>
+        <ul class="flex grow flex-wrap items-center gap-2">
+            <li
+                v-for="member in responsibleMembers"
+                :key="member.id"
+                class="inline-flex h-10 items-center gap-1 rounded-full border border-surface pl-3.5 pr-1.5 text-sm font-medium"
+            >
+                <span :title="member.name">{{ member.displayName }}</span>
+                <button
+                    v-if="isAdmin"
+                    :aria-label="`Remove ${member.displayName} as responsible`"
+                    class="flex size-7 items-center justify-center rounded-full text-surface-700 hover:bg-surface-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-surface-100 dark:hover:bg-surface-800"
+                    type="button"
+                    @click="removeResponsible(member.id)"
+                >
+                    <OiTimes aria-hidden="true" :size="16" />
+                </button>
+            </li>
+            <li v-if="!responsibleMembers.length && !isAdmin" class="text-sm text-surface-600 dark:text-surface-200">
+                No responsibles yet.
+            </li>
+            <li v-if="isAdmin">
                 <Select
                     v-model="selectedUserId"
-                    class="!w-full !rounded-lg !border-dashed !border-surface !bg-transparent hover:!border-indigo-400 transition-all !text-sm"
-                    option-label="name"
+                    aria-label="Add responsible"
+                    filter
+                    filter-placeholder="Search members"
+                    option-label="displayName"
                     option-value="id"
-                    :options="availableUsers"
-                    placeholder="+ Add Responsible"
-                    @change="(event) => addResponsible(event.value)"
+                    :options="availableMembers"
+                    placeholder="+ Add responsible"
+                    :pt="{
+                        root: {
+                            class: 'h-10 items-center rounded-control border-dashed border-surface-400 bg-transparent dark:border-surface-500',
+                        },
+                        label: { class: 'py-0 text-sm font-semibold text-primary' },
+                        dropdown: { class: 'hidden' },
+                    }"
+                    @update:model-value="addResponsible"
                 />
-            </div>
-        </div>
-    </div>
+            </li>
+        </ul>
+    </section>
 </template>
-
-<style scoped></style>

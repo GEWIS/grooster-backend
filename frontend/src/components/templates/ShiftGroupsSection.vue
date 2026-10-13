@@ -1,107 +1,91 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { ShiftGroup } from '@gewis/grooster-backend-ts';
+import { OiChevronRight, OiPlus } from '@openvue/openicons-vue';
+import type { ShiftGroup } from '@gewis/grooster-backend-ts';
 import ApiService from '@/services/ApiService';
-import { useOrganStore } from '@/stores/organ.store';
-import { Role, useAuthStore } from '@/stores/auth.store';
 import ShiftGroupAdd from '@/components/templates/dialogs/ShiftGroupAdd.vue';
 import ShiftGroupPriority from '@/components/templates/ShiftGroupPriority.vue';
+import { dialogPt } from '@/theme/pt';
 
-const organStore = useOrganStore();
-const authStore = useAuthStore();
+const props = defineProps<{ organId: number; isAdmin: boolean }>();
+const emit = defineEmits<{ 'update:groups': [groups: ShiftGroup[]] }>();
 
-const shiftGroups = ref<ShiftGroup[]>([]);
+const groups = ref<ShiftGroup[]>([]);
+const addOpen = ref(false);
+const openGroup = ref<ShiftGroup | null>(null);
 
-type Dialogs = 'AddGroup' | 'None';
-const openDialog = ref<Dialogs>('None');
-
-const emit = defineEmits(['update:groups']);
-
-const expandedGroupId = ref<number>(null);
-
-const fetchGroups = async () => {
+async function fetchGroups() {
     try {
-        const response = await ApiService.shiftGroupApi.getShiftGroups(organStore.organ);
-        const newGroups = response.data ?? [];
-
-        shiftGroups.value = newGroups;
-        emit('update:groups', newGroups);
+        const response = await ApiService.shiftGroupApi.getShiftGroups(props.organId);
+        groups.value = response.data ?? [];
+        emit('update:groups', groups.value);
     } catch (error) {
         console.error('Failed to fetch groups:', error);
     }
-};
+}
 
-const toggleGroup = (groupId: number) => {
-    if (groupId === expandedGroupId.value) {
-        expandedGroupId.value = null;
-    } else {
-        expandedGroupId.value = groupId;
-    }
-};
-
-const handleGroupClose = async () => {
-    openDialog.value = 'None';
-    await fetchGroups();
-};
-
-onMounted(async () => {
-    await fetchGroups();
-});
+onMounted(fetchGroups);
 </script>
 
 <template>
-    <section class="flex flex-col gap-2">
-        <h2 class="text-lg font-semibold text-muted-color mb-4 flex items-center gap-2">
-            <i class="pi pi-users text-primary"></i> Shift Groups
-            <Button
-                v-if="authStore.can([Role.Admin, Role.Owner])"
-                class="p-button-outlined"
-                icon="pi pi-users"
-                label="Add shift group"
-                @click="openDialog = 'AddGroup'"
-            />
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
-            <template v-for="group in shiftGroups" :key="group.id">
-                <div
-                    :class="[
-                        'p-4 bg-surface-0 dark:bg-surface-900 border rounded-lg shadow-sm transition-all cursor-pointer hover:border-primary',
-                        expandedGroupId === group.id ? 'border-primary ring-2 ring-primary' : 'border-surface',
-                    ]"
-                    @click="toggleGroup(group.id)"
-                >
-                    <div class="flex items-center justify-between">
-                        <p class="font-bold text-color">{{ group.name }}</p>
-                        <i class="pi pi-chevron-right text-surface-400 dark:text-surface-500 text-sm"></i>
-                    </div>
-                </div>
-            </template>
-        </div>
-
-        <div v-if="expandedGroupId">
-            <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]" @click="expandedGroupId = null"></div>
-
-            <div
-                class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[70] bg-surface-0 dark:bg-surface-900 border border-surface rounded-2xl shadow-2xl p-8 w-[90vw] max-w-[800px] min-h-[500px] overflow-y-auto"
-            >
-                <div class="flex justify-between items-center mb-8">
-                    <div>
-                        <h3 class="text-2xl font-bold text-color">
-                            Assigning priority for: {{ shiftGroups.find((g) => g.id === expandedGroupId)?.name }}
-                        </h3>
-                    </div>
-                    <Button
-                        class="p-button-rounded p-button-text p-button-lg text-surface-400 dark:text-surface-500 hover:text-red-500"
-                        icon="pi pi-times"
-                        @click="expandedGroupId = null"
-                    />
-                </div>
-
-                <ShiftGroupPriority :group-id="expandedGroupId" />
+    <section aria-labelledby="shift-groups-title" class="flex flex-col gap-4 pt-2">
+        <div class="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
+            <div class="flex grow flex-col gap-1">
+                <h2 id="shift-groups-title" class="font-display text-[22px] font-semibold">Shift groups</h2>
+                <p class="text-sm text-surface-600 dark:text-surface-200">
+                    Who can be scheduled on a shift. Link a group to a shift in a template.
+                </p>
             </div>
+            <Button
+                v-if="isAdmin"
+                class="h-10 self-start bg-surface-0 text-sm md:self-auto dark:bg-surface-900"
+                label="New group"
+                outlined
+                severity="secondary"
+                @click="addOpen = true"
+            >
+                <template #icon><OiPlus aria-hidden="true" :size="16" /></template>
+            </Button>
         </div>
-    </section>
-    <ShiftGroupAdd :open="openDialog === 'AddGroup'" @close="handleGroupClose" />
-</template>
 
-<style scoped></style>
+        <ul
+            v-if="groups.length"
+            class="overflow-hidden rounded-card border border-surface bg-surface-0 dark:bg-surface-900"
+        >
+            <li v-for="group in groups" :key="group.id" class="border-t border-surface first:border-t-0">
+                <button
+                    class="flex w-full items-center gap-4 px-5 py-4 text-left hover:bg-surface-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary dark:hover:bg-surface-800"
+                    :disabled="!isAdmin"
+                    type="button"
+                    @click="openGroup = group"
+                >
+                    <span class="grow text-[15px] font-semibold">{{ group.name }}</span>
+                    <span v-if="isAdmin" class="text-[13px] text-surface-600 dark:text-surface-200">Priorities</span>
+                    <OiChevronRight
+                        v-if="isAdmin"
+                        aria-hidden="true"
+                        class="text-surface-600 dark:text-surface-200"
+                        :size="18"
+                    />
+                </button>
+            </li>
+        </ul>
+        <p
+            v-else
+            class="rounded-card border border-dashed border-surface-400 px-6 py-8 text-center text-sm text-surface-600 dark:border-surface-500 dark:text-surface-200"
+        >
+            No shift groups yet.
+        </p>
+    </section>
+
+    <ShiftGroupAdd v-model:visible="addOpen" :organ-id="organId" @created="fetchGroups" />
+    <Dialog
+        :header="openGroup ? `${openGroup.name}: priorities` : ''"
+        modal
+        :pt="{ ...dialogPt, root: { class: `${dialogPt.root.class} md:w-[800px]` } }"
+        :visible="openGroup !== null"
+        @update:visible="(open: boolean) => !open && (openGroup = null)"
+    >
+        <ShiftGroupPriority v-if="openGroup" :group-id="openGroup.id" :organ-id="organId" />
+    </Dialog>
+</template>

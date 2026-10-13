@@ -1,146 +1,75 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import {
-    RosterTemplateShiftPreference,
-    RosterTemplate,
-    TemplateShiftPreferenceCreateRequest,
-    TemplateShiftPreferenceUpdateRequest,
-} from '@gewis/grooster-backend-ts';
+import { ref, watch } from 'vue';
+import type { RosterTemplate, RosterTemplateShiftPreference } from '@gewis/grooster-backend-ts';
+import { useToast } from 'openvue/usetoast';
+import PreferenceSelect from '@/components/common/PreferenceSelect.vue';
 import ApiService from '@/services/ApiService';
 import { useUserStore } from '@/stores/user.store';
+import { dialogPt } from '@/theme/pt';
 
-const props = withDefaults(
-    defineProps<{
-        open: boolean;
-        template: RosterTemplate;
-    }>(),
-    {
-        open: false,
-    },
-);
+const props = defineProps<{ template: RosterTemplate }>();
+const visible = defineModel<boolean>('visible', { required: true });
 
-const emit = defineEmits(['close']);
-
+const OPTIONS = ['J', 'N', 'X', 'L'];
 const userStore = useUserStore();
-const shiftPreferences = ref<Record<number, RosterTemplateShiftPreference>>({});
-const options = ['J', 'N', 'X', 'L'];
+const toast = useToast();
+const preferences = ref<Record<number, RosterTemplateShiftPreference>>({});
 
-onMounted(async () => {
+watch(visible, async (open) => {
+    if (!open || !userStore.user) return;
     try {
-        const { data: preferences } = await ApiService.roster.getRosterTemplateShiftPreferences(
+        const { data } = await ApiService.roster.getRosterTemplateShiftPreferences(
             userStore.user.id,
             props.template.id,
         );
-
-        const prefMap: Record<number, RosterTemplateShiftPreference> = {};
-
-        props.template.shifts.forEach((shift) => {
-            const existingPref = preferences.find((p) => p.rosterTemplateShiftID === shift.id);
-
-            if (existingPref) {
-                prefMap[shift.id] = existingPref;
-            }
-        });
-
-        shiftPreferences.value = prefMap;
-    } catch (e) {
-        console.error(e);
+        preferences.value = Object.fromEntries(data.map((pref) => [pref.rosterTemplateShiftID, pref]));
+    } catch (error) {
+        console.error(error);
     }
 });
 
-const visible = computed({
-    get: () => props.open,
-    set: () => {
-        emit('close');
-    },
-});
-
-const displayShifts = computed(() => {
-    return props.template.shifts.map((shift) => {
-        const pref = Object.values(shiftPreferences.value).find((p) => p.rosterTemplateShiftID === shift.id) || {
-            id: null,
-            rosterTemplateShiftID: shift.id,
-            value: null,
-        };
-
-        return {
-            ...pref,
-            displayName: shift.shiftName,
-        };
-    });
-});
-
-const onPreferenceChange = async (shiftId: number, templateShiftId: number, value: string) => {
-    if (!shiftId) {
-        try {
-            const params: TemplateShiftPreferenceCreateRequest = {
-                preference: value,
-                rosterTemplateShiftID: templateShiftId,
-                userId: userStore.user.id,
-            };
-
-            const { data } = await ApiService.roster.createRosterTemplateShiftPreference(params);
-
-            shiftPreferences.value[templateShiftId] = data;
-        } catch (e) {
-            console.error(e);
-        }
-    } else {
-        try {
-            const params: TemplateShiftPreferenceUpdateRequest = {
-                preference: value,
-            };
-
-            const { data } = await ApiService.roster.updateRosterTemplateShiftPreference(shiftId, params);
-
-            shiftPreferences.value[templateShiftId] = data;
-        } catch (e) {
-            console.error(e);
-        }
+async function setPreference(templateShiftId: number, value: string) {
+    const existing = preferences.value[templateShiftId];
+    try {
+        const { data } = existing?.id
+            ? await ApiService.roster.updateRosterTemplateShiftPreference(existing.id, { preference: value })
+            : await ApiService.roster.createRosterTemplateShiftPreference({
+                  preference: value,
+                  rosterTemplateShiftID: templateShiftId,
+                  userId: userStore.user.id,
+              });
+        preferences.value = { ...preferences.value, [templateShiftId]: data };
+    } catch (error) {
+        console.error(error);
+        toast.add({ severity: 'error', summary: 'Could not save your preference', life: 5000 });
     }
-};
+}
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :style="{ width: '28rem' }" @hide="emit('close')">
+    <Dialog v-model:visible="visible" modal :pt="dialogPt">
         <template #header>
             <div class="flex flex-col gap-1">
-                <h3 class="m-0 text-xl font-semibold text-color">Roster Template Preferences</h3>
-                <small class="text-muted-color">Give your preferences for each shift in this template.</small>
+                <h2 class="font-display text-[22px] font-semibold tracking-[-0.01em]">My preferences</h2>
+                <p class="text-sm text-surface-600 dark:text-surface-200">
+                    Your usual answer for each shift in {{ template.name }}. Saved automatically.
+                </p>
             </div>
         </template>
-        <div
-            class="max-w-2xl mx-auto bg-surface-0 dark:bg-surface-900 rounded-xl shadow-sm border border-surface overflow-hidden"
-        >
-            <div class="px-6 py-4 border-b border-surface bg-surface-50/50 dark:bg-surface-800/50">
-                <h3 class="text-sm font-semibold text-muted-color uppercase tracking-wider">Shift Preferences</h3>
-            </div>
-
-            <div class="divide-y divide-surface-100 dark:divide-surface-700">
-                <div
-                    v-for="item in displayShifts"
-                    :key="item.rosterTemplateShiftID"
-                    class="grid grid-cols-2 items-center px-6 py-3 hover:bg-emphasis transition-colors duration-200"
-                >
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-medium text-muted-color">{{ item.displayName }}</span>
-                    </div>
-
-                    <div class="flex justify-end">
-                        <Select
-                            v-model="item.value"
-                            class="w-full max-w-[200px]"
-                            :options="options"
-                            placeholder="Select preference..."
-                            @update:model-value="
-                                (value) => onPreferenceChange(item.id, item.rosterTemplateShiftID, value)
-                            "
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <ul class="flex flex-col divide-y divide-surface-100 dark:divide-surface-800">
+            <li v-for="shift in template.shifts" :key="shift.id" class="flex min-h-[60px] items-center gap-3 py-2">
+                <span class="min-w-0 grow truncate text-base font-semibold">{{ shift.shiftName }}</span>
+                <PreferenceSelect
+                    :label="`${shift.shiftName}: your usual answer`"
+                    :model-value="preferences[shift.id]?.value ?? null"
+                    :options="OPTIONS"
+                    size="row"
+                    @update:model-value="setPreference(shift.id, $event)"
+                />
+            </li>
+        </ul>
+        <template #footer>
+            <Button class="h-10 text-sm" label="Done" @click="visible = false" />
+        </template>
     </Dialog>
 </template>
-
-<style scoped></style>

@@ -1,0 +1,81 @@
+/*
+  Roster app design tokens (Tailwind v4). Imported from main.css after tailwindcss-primeui.
+  Brand green and neutrals come from the OpenVue preset (src/theme/openvue-preset.ts) through
+  tailwindcss-primeui; this file adds fonts, preference colours and the top bar.
+  The `dark` variant (.app-dark) is declared in main.css.
+*/
+
+@theme {
+    /* Fira Mono has 400/500/700; font-semibold (600) renders with the 700 file */
+    --font-sans: 'Fira Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+
+    /* Preference colours: bg-pref-prefer + text-pref-prefer-fg, and so on.
+     Each pair also has its own icon, so colour is never the only signal. */
+    --color-pref-none: #ffffff;
+    --color-pref-none-fg: #66716c;
+    --color-pref-prefer: #dcefe3;
+    --color-pref-prefer-fg: #125a35;
+    --color-pref-ok: #eef1ef;
+    --color-pref-ok-fg: #3f4a45;
+    --color-pref-avoid: #fbeccf;
+    --color-pref-avoid-fg: #744600;
+    --color-pref-no: #f9dedb;
+    --color-pref-no-fg: #912a21;
+    /* Our backend letters: J = prefer (green), X = avoid (amber), N = no (red), L = purple, S = rainbow, B = beer */
+    --color-pref-l: #ece0f6;
+    --color-pref-l-fg: #5b2a86;
+    --color-pref-special-fg: #3a2400;
+
+    --animate-pref-rainbow: pref-rainbow 6s linear infinite;
+    @keyframes pref-rainbow {
+        to {
+            background-position: 200% 50%;
+        }
+    }
+
+    /* Status tag "Assigning" */
+    --color-status-warn: #fdf0d4;
+    --color-status-warn-fg: #6e4300;
+    --color-status-warn-dot: #c98a12;
+
+    /* Top bar (dark green) */
+    --color-topbar: #0e2a21;
+    --color-topbar-hover: #17392e;
+    --color-topbar-active: #1f4a3b;
+    --color-topbar-border: #2c5646;
+    --color-topbar-muted: #a9c9b8;
+    --color-topbar-fg: #cfe0d7;
+    --color-topbar-icon: #e8f1ec;
+    --color-topbar-field: #133529;
+
+    --radius-card: 12px;
+    --radius-control: 8px;
+}
+
+.app-dark {
+    --color-pref-none: #131b17;
+    --color-pref-none-fg: #a3b0a9;
+    --color-pref-prefer: #173d2a;
+    --color-pref-prefer-fg: #9fdcb8;
+    --color-pref-ok: #26302b;
+    --color-pref-ok-fg: #c9d3cd;
+    --color-pref-avoid: #3d2c0c;
+    --color-pref-avoid-fg: #f2c97a;
+    --color-pref-no: #43201c;
+    --color-pref-no-fg: #f4aaa1;
+    --color-pref-l: #33214a;
+    --color-pref-l-fg: #dcc2f4;
+    --color-status-warn: #3d2c0c;
+    --color-status-warn-fg: #f2c97a;
+}
+
+/* Special answers kept from the old roster table: S (rainbow) and B (beer). Text uses pref-special-fg. */
+@utility bg-pref-rainbow {
+    background-image: linear-gradient(90deg, #ffb3b3, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a8c8ff, #c9b8ff, #ffb3b3);
+    background-size: 200% 100%;
+}
+
+@utility bg-pref-beer {
+    background-image: linear-gradient(to bottom, #fff8e1 0%, #fff8e1 22%, #f5a623 22%, #d9840d 100%);
+}

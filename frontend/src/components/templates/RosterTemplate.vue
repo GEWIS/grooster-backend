@@ -1,166 +1,119 @@
 <script setup lang="ts">
-import {
-    RosterTemplate as RosterTemplateModel,
-    ShiftGroup,
-    TemplateShiftUpdateRequest,
-} from '@gewis/grooster-backend-ts';
-import { ref } from 'vue';
-import RosterTemplateDelete from '@/components/templates/dialogs/RosterTemplateDelete.vue';
-import RosterTemplateUseDialog from '@/components/templates/dialogs/RosterTemplateUseDialog.vue';
+import { computed, ref } from 'vue';
+import Menu from 'openvue/menu';
+import { OiEllipsisH, OiHeart, OiTrash, OiUsers } from '@openvue/openicons-vue';
+import type { RosterTemplate as RosterTemplateModel, ShiftGroup } from '@gewis/grooster-backend-ts';
 import RosterTemplatePreferences from '@/components/templates/dialogs/RosterTemplatePreferences.vue';
-import ApiService from '@/services/ApiService';
-import { Role, useAuthStore } from '@/stores/auth.store';
-
-type Dialogs = 'Preferences' | 'Delete' | 'Roster' | 'None';
+import TemplateShiftGroupsDialog from '@/components/templates/dialogs/TemplateShiftGroupsDialog.vue';
+import { useTemplateStore } from '@/stores/template.store';
+import { useConfirmDelete } from '@/composables/useConfirmDelete';
 
 const props = defineProps<{
     template: RosterTemplateModel;
     shiftGroups: ShiftGroup[];
+    isAdmin: boolean;
 }>();
-const openDialog = ref<Dialogs>('None');
+const emit = defineEmits<{ use: [] }>();
 
-const authStore = useAuthStore();
+const templateStore = useTemplateStore();
+const confirmDelete = useConfirmDelete();
 
-const showDetail = ref<boolean>(false);
+// Only one dialog can be open at a time
+type DialogType = 'preferences' | 'shift-groups';
+const activeDialog = ref<DialogType | null>(null);
+const closeDialog = () => (activeDialog.value = null);
+const menu = ref<InstanceType<typeof Menu>>();
 
-const handleGroupChange = async (shiftId: number, groupId: number) => {
-    try {
-        const params: TemplateShiftUpdateRequest = {
-            shiftGroupId: groupId,
-        };
+const shifts = computed(() => props.template.shifts ?? []);
 
-        await ApiService.roster.updateRosterTemplateShift(shiftId, params);
-    } catch (e) {
-        console.error(e);
-    }
-};
-
-const getGroupName = (id: number) => {
-    return props.shiftGroups.find((g) => g.id === id)?.name || '';
-};
+const menuItems = computed(() => [
+    { label: 'My preferences', iconComponent: OiHeart, command: () => (activeDialog.value = 'preferences') },
+    ...(props.isAdmin
+        ? [
+              { label: 'Shift groups', iconComponent: OiUsers, command: () => (activeDialog.value = 'shift-groups') },
+              { separator: true },
+              {
+                  label: 'Delete template',
+                  iconComponent: OiTrash,
+                  danger: true,
+                  command: () =>
+                      confirmDelete({
+                          header: 'Delete template?',
+                          message: `"${props.template.name}" is deleted. Rosters made from it stay.`,
+                          acceptLabel: 'Delete template',
+                          onAccept: () => templateStore.deleteTemplate(props.template.id),
+                      }),
+              },
+          ]
+        : []),
+]);
 </script>
 
 <template>
-    <div class="p-2">
-        <Card class="overflow-hidden border border-surface shadow-sm hover:shadow-md transition-shadow duration-300">
-            <template #content>
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-color truncate">
-                        {{ props.template.name }}
-                    </h3>
-                    <div class="flex gap-2">
-                        <Button icon="pi pi-heart" rounded @click="openDialog = 'Preferences'" />
-                        <Button
-                            v-if="authStore.can([Role.Admin, Role.Owner])"
-                            icon="pi pi-plus"
-                            rounded
-                            severity="secondary"
-                            text
-                            @click="openDialog = 'Roster'"
-                        />
-                        <Button
-                            v-if="authStore.can([Role.Admin, Role.Owner])"
-                            icon="pi pi-trash"
-                            rounded
-                            severity="danger"
-                            text
-                            @click="openDialog = 'Delete'"
-                        />
-                    </div>
-                </div>
+    <article
+        :aria-labelledby="`template-${template.id}`"
+        class="flex flex-col gap-4 rounded-card border border-surface bg-surface-0 p-5 dark:bg-surface-900"
+    >
+        <div class="flex items-center gap-2">
+            <h2 :id="`template-${template.id}`" class="min-w-0 grow truncate text-lg font-semibold">
+                {{ template.name }}
+            </h2>
+            <button
+                :aria-controls="`template-menu-${template.id}`"
+                aria-haspopup="menu"
+                :aria-label="`Actions for ${template.name}`"
+                class="flex size-9 items-center justify-center rounded-control text-surface-700 hover:bg-surface-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-surface-100 dark:hover:bg-surface-800"
+                type="button"
+                @click="menu?.toggle($event)"
+            >
+                <OiEllipsisH aria-hidden="true" :size="18" />
+            </button>
+        </div>
 
-                <Divider class="my-0" />
+        <ol :aria-label="`Shifts in ${template.name}`" class="flex flex-wrap items-center gap-1.5">
+            <li v-for="(shift, index) in shifts" :key="shift.id" class="inline-flex items-center gap-1.5">
+                <span
+                    class="inline-flex h-7 items-center rounded-md bg-surface-100 px-2.5 text-xs font-semibold text-surface-700 dark:bg-surface-800 dark:text-surface-100"
+                >
+                    {{ shift.shiftName }}
+                </span>
+                <!-- Separator after the chip, so a wrapped line ends with "·" instead of starting with it -->
+                <span v-if="index < shifts.length - 1" aria-hidden="true" class="text-surface-500 dark:text-surface-300"
+                    >·</span
+                >
+            </li>
+        </ol>
 
-                <div class="flex justify-between items-center mt-3">
-                    <div class="flex items-center text-sm text-muted-color">
-                        <i class="pi pi-calendar mr-2"></i>
-                        {{ props.template.shifts?.length || 0 }} Shifts
-                    </div>
-                    <Button
-                        class="p-button-sm"
-                        :icon="showDetail ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-                        icon-pos="right"
-                        :label="showDetail ? 'Hide details' : 'View details'"
-                        variant="text"
-                        @click="showDetail = !showDetail"
-                    />
-                </div>
+        <div
+            class="mt-auto flex justify-center gap-3 border-t border-surface-100 pt-3.5 text-[13px] text-surface-600 dark:border-surface-800 dark:text-surface-200"
+        >
+            <Button
+                v-if="isAdmin"
+                class="h-9 bg-surface-0 text-sm dark:bg-surface-900"
+                label="Use template"
+                outlined
+                severity="secondary"
+                @click="emit('use')"
+            />
+        </div>
 
-                <transition name="p-toggleable-content">
-                    <div v-if="showDetail" class="mt-4 pt-4 border-t border-dashed border-surface">
-                        <ul class="space-y-2">
-                            <li
-                                v-for="shift in props.template.shifts"
-                                :key="shift.id"
-                                class="flex items-center justify-between p-2 bg-surface-50 dark:bg-surface-800 rounded-md border border-surface gap-3"
-                            >
-                                <div class="flex items-center min-w-0 flex-1 gap-1">
-                                    <i class="pi pi-clock mr-2 text-blue-500 text-sm"></i>
-                                    <span class="text-sm font-medium text-muted-color truncate">
-                                        {{ shift.shiftName }}
-                                    </span>
-                                </div>
-
-                                <div class="flex-shrink-0 w-40 h-8">
-                                    <Select
-                                        v-model="shift.shiftGroupId"
-                                        class="w-full h-8 text-xs flex items-center border-surface"
-                                        :disabled="!authStore.can([Role.Admin, Role.Owner])"
-                                        option-label="name"
-                                        option-value="id"
-                                        :options="shiftGroups"
-                                        placeholder="Assign..."
-                                        show-clear
-                                        @change="(e) => handleGroupChange(shift.id, e.value)"
-                                    >
-                                        <template #value="slotProps">
-                                            <div
-                                                v-if="slotProps.value"
-                                                class="flex items-center gap-2 text-xs truncate"
-                                            >
-                                                <span class="truncate">{{ getGroupName(slotProps.value) }}</span>
-                                            </div>
-                                            <span v-else class="text-xs text-surface-400 dark:text-surface-500"
-                                                >Assign...</span
-                                            >
-                                        </template>
-
-                                        <template #option="slotProps">
-                                            <div class="flex items-center gap-2 text-xs">
-                                                <div
-                                                    class="w-2 h-2 rounded-full flex-shrink-0"
-                                                    :style="{ backgroundColor: slotProps.option.color || '#cbd5e1' }"
-                                                ></div>
-                                                <span class="truncate">{{ slotProps.option.name }}</span>
-                                            </div>
-                                        </template>
-                                    </Select>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </transition>
+        <Menu :id="`template-menu-${template.id}`" ref="menu" :model="menuItems" popup>
+            <template #item="{ item, props: itemProps }">
+                <a v-bind="itemProps.action" :class="['gap-2', item.danger ? 'text-red-700 dark:text-red-300' : '']">
+                    <span>{{ item.label }}</span>
+                </a>
             </template>
-        </Card>
-    </div>
-
-    <RosterTemplateDelete
-        :open="openDialog === 'Delete'"
-        :template-id="props.template.id"
-        @close="openDialog = 'None'"
-    />
-    <RosterTemplateUseDialog
-        :name="props.template.name"
-        :open="openDialog === 'Roster'"
-        :shifts="props.template.shifts.map((s) => s.shiftName)"
-        :template-id="props.template.id"
-        @close="openDialog = 'None'"
-    />
-    <RosterTemplatePreferences
-        :open="openDialog === 'Preferences'"
-        :template="props.template"
-        @close="openDialog = 'None'"
-    />
+        </Menu>
+        <RosterTemplatePreferences
+            :template="template"
+            :visible="activeDialog === 'preferences'"
+            @update:visible="closeDialog"
+        />
+        <TemplateShiftGroupsDialog
+            :shift-groups="shiftGroups"
+            :template="template"
+            :visible="activeDialog === 'shift-groups'"
+            @update:visible="closeDialog"
+        />
+    </article>
 </template>
-
-<style scoped></style>
