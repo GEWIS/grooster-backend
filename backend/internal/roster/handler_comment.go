@@ -2,6 +2,7 @@ package roster
 
 import (
 	"GEWIS-Rooster/internal/models"
+	"GEWIS-Rooster/internal/platform/middleware"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -40,7 +41,7 @@ func (h *Handler) CreateRosterComment(c *gin.Context) {
 		return
 	}
 
-	callerID, exists := c.Get("userID")
+	callerID, exists := c.Get(middleware.UserIDKey)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return

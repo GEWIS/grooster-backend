@@ -30,7 +30,7 @@ type Service interface {
 	GetShiftGroupPriorities(groupID uint) ([]*models.ShiftGroupPriority, error)
 	UpdateShiftGroupPriority(groupID uint, params GroupPriorityUpdateParam) (*models.ShiftGroupPriority, error)
 
-	GetRosterResponsibles(rosterID uint) ([]*models.RosterResponsible, error) 
+	GetRosterResponsibles(rosterID uint) ([]*models.RosterResponsible, error)
 	CreateRosterResponsible(rosterID uint, userID uint) (*models.RosterResponsible, error)
 	DeleteRosterResponsible(rosterID uint, userID uint) error
 }

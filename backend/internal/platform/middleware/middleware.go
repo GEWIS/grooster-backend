@@ -1,3 +1,5 @@
+// Package middleware contains Gin middleware for authentication and
+// request logging.
 package middleware
 
 import (
@@ -14,6 +16,10 @@ import (
 	"os"
 	"strings"
 )
+
+// UserIDKey is the gin.Context key under which the authenticated user's
+// database ID is stored. The value is always a uint (models.User.ID).
+const UserIDKey = "userID"
 
 var (
 	verifier *oidc.IDTokenVerifier
@@ -126,7 +132,7 @@ func (a *AuthMiddleware) AuthMiddlewareCheck() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userID", authUser.ID)
+		c.Set(UserIDKey, authUser.ID)
 		c.Next()
 	}
 }

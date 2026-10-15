@@ -168,7 +168,7 @@ type ShiftOrderingOverride struct {
 type RosterComment struct {
 	BaseModel
 
-	RosterID uint `json:"rosterId" gorm:"not null;uniqueIndex:idx_roster_comment_user"`
+	RosterID uint   `json:"rosterId" gorm:"not null;uniqueIndex:idx_roster_comment_user"`
 	Roster   Roster `json:"-" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
 
 	UserID uint `json:"userId" gorm:"not null;uniqueIndex:idx_roster_comment_user"`
@@ -180,7 +180,7 @@ type RosterComment struct {
 type RosterResponsible struct {
 	BaseModel
 
-	RosterID uint `json:"rosterId" gorm:"not null;uniqueIndex:idx_roster_responsible"`
+	RosterID uint   `json:"rosterId" gorm:"not null;uniqueIndex:idx_roster_responsible"`
 	Roster   Roster `json:"-" gorm:"foreignKey:RosterID;constraint:OnDelete:CASCADE;"`
 
 	UserID uint `json:"userId" gorm:"not null;uniqueIndex:idx_roster_responsible"`

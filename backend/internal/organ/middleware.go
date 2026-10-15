@@ -2,6 +2,7 @@ package organ
 
 import (
 	"GEWIS-Rooster/internal/models"
+	"GEWIS-Rooster/internal/platform/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -15,7 +16,7 @@ func requireRosterOrganMemberRoleParam(db *gorm.DB, minRole models.OrganRole) gi
 			return
 		}
 
-		val, exists := c.Get("userID")
+		val, exists := c.Get(middleware.UserIDKey)
 		if !exists {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "user not authenticated"})
 			return

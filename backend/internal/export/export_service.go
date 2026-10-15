@@ -64,9 +64,9 @@ func (e *service) AssignmentsToPng(rosterID uint) ([]byte, error) {
 	}
 
 	sort.Slice(savedShifts, func(i, j int) bool {
-    	oi, oj := savedShifts[i].RosterShift.Order, savedShifts[j].RosterShift.Order
-    	if oi != oj {
-        	return oi < oj
+		oi, oj := savedShifts[i].RosterShift.Order, savedShifts[j].RosterShift.Order
+		if oi != oj {
+			return oi < oj
 		}
 		return savedShifts[i].RosterShift.ID < savedShifts[j].RosterShift.ID
 	})
