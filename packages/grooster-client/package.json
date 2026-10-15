@@ -7,7 +7,7 @@
     "dist/"
   ],
   "repository": {
-    "url": "git+https://github.com/GEWIS/grooster-backend.git",
+    "url": "git+https://github.com/GEWIS/grooster.git",
     "type": "git",
     "directory": "packages/grooster-client"
   },
