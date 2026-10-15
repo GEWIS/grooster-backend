@@ -2,13 +2,14 @@ package roster
 
 import (
 	"GEWIS-Rooster/internal/models"
+	"GEWIS-Rooster/internal/platform/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
 )
 
 func checkAccess(c *gin.Context, db *gorm.DB, organID interface{}, minRole models.OrganRole) {
-	userID, exists := c.Get("userID")
+	userID, exists := c.Get(middleware.UserIDKey)
 	if !exists {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return

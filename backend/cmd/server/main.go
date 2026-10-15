@@ -10,6 +10,7 @@ import (
 	"GEWIS-Rooster/internal/roster"
 	"GEWIS-Rooster/internal/user"
 	"database/sql"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -17,7 +18,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -29,12 +29,16 @@ import (
 // @in							header
 // @name						Authorization
 func main() {
-	log.Print("Starting server")
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+	slog.SetDefault(logger)
 
 	if _, err := os.Stat(".env"); err == nil {
-		log.Print("Loading .env file")
+		logger.Info("Loading .env file")
 		if err := godotenv.Load(); err != nil {
-			log.Fatal().Msgf("Error loading .env file: %v", err)
+			logger.Error("Error loading .env file", "err", err)
+			os.Exit(1)
 		}
 	}
 
@@ -48,11 +52,11 @@ func main() {
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
-			log.Print("failed to close database connection", err)
+			logger.Error("failed to close database connection", "err", err)
 		}
 	}(sqlDB)
 
-	log.Print("Connecting to database")
+	logger.Info("Connecting to database")
 
 	r := gin.Default()
 
@@ -63,7 +67,8 @@ func main() {
 	}
 
 	if len(origins) == 0 {
-		log.Fatal().Msg("No ORIGINS provided")
+		logger.Error("No ORIGINS provided")
+		os.Exit(1)
 	}
 
 	r.Use(cors.New(cors.Config{
@@ -82,6 +87,9 @@ func main() {
 
 	m := middleware.AuthMiddleware{}
 	provider, config := m.SetupOIDC()
+
+	logMiddleware := middleware.NewLoggingMiddleware()
+	api.Use(logMiddleware.LogMiddleware())
 
 	authVerifier := provider.Verifier(&oidc.Config{ClientID: os.Getenv("CLIENT_ID"), SkipClientIDCheck: true})
 	authService := auth.NewAuthService(userService, db, authVerifier)
@@ -104,6 +112,6 @@ func main() {
 	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	if err := r.Run(":8080"); err != nil {
-		log.Print("Server error", err)
+		logger.Error("Server error", "err", err)
 	}
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"GEWIS-Rooster/internal/models"
+	"GEWIS-Rooster/internal/platform/middleware"
 	"GEWIS-Rooster/internal/user"
 	"context"
 	"crypto/rand"
@@ -81,7 +82,7 @@ func (s *service) HandleLocalAuthentication(ctx *gin.Context) (string, error) {
 		return "", err
 	}
 
-	ctx.Set("userID", localUser.ID)
+	ctx.Set(middleware.UserIDKey, localUser.ID)
 
 	return jwtToken, nil
 }
