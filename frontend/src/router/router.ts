@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
-import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalizedGeneric } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import RosterView from '@/views/RosterView.vue';
 import OrganView from '@/views/OrganView.vue';
 import { getGEWISId, isAuthenticated, loginRedirect } from '@/helpers/TokenHelper';
@@ -15,20 +15,20 @@ const routes: RouteRecordRaw[] = [
         path: '/rosters/:id',
         name: 'rosters',
         component: RosterView,
-        beforeEnter: handleOrganAccess,
+        meta: { requireOrgan: true },
     },
     {
         path: '/templates/:id',
         name: 'templates',
         component: RosterTemplateView,
-        beforeEnter: handleOrganAccess,
+        meta: { requireOrgan: true },
     },
     { path: '/callback', component: OrganView },
     {
         path: '/organ/:id/profile',
         name: 'profile',
         component: OrganMemberSettings,
-        beforeEnter: handleOrganAccess,
+        meta: { requireOrgan: true },
     },
 ];
 
@@ -63,46 +63,29 @@ router.beforeEach(async (to, from) => {
         if (gewisId) {
             await userStore.fetchUser(gewisId);
         }
+
+        // Runs on every navigation (including param-only changes like /rosters/1 -> /rosters/2),
+        // which per-route beforeEnter guards do not.
+        if (to.meta.requireOrgan) {
+            const id = parseInt(to.params.id as string);
+            const user = userStore.getUser;
+            const organ = user?.organs.find((org) => org.id === id);
+
+            if (isNaN(id) || !organ) {
+                return '/';
+            }
+
+            if (organStore.getOrgan !== id) {
+                rosterStore.clearRosters();
+            }
+            organStore.setOrgan(id, organ.name);
+        }
+
         return true;
     } else {
         loginRedirect();
         return false;
     }
 });
-
-/**
- * Reusable guard to ensure the organ store is set and user has access
- */
-function handleOrganAccess(
-    to: RouteLocationNormalizedGeneric,
-    from: RouteLocationNormalizedGeneric,
-    next: NavigationGuardNext,
-) {
-    const organStore = useOrganStore();
-    const userStore = useUserStore();
-
-    const id = parseInt(to.params.id as string);
-
-    if (isNaN(id)) {
-        return next('/');
-    }
-
-    const user = userStore.getUser;
-
-    if (!user) {
-        return next('/');
-    }
-
-    const organ = user.organs.find((org) => org.id === id);
-
-    if (!organ) {
-        return next('/');
-    }
-
-    organStore.setOrgan(id, organ.name);
-    const rosterStore = useRosterStore();
-    rosterStore.clearRosters();
-    next();
-}
 
 export default router;
