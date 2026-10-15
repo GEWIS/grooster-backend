@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+  install:
+    desc: Install all Go and npm dependencies
+    deps: [install:backend, install:frontend]
+
+  install:backend:
+    dir: backend
+    cmd: go mod download
+    sources:
+      - go.mod
+      - go.sum
+
+  install:frontend:
+    dir: frontend
+    cmd: npm ci
+    sources:
+      - package.json
+      - package-lock.json
+    generates:
+      - node_modules/.package-lock.json
+  seed:
+    desc: Seed database
+    cmds:
+      - cd backend && go run cmd/seeder/main.go 
+
+  dev:
+    desc: Run backend and frontend dev servers
+    deps: [dev:backend, dev:frontend]
+
+  dev:backend:
+    dir: backend
+    cmd: go run cmd/server/main.go
+
+  dev:frontend:
+    dir: frontend
+    cmd: npm run dev
