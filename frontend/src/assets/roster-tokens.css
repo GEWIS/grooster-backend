@@ -14,16 +14,16 @@
      Each pair also has its own icon, so colour is never the only signal. */
     --color-pref-none: #ffffff;
     --color-pref-none-fg: #66716c;
-    --color-pref-prefer: #dcefe3;
+    --color-pref-prefer: #a6d9b8;
     --color-pref-prefer-fg: #125a35;
     --color-pref-ok: #eef1ef;
     --color-pref-ok-fg: #3f4a45;
-    --color-pref-avoid: #fbeccf;
+    --color-pref-avoid: #f2c97a;
     --color-pref-avoid-fg: #744600;
-    --color-pref-no: #f9dedb;
-    --color-pref-no-fg: #912a21;
+    --color-pref-no: #eba59d;
+    --color-pref-no-fg: #7a1f17;
     /* Our backend letters: J = prefer (green), X = avoid (amber), N = no (red), L = purple, S = rainbow, B = beer */
-    --color-pref-l: #ece0f6;
+    --color-pref-l: #c9a8e6;
     --color-pref-l-fg: #5b2a86;
     --color-pref-special-fg: #3a2400;
 
